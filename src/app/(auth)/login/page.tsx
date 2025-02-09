@@ -1,7 +1,13 @@
-export default function LoginPage() {
+import LoginForm from "@/components/auth/LoginForm";
+import styles from "./page.module.scss";
+
+const LoginPage = () => {
     return (
-        <div>
-            <h1>Login</h1>
+        <div className={styles.container}>
+            <h1 className={styles.header}>Welcome to Traveling Dog</h1>
+            <LoginForm />
         </div>
     );
-}
+};
+
+export default LoginPage;
