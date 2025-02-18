@@ -4,7 +4,7 @@ import { useState } from "react";
 import styles from "@/styles/auth/LoginForm.module.scss";
 import Airplane from "@/components/animations/Airplane";
 import { useRouter } from "next/navigation";
-
+import { useAuthAction } from "@/recoil/actions/auth";
 const LoginForm = () => {
     const router = useRouter();
     const [email, setEmail] = useState("");
@@ -16,6 +16,8 @@ const LoginForm = () => {
     const [formError, setFormError] = useState("");
 
     const [isFlying, setIsFlying] = useState(false);
+
+    const { login } = useAuthAction();
 
     const validateEmail = (value: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -46,7 +48,12 @@ const LoginForm = () => {
         }
     };
 
-    const handleLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const submitLogin = async () => {
+        const base64Auth = Buffer.from(`${email}:${password}`).toString("base64");
+        await login(base64Auth);
+    };
+
+    const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
         let valid = true;
@@ -65,10 +72,11 @@ const LoginForm = () => {
             return;
         }
 
-        handleAirplane().then(() => {
-            setFormError("");
-            router.push("/");
-        });
+        await submitLogin();
+        setFormError("");
+
+        await handleAirplane();
+        router.push("/");
     };
 
     const handleAirplane = () => {

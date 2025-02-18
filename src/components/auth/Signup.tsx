@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import styles from "@/styles/auth/SignupForm.module.scss";
+import { useAuthAction } from "@/recoil/actions/auth";
+import { useRouter } from "next/navigation";
 
 const Signup = () => {
+    const router = useRouter();
     const [email, setEmail] = useState("");
     const [emailError, setEmailError] = useState("");
 
@@ -14,6 +17,8 @@ const Signup = () => {
     const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
     const [formError, setFormError] = useState("");
+
+    const { signup } = useAuthAction();
 
     const validateEmail = (value: string) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -60,7 +65,18 @@ const Signup = () => {
         }
     };
 
-    const handleSignup = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const submitSignup = async () => {
+        try {
+            // base64로 인코딩하여 basic auth로 로그인
+            const base64Auth = Buffer.from(`${email}:${password}`).toString("base64");
+            await signup(base64Auth);
+        } catch (error) {
+            console.log(error);
+            setFormError("invalid input");
+        }
+    };
+
+    const handleSignup = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         let valid = true;
 
@@ -82,9 +98,9 @@ const Signup = () => {
             return;
         }
 
+        await submitSignup();
         setFormError("");
-        // 유효성 검사를 통과하면 홈페이지로 리다이렉션
-        window.location.href = "/";
+        router.push("/");
     };
 
     return (
