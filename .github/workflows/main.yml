@@ -21,11 +21,11 @@ jobs:
 
             - name: Build Docker image
               run: |
-                  docker build --no-cache -f Dockerfile.development -t dmdmdm1322/travelingdog-frontend:latest .
+                  docker build --no-cache -f Dockerfile.development -t dmdmdm1322/travelingdog-dev-frontend:latest .
 
             - name: Push Docker image to Docker Hub
               run: |
-                  docker push dmdmdm1322/travelingdog-frontend:latest
+                  docker push dmdmdm1322/travelingdog-dev-frontend:latest
 
             - name: Install sshpass
               run: sudo apt-get install sshpass
@@ -33,7 +33,7 @@ jobs:
             - name: Deploy to Azure VM
               run: |
                   sshpass -p "${{ secrets.AZURE_SSH_PASS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.AZURE_SSH_USER }}@${{ secrets.AZURE_VM_IP }} << 'EOF'
-                  docker pull dmdmdm1322/travelingdog-frontend:latest
+                  docker pull dmdmdm1322/travelingdog-dev-frontend:latest
                   docker-compose down
                   docker-compose up -d
                   EOF

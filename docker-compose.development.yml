@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+    app:
+        image: dmdmdm1322/travelingdog-dev-frontend:latest # 생성할 이미지 이름
+        container_name: travelingdog-dev-frontend
+        environment:
+            - NODE_ENV=development
+        ports:
+            - "3000:3000"

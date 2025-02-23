@@ -1,0 +1,36 @@
+# 1단계: 빌드 이미지 생성
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+# 의존성 설치를 위해 package.json (및 package-lock.json이 존재한다면 함께) 복사
+COPY package.json package-lock.json* ./
+
+# 전체 의존성을 설치 (devDependencies 포함)
+RUN npm install
+
+# 애플리케이션 소스 코드 전체 복사
+COPY . .
+
+# Next.js 애플리케이션 빌드
+RUN npm run build
+
+# 2단계: 프로덕션용 최종 이미지 생성
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+# 개발 환경 변수 설정
+ENV NODE_ENV=development
+
+# 필요한 의존성만 설치
+COPY package.json package-lock.json* ./
+RUN npm install --only=production
+
+# 빌드된 결과물 및 정적 파일 복사
+COPY --from=builder /app/.next .next
+COPY --from=builder /app/public public
+
+# 컨테이너가 사용할 포트 노출
+EXPOSE 3000
+
+# 컨테이너 시작 시 애플리케이션 실행 명령어
+CMD ["npm", "run", "start"]
