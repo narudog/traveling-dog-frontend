@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./page.module.scss";
 import SearchSection from "@/components/landing/SearchSection";
+import PolylineMap from "@/components/map/PolylineMap";
 
 export default function Home() {
     return (
@@ -33,7 +34,7 @@ export default function Home() {
                         <SearchSection />
                     </div>
                     <div className={styles.heroImage}>
-                        <Image src="/images/hero-travel.png" alt="Travel Planning" width={600} height={400} priority />
+                        <PolylineMap />
                     </div>
                 </section>
 

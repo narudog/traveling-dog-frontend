@@ -129,4 +129,20 @@ describe("Home Page", () => {
     //         expect(searchBox).toHaveStyle({ flexDirection: "column" });
     //     });
     // });
+
+    describe("PolylineMap 기능", () => {
+        it("지도 컴포넌트가 성공적으로 렌더링되어야 합니다", async () => {
+            render(<Home />);
+
+            // Leaflet 지도 컨테이너가 렌더링되는지 확인
+            const mapElement = await screen.findByRole("region");
+            expect(mapElement).toBeInTheDocument();
+            expect(mapElement).toHaveClass("leaflet-container");
+
+            // Polyline이 렌더링되는지 확인 (SVG path 요소로 렌더링됨)
+            const polyline = document.querySelector("path");
+            expect(polyline).toBeInTheDocument();
+            expect(polyline).toHaveAttribute("stroke", "blue");
+        });
+    });
 });
