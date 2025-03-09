@@ -1,10 +1,17 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import LoginPage from "../../../(auth)/login/page";
 import { describe, it, expect } from "@jest/globals";
+import { RecoilRoot } from "recoil";
+import React, { ReactElement } from "react";
+
+// 테스트용 렌더링 함수
+const renderWithRecoil = (ui: ReactElement) => {
+    return render(<RecoilRoot>{ui}</RecoilRoot>);
+};
 
 describe("Login Page", () => {
     it("페이지 헤더 및 폼 렌더링 확인", () => {
-        render(<LoginPage />);
+        renderWithRecoil(<LoginPage />);
 
         expect(
             screen.getByRole("heading", {
@@ -19,13 +26,13 @@ describe("Login Page", () => {
     });
 
     // it("소셜 로그인 버튼 존재 확인", () => {
-    //     render(<LoginPage />);
+    //     renderWithRecoil(<LoginPage />);
     //     expect(screen.getByRole("button", { name: /continue with google/i })).toBeInTheDocument();
     //     expect(screen.getByRole("button", { name: /continue with github/i })).toBeInTheDocument();
     // });
 
     it("이메일 입력 필드 유효성 검사 확인", async () => {
-        render(<LoginPage />);
+        renderWithRecoil(<LoginPage />);
         const emailInput = screen.getByLabelText(/email/i);
         // 처음에는 에러 메시지가 보이지 않아야 함
         expect(screen.queryByText(/invalid email/i)).toBeNull();
@@ -38,7 +45,7 @@ describe("Login Page", () => {
     });
 
     it("비밀번호 입력 필드 유효성 검사 확인", async () => {
-        render(<LoginPage />);
+        renderWithRecoil(<LoginPage />);
         const passwordInput = screen.getByLabelText(/password/i);
 
         // 처음에는 에러 메시지가 보이지 않아야 함
@@ -52,7 +59,7 @@ describe("Login Page", () => {
     });
 
     it("로그인 버튼 클릭 시 유효성 에러 확인", async () => {
-        render(<LoginPage />);
+        renderWithRecoil(<LoginPage />);
         const loginButton = screen.getByRole("button", { name: /sign in/i });
         const emailInput = screen.getByLabelText(/email/i);
         const passwordInput = screen.getByLabelText(/password/i);
@@ -70,7 +77,7 @@ describe("Login Page", () => {
     });
 
     // it("소셜 로그인 버튼 클릭 시 리다이렉션 확인", () => {
-    //     render(<LoginPage />);
+    //     renderWithRecoil(<LoginPage />);
     //     const googleLoginButton = screen.getByRole("button", { name: /continue with google/i });
     //     const githubLoginButton = screen.getByRole("button", { name: /continue with github/i });
 
@@ -82,7 +89,7 @@ describe("Login Page", () => {
     // });
 
     it("로그인 버튼 클릭 시 리다이렉션 확인", () => {
-        render(<LoginPage />);
+        renderWithRecoil(<LoginPage />);
         const loginButton = screen.getByRole("button", { name: /sign in/i });
         const emailInput = screen.getByLabelText(/email/i);
         const passwordInput = screen.getByLabelText(/password/i);
