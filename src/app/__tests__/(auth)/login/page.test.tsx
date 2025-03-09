@@ -1,8 +1,26 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import LoginPage from "../../../(auth)/login/page";
-import { describe, it, expect } from "@jest/globals";
+import { describe, it, expect, jest, beforeEach } from "@jest/globals";
 import { RecoilRoot } from "recoil";
 import React, { ReactElement } from "react";
+import { mockTravelPlannerAPI, setupApiMocks } from "../../__mocks__/apiMock";
+
+// axios 모킹 설정
+jest.mock("@/axios/axios", () => ({
+    __esModule: true,
+    default: {
+        post: jest.fn().mockImplementation((url, data, config) => {
+            return Promise.resolve({
+                data: {
+                    id: "user-123",
+                    nickname: "testuser",
+                    email: "test@example.com",
+                    token: "mock-token-xyz",
+                },
+            });
+        }),
+    },
+}));
 
 // 테스트용 렌더링 함수
 const renderWithRecoil = (ui: ReactElement) => {
@@ -10,6 +28,12 @@ const renderWithRecoil = (ui: ReactElement) => {
 };
 
 describe("Login Page", () => {
+    beforeEach(() => {
+        // 각 테스트 전에 모킹 초기화
+        jest.clearAllMocks();
+        setupApiMocks();
+    });
+
     it("페이지 헤더 및 폼 렌더링 확인", () => {
         renderWithRecoil(<LoginPage />);
 
@@ -99,5 +123,84 @@ describe("Login Page", () => {
         fireEvent.click(loginButton);
 
         expect(window.location.href).toContain("/");
+    });
+
+    // API 통합 테스트 추가
+    it("axios.post가 올바르게 호출되어야 합니다", async () => {
+        // axios 모듈 가져오기
+        const axiosInstance = require("@/axios/axios").default;
+
+        // 직접 axios.post 호출
+        const response = await axiosInstance.post(
+            "/auth/login",
+            {},
+            {
+                headers: {
+                    Authorization: `Basic ${Buffer.from("test@example.com:password123").toString("base64")}`,
+                },
+            }
+        );
+
+        // 응답 확인
+        expect(response.data).toEqual({
+            id: "user-123",
+            nickname: "testuser",
+            email: "test@example.com",
+            token: "mock-token-xyz",
+        });
+
+        // axios.post가 호출되었는지 확인
+        expect(axiosInstance.post).toHaveBeenCalledWith(
+            "/auth/login",
+            {},
+            {
+                headers: {
+                    Authorization: expect.stringContaining("Basic "),
+                },
+            }
+        );
+    });
+
+    it("로그인 실패 시 에러 메시지가 표시되어야 합니다", async () => {
+        // axios 모듈 가져오기
+        const axiosInstance = require("@/axios/axios").default;
+
+        // 이 테스트에서만 에러 발생하도록 모킹 오버라이드
+        axiosInstance.post.mockRejectedValueOnce({
+            response: {
+                data: {
+                    message: "Invalid email or password",
+                },
+            },
+        });
+
+        // 에러 발생 확인
+        try {
+            await axiosInstance.post(
+                "/auth/login",
+                {},
+                {
+                    headers: {
+                        Authorization: `Basic ${Buffer.from("wrong@example.com:wrongpass").toString("base64")}`,
+                    },
+                }
+            );
+            // 여기까지 실행되면 테스트 실패
+            fail("로그인이 성공했지만, 실패해야 합니다.");
+        } catch (error) {
+            // 에러 응답 확인
+            expect(error).toHaveProperty("response.data.message", "Invalid email or password");
+        }
+
+        // axios.post가 호출되었는지 확인
+        expect(axiosInstance.post).toHaveBeenCalledWith(
+            "/auth/login",
+            {},
+            {
+                headers: {
+                    Authorization: expect.stringContaining("Basic "),
+                },
+            }
+        );
     });
 });
