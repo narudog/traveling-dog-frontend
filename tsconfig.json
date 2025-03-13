@@ -28,8 +28,7 @@
             "@constants/*": ["./src/constants/*"],
             "@services/*": ["./src/services/*"]
         },
-        "types": ["jest", "@testing-library/jest-dom"]
     },
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next.config.js", "jest-setup.ts", "src/app/__tests__/__mocks__/reactLeafletMock.js"],
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next.config.js"],
     "exclude": ["node_modules"]
 }
