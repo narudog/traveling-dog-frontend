@@ -21,7 +21,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build --no-cache -f Dockerfile.development -t ${{ secrets.DOCKER_USERNAME }}/travelingdog-dev-frontend:latest .
+          docker build --no-cache -f Dockerfile.development \
+                    --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}" \
+                    --build-arg NEXT_PUBLIC_GOOGLE_MAPS_ID="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_ID }}" \
+                    -t ${{ secrets.DOCKER_USERNAME }}/travelingdog-dev-frontend:latest .
 
       - name: Push Docker image to Docker Hub
         run: |
