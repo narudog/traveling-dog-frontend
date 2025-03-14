@@ -220,7 +220,7 @@ export default function PolylineMap() {
   const [showDirectRoute, setShowDirectRoute] = useState(false);
 
   return (
-    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}>
+    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}>
       <Map
         defaultCenter={defaultPosition}
         defaultZoom={7}

@@ -2,17 +2,17 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 
-# 의존성 설치를 위해 package.json (및 package-lock.json이 존재한다면 함께) 복사
+# 의존성 설치를 위해 package.json 복사
 COPY package.json package-lock.json* ./
 
-# 전체 의존성을 설치 (devDependencies 포함)
+# 전체 의존성을 설치
 RUN npm install
 
 # 애플리케이션 소스 코드 전체 복사
 COPY . .
 
 # Next.js 애플리케이션 빌드
-RUN npm run build
+RUN npm run build:dev
 
 # 2단계: 프로덕션용 최종 이미지 생성
 FROM node:18-alpine AS runner
