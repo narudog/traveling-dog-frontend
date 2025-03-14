@@ -33,10 +33,9 @@ jobs:
       - name: Deploy to Azure VM
         run: |
           sshpass -p "${{ secrets.AZURE_SSH_PASS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.AZURE_SSH_USER }}@${{ secrets.AZURE_VM_IP }} << 'EOF'
-          echo "export NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}" >> ~/.bashrc
-          echo "export NEXT_PUBLIC_GOOGLE_MAPS_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_ID }}" >> ~/.bashrc
-          source ~/.bashrc
           docker pull ${{ secrets.DOCKER_USERNAME }}/travelingdog-dev-frontend:latest
           docker-compose down
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}" \
+          NEXT_PUBLIC_GOOGLE_MAPS_ID="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_ID }}" \
           docker-compose up -d
           EOF
