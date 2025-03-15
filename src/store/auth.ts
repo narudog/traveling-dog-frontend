@@ -15,7 +15,7 @@ interface AuthActions {
   logout: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  signup: (base64Auth: string) => Promise<void>;
+  signup: (nickname: string, email: string, password: string) => Promise<void>;
 }
 
 // 스토어 생성
@@ -26,19 +26,15 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
   loading: false,
   error: null,
 
-  signup: async (base64Auth: string) => {
+  signup: async (nickname: string, email: string, password: string) => {
     set({ loading: true, error: null });
     try {
       // 헤더 정보는 세 번째 인자로 전달
-      const response = await axiosInstance.post(
-        "/auth/signup",
-        {},
-        {
-          headers: {
-            Authorization: `Basic ${base64Auth}`,
-          },
-        }
-      );
+      const response = await axiosInstance.post("/auth/signup", {
+        nickname,
+        email,
+        password,
+      });
       // 성공 시 결과 저장
       set({ user: response.data, loading: false, error: null });
       return response.data;
