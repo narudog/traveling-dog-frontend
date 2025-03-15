@@ -1,156 +1,114 @@
 "use client";
 
-import { useAuthStore } from "@/store/auth";
-import styles from "@/styles/auth/SignupForm.module.scss";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import styles from "@/styles/auth/SignupForm.module.scss";
 
-const SignupForm = () => {
+export default function SignupForm() {
     const router = useRouter();
-
-    const [nickname, setNickname] = useState("");
-    const [nicknameError, setNicknameError] = useState("");
-
+    const { update } = useSession();
     const [email, setEmail] = useState("");
-    const [emailError, setEmailError] = useState("");
-
     const [password, setPassword] = useState("");
-    const [passwordError, setPasswordError] = useState("");
-
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [confirmPasswordError, setConfirmPasswordError] = useState("");
+    const [nickname, setNickname] = useState("");
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
-    const [formError, setFormError] = useState("");
-
-    const auth = useAuthStore();
-
-    const validateEmail = (value: string) => {
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(value);
+    const validateEmail = (email: string) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
     };
 
-    const validatePassword = (value: string) => {
-        return value.length >= 8;
-    };
-
-    const validateNickname = (value: string) => {
-        return value.length >= 2;
-    };
-
-    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setEmail(value);
-        if (!validateEmail(value)) {
-            setEmailError("invalid email");
-        } else {
-            setEmailError("");
-        }
-    };
-
-    const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setNickname(value);
-        if (!validateNickname(value)) {
-            setNicknameError("invalid nickname");
-        } else {
-            setNicknameError("");
-        }
-    };
-
-    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setPassword(value);
-        if (!validatePassword(value)) {
-            setPasswordError("invalid password");
-        } else {
-            setPasswordError("");
-        }
-        // 비밀번호 변경 시, 비밀번호 확인 필드도 체크
-        if (confirmPassword && value !== confirmPassword) {
-            setConfirmPasswordError("passwords do not match");
-        } else {
-            setConfirmPasswordError("");
-        }
-    };
-
-    const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setConfirmPassword(value);
-        if (password !== value) {
-            setConfirmPasswordError("passwords do not match");
-        } else {
-            setConfirmPasswordError("");
-        }
-    };
-
-    const submitSignup = async () => {
-        try {
-            await auth.signup(nickname, email, password);
-        } catch (error) {
-            setFormError("invalid input");
-        }
-    };
-
-    const handleSignup = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        let valid = true;
+        setError("");
 
-        if (!validateNickname(nickname)) {
-            setNicknameError("invalid nickname");
-            valid = false;
-        }
-
-        if (!validateEmail(email)) {
-            setEmailError("invalid email");
-            valid = false;
-        }
-        if (!validatePassword(password)) {
-            setPasswordError("invalid password");
-            valid = false;
-        }
-        if (password !== confirmPassword) {
-            setConfirmPasswordError("passwords do not match");
-            valid = false;
-        }
-
-        if (!valid) {
-            setFormError("invalid input");
+        // 유효성 검사
+        if (!email || !password || !confirmPassword || !nickname) {
+            setError("모든 필드를 입력해주세요.");
             return;
         }
 
-        await submitSignup();
-        setFormError("");
-        router.push("/");
+        if (!validateEmail(email)) {
+            setError("유효한 이메일 주소를 입력해주세요.");
+            return;
+        }
+
+        if (password.length < 8) {
+            setError("비밀번호는 8자 이상이어야 합니다.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+
+            // 회원가입 API 호출
+            const response = await fetch("/api/auth/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                    nickname,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "회원가입에 실패했습니다.");
+            }
+
+            // 세션 업데이트 (회원가입 API에서 이미 세션 쿠키를 설정했으므로)
+            await update();
+
+            // 홈페이지로 리다이렉트
+            router.push("/");
+            router.refresh(); // 세션 상태 갱신
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={handleSubmit}>
+            <h1>회원가입</h1>
+
             <div className={styles.inputGroup}>
-                <label htmlFor="nickname">Nickname</label>
-                <input id="nickname" type="text" value={nickname} onChange={handleNicknameChange} />
-                {nicknameError && <p className={styles.error}>{nicknameError}</p>}
+                <label htmlFor="email">이메일</label>
+                <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
+
             <div className={styles.inputGroup}>
-                <label htmlFor="email">Email</label>
-                <input id="email" type="text" value={email} onChange={handleEmailChange} />
-                {emailError && <p className={styles.error}>{emailError}</p>}
+                <label htmlFor="nickname">닉네임</label>
+                <input id="nickname" type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} required />
             </div>
+
             <div className={styles.inputGroup}>
-                <label htmlFor="password">Password</label>
-                <input id="password" type="password" value={password} onChange={handlePasswordChange} />
-                {passwordError && <p className={styles.error}>{passwordError}</p>}
+                <label htmlFor="password">비밀번호</label>
+                <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
+
             <div className={styles.inputGroup}>
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                <input id="confirmPassword" type="password" value={confirmPassword} onChange={handleConfirmPasswordChange} />
-                {confirmPasswordError && <p className={styles.error}>{confirmPasswordError}</p>}
+                <label htmlFor="confirmPassword">비밀번호 확인</label>
+                <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
             </div>
-            <button type="button" onClick={handleSignup} className={styles.button}>
-                Sign Up
+
+            {error && <p className={styles.error}>{error}</p>}
+
+            <button type="submit" className={styles.button} disabled={isLoading}>
+                {isLoading ? "처리 중..." : "가입하기"}
             </button>
-            {formError && <p className={styles.error}>{formError}</p>}
         </form>
     );
-};
-
-export default SignupForm;
+}
