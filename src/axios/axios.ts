@@ -14,11 +14,14 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        return Promise.resolve(response.data);
+    },
     (error) => {
         if (error.response.status === 401) {
             localStorage.removeItem("token");
         }
+        return Promise.reject(error.response.data);
     }
 );
 
