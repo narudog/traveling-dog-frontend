@@ -5,8 +5,8 @@ import { useAuthStore } from "@/store/auth";
 import styles from "@/styles/auth/LoginForm.module.scss";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { signIn, SignInResponse } from "next-auth/react";
 import { AuthError, SignInResult } from "@/types/auth";
+import axiosInstance from "@/axios/axios";
 function LoginForm() {
     const auth = useAuthStore();
     const router = useRouter();
@@ -69,23 +69,12 @@ function LoginForm() {
         }
 
         try {
-            const result = await signIn("credentials", {
-                email,
-                password,
-                redirect: false,
-            });
+            await auth.login(email, password);
 
-            if (result?.error) {
-                setFormError(result.error);
-                return;
-            }
-
-            if (result?.ok) {
-                setFormError("");
-                await handleAirplane();
-                router.push("/");
-                router.refresh(); // 세션 상태 갱신을 위한 새로고침
-            }
+            setFormError("");
+            await handleAirplane();
+            router.push("/");
+            router.refresh(); // 세션 상태 갱신을 위한 새로고침
         } catch (error) {
             setFormError("로그인 중 오류가 발생했습니다.");
         }

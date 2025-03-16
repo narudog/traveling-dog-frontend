@@ -2,19 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import styles from "@/styles/auth/SignupForm.module.scss";
+import { useAuthStore } from "@/store/auth";
 
 export default function SignupForm() {
     const router = useRouter();
-    const { update } = useSession();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [nickname, setNickname] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-
+    const auth = useAuthStore();
     const validateEmail = (email: string) => {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(email);
@@ -48,27 +47,7 @@ export default function SignupForm() {
         try {
             setIsLoading(true);
 
-            // 회원가입 API 호출
-            const response = await fetch("/api/auth/signup", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email,
-                    password,
-                    nickname,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "회원가입에 실패했습니다.");
-            }
-
-            // 세션 업데이트 (회원가입 API에서 이미 세션 쿠키를 설정했으므로)
-            await update();
+            await auth.signup(email, password, nickname);
 
             // 홈페이지로 리다이렉트
             router.push("/");

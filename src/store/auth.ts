@@ -11,7 +11,7 @@ interface AuthState {
 
 // 액션 인터페이스
 interface AuthActions {
-  login: (base64Auth: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -50,10 +50,11 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
   },
 
   // 액션
-  login: async (base64Auth: string) => {
+  login: async (email: string, password: string) => {
     // API 호출 시작: 로딩 상태 업데이트
     set((prev) => ({ ...prev, loading: true, error: null }));
     try {
+      const base64Auth = Buffer.from(`${email}:${password}`).toString("base64");
       // 헤더 정보는 세 번째 인자로 전달
       const response = await axiosInstance.post(
         "/auth/login",
