@@ -68,19 +68,27 @@ const TravelPlanDetailPage = () => {
             <header className={styles.planDetail__header}>
                 <div className={styles.planDetail__titleArea}>
                     <h1 className={styles.planDetail__title}>{mockTravelPlan.title}</h1>
-                    <div className={styles.planDetail__meta}>
-                        <span className={styles.planDetail__location}>
-                            {mockTravelPlan.country} - {mockTravelPlan.city}
-                        </span>
-                        <span className={styles.planDetail__date}>
-                            {format(new Date(mockTravelPlan.startDate), 'yyyy.MM.dd')} -
-                            {format(new Date(mockTravelPlan.endDate), 'yyyy.MM.dd')}
-                        </span>
-                    </div>
+                    <span className={styles.planDetail__location}>
+                        {mockTravelPlan.country} - {mockTravelPlan.city}
+                    </span>
+                    <span className={styles.planDetail__date}>
+                        {format(new Date(mockTravelPlan.startDate), 'yyyy.MM.dd')} ~ {format(new Date(mockTravelPlan.endDate), 'yyyy.MM.dd')}
+                    </span>
                     <div className={styles.planDetail__stats}>
-                        <span>조회수 {mockTravelPlan.viewCount}</span>
-                        <span>좋아요 {mockTravelPlan.likeCount}</span>
-                        <span>작성자 {mockTravelPlan.nickname}</span>
+                        <div className={styles.planDetail__statsItem}>
+                            <span className={styles.planDetail__statsLabel}>조회수</span>
+                            <span className={styles.planDetail__statsValue}>{mockTravelPlan.viewCount}</span>
+                        </div>
+                        <div className={styles.planDetail__divider}>|</div>
+                        <div className={styles.planDetail__statsItem}>
+                            <span className={styles.planDetail__statsLabel}>좋아요</span>
+                            <span className={styles.planDetail__statsValue}>{mockTravelPlan.likeCount}</span>
+                        </div>
+                        <div className={styles.planDetail__divider}>|</div>
+                        <div className={styles.planDetail__statsItem}>
+                            <span className={styles.planDetail__statsLabel}>작성자</span>
+                            <span className={styles.planDetail__statsValue}>{mockTravelPlan.nickname}</span>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -98,9 +106,8 @@ const TravelPlanDetailPage = () => {
                             <p className={styles.planDetail__locationDesc}>
                                 {location.description}
                             </p>
-                            <div className={styles.planDetail__locationCoords}>
-                                <span>위도: {location.latitude}</span>
-                                <span>경도: {location.longitude}</span>
+                            <div className={styles.planDetail__locationOrder}>
+                                <span>순서: {location.locationOrder}</span>
                             </div>
                         </div>
                     ))}

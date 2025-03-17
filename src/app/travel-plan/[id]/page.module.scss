@@ -4,13 +4,13 @@
     gap: 1rem;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1.5rem;
     background-color: #f8fafc;
 
     &__header {
         background: white;
         border-radius: 12px;
-        padding: 2rem;
+        padding: 1.5rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     }
 
@@ -26,39 +26,42 @@
         color: #1e293b;
     }
 
-    &__meta {
-        display: flex;
-        gap: 1.5rem;
-        color: #64748b;
-        font-size: 1.1rem;
-    }
-
     &__stats {
         display: flex;
-        gap: 1.5rem;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
         color: #64748b;
         font-size: 0.95rem;
+        margin-top: 1rem;
+    }
 
-        span {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+    &__statsItem {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
 
-            &::before {
-                content: '';
-                display: inline-block;
-                width: 6px;
-                height: 6px;
-                background-color: #94a3b8;
-                border-radius: 50%;
-            }
-        }
+    &__statsLabel {
+        color: #94a3b8;
+        font-size: 0.85rem;
+    }
+
+    &__statsValue {
+        color: #1e293b;
+        font-weight: 500;
+    }
+
+    &__divider {
+        color: #e2e8f0;
+        font-weight: 200;
     }
 
     &__locations {
         background: white;
         border-radius: 12px;
-        padding: 2rem;
+        padding: 1.5rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     }
 
@@ -66,7 +69,7 @@
         font-size: 1.5rem;
         font-weight: 600;
         color: #1e293b;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
         padding-bottom: 1rem;
         border-bottom: 2px solid #e2e8f0;
     }
@@ -74,11 +77,11 @@
     &__locationList {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1rem;
     }
 
     &__locationItem {
-        padding: 1.5rem;
+        padding: 1rem;
         border-radius: 8px;
         background-color: #f8fafc;
         border: 1px solid #e2e8f0;
@@ -114,7 +117,7 @@
         line-height: 1.6;
     }
 
-    &__locationCoords {
+    &__locationOrder {
         display: flex;
         gap: 1rem;
         color: #64748b;
