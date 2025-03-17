@@ -2,6 +2,7 @@ import { TravelPlan, PlanStatus } from '@/types/plan';
 import styles from './page.module.scss';
 import { format } from 'date-fns';
 import PolylineMap from '@/components/map/PolylineMap';
+import { getPlanDetail } from '@/app/actions/planActions';
 
 // 임시 데이터 (실제로는 API에서 받아올 예정)
 const mockTravelPlan: TravelPlan = {
@@ -62,7 +63,9 @@ const mockTravelPlan: TravelPlan = {
     updatedAt: '2024-03-15'
 };
 
-const TravelPlanDetailPage = () => {
+const TravelPlanDetailPage = async ({ params }: { params: { id: string } }) => {
+    const travelPlan = await getPlanDetail(params.id);
+
     return (
         <div className={styles.planDetail}>
             <header className={styles.planDetail__header}>

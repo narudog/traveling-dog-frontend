@@ -1,4 +1,4 @@
-import axiosInstance from "@/axios/axios";
+import axiosInstance from "@/lib/axios";
 import { create } from "zustand";
 
 // 인터페이스 정의

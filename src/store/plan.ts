@@ -1,4 +1,4 @@
-import axiosInstance from "@/axios/axios";
+import axiosInstance from "@/lib/axios";
 import { create } from "zustand";
 import { TravelPlan, PlanCreateRequest, PlanUpdateRequest } from "@/types/plan";
 
