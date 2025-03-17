@@ -2,11 +2,10 @@
 
 import Airplane from "@/components/animations/Airplane";
 import { useAuthStore } from "@/store/auth";
-import styles from "@/styles/auth/LoginForm.module.scss";
+import styles from "./LoginForm.module.scss";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AuthError, SignInResult } from "@/types/auth";
-import axiosInstance from "@/axios/axios";
+
 function LoginForm() {
     const auth = useAuthStore();
     const router = useRouter();

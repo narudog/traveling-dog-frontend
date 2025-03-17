@@ -1,4 +1,4 @@
-import styles from "@/styles/commons/Header.module.scss";
+import styles from "./Header.module.scss";
 import { getServerSession } from "next-auth/next";
 import Image from "next/image";
 import Link from "next/link";

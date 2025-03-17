@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import gsap from "gsap";
-import styles from "@/styles/animations/Airplane.module.scss";
+import styles from "./Airplane.module.scss";
 
 interface AirplaneProps {
     isFlying: boolean;

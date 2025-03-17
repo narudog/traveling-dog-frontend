@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import styles from "@/styles/landing/SearchSection.module.scss";
+import styles from "./SearchSection.module.scss";
 import { useForm } from "react-hook-form";
 import { usePlanStore } from "@/store/plan";
 type SearchFormInputs = {

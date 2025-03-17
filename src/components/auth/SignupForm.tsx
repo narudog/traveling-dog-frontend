@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "@/styles/auth/SignupForm.module.scss";
+import styles from "./SignupForm.module.scss";
 import { useAuthStore } from "@/store/auth";
 
 export default function SignupForm() {
