@@ -13,7 +13,7 @@ export async function getPlanList() {
     }
 }
 
-export async function getPlanDetail(planId: number) {
+export async function getPlanDetail(planId: string) {
     try {
         const { data } = await axiosInstance.get(`/travel/plan/${planId}`);
 

@@ -5,6 +5,12 @@ import PolylineMap from '@/components/map/PolylineMap';
 import { getPlanDetail } from '@/app/actions/planActions';
 import { redirect } from 'next/navigation';
 
+interface TravelPlanDetailPageProps {
+    params: Promise<{
+        id: string;
+    }>;
+}
+
 // 임시 데이터 (실제로는 API에서 받아올 예정)
 const mockTravelPlan: TravelPlan = {
     id: 1,
@@ -64,9 +70,10 @@ const mockTravelPlan: TravelPlan = {
     updatedAt: '2024-03-15'
 };
 
-const TravelPlanDetailPage = async ({ params }: { params: { id: number } }) => {
+const TravelPlanDetailPage = async ({ params }: TravelPlanDetailPageProps) => {
+    const { id } = await params;
     try {
-        const travelPlan = await getPlanDetail(params.id);
+        const travelPlan = await getPlanDetail(id);
     } catch (error) {
         // alert('로그인 후 이용해주세요.');
         redirect('/login');
