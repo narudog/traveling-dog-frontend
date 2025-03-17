@@ -35,7 +35,7 @@ const StraightPolyline = ({ positions }: { positions: LatLngLiteral[] }) => {
       geodesic: true,
       strokeColor: "red", // 직선은 빨간색으로 표시
       strokeOpacity: 0.8,
-      strokeWeight: 2,
+      strokeWeight: 3,
     });
 
     // 지도에 폴리라인 추가
@@ -77,9 +77,9 @@ const RoadDirections = ({ positions }: { positions: LatLngLiteral[] }) => {
         map,
         suppressMarkers: true, // 마커는 별도로 표시하므로 숨김
         polylineOptions: {
-          strokeColor: "blue",
+          strokeColor: "red",
           strokeOpacity: 0.8,
-          strokeWeight: 2,
+          strokeWeight: 3,
         },
       })
     );
@@ -199,21 +199,14 @@ const calculateDistance = (p1: LatLngLiteral, p2: LatLngLiteral): number => {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos((p1.lat * Math.PI) / 180) *
-      Math.cos((p2.lat * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos((p2.lat * Math.PI) / 180) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 };
 
-export default function PolylineMap() {
-  // 연결할 좌표 배열 (위도, 경도)
-  const positions: LatLngLiteral[] = [
-    { lat: 37.5665, lng: 126.978 }, // 서울
-    { lat: 35.1796, lng: 129.0756 }, // 부산
-    { lat: 35.8714, lng: 128.6014 }, // 대구
-  ];
-
+export default function PolylineMap({ positions }: { positions: LatLngLiteral[] }) {
   const defaultPosition = { lat: 36.5, lng: 127.8 }; // 한국 중심 좌표로 조정
 
   // 직선 경로와 도로 경로 전환 상태

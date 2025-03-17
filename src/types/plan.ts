@@ -1,11 +1,11 @@
 export interface TravelPlan {
-    id: string;
+    id: number;
     title: string;
     country: string;
     city: string;
     startDate: string;
     endDate: string;
-    userId: string;
+    userId: number;
     nickname: string;
     travelLocations: TravelLocation[];
     viewCount: number;
@@ -16,13 +16,12 @@ export interface TravelPlan {
 }
 
 export interface TravelLocation {
-    id: string;
+    id: number;
     placeName: string;
     longitude: number;
     latitude: number;
     description: string;
     locationOrder: number;
-    availableDate: string;
     createdAt: string;
     updatedAt: string;
 }

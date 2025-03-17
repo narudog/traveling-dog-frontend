@@ -2,6 +2,12 @@ import Header from "@/components/commons/Header";
 import SearchSection from "@/components/landing/SearchSection";
 import PolylineMap from "@/components/map/PolylineMap";
 import styles from "./page.module.scss";
+import { LatLngLiteral } from "leaflet";
+const positions: LatLngLiteral[] = [
+  { lat: 37.5665, lng: 126.978 }, // 서울
+  { lat: 35.1796, lng: 129.0756 }, // 부산
+  { lat: 35.8714, lng: 128.6014 }, // 대구
+];
 export default function Home() {
   return (
     <>
@@ -21,7 +27,7 @@ export default function Home() {
             <SearchSection />
           </div>
           <div className={styles.heroImage}>
-            <PolylineMap />
+            <PolylineMap positions={positions} />
           </div>
         </section>
 
