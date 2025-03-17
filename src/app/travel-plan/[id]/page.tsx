@@ -3,6 +3,7 @@ import styles from './page.module.scss';
 import { format } from 'date-fns';
 import PolylineMap from '@/components/map/PolylineMap';
 import { getPlanDetail } from '@/app/actions/planActions';
+import { redirect } from 'next/navigation';
 
 // 임시 데이터 (실제로는 API에서 받아올 예정)
 const mockTravelPlan: TravelPlan = {
@@ -63,8 +64,13 @@ const mockTravelPlan: TravelPlan = {
     updatedAt: '2024-03-15'
 };
 
-const TravelPlanDetailPage = async ({ params }: { params: { id: string } }) => {
-    const travelPlan = await getPlanDetail(params.id);
+const TravelPlanDetailPage = async ({ params }: { params: { id: number } }) => {
+    try {
+        const travelPlan = await getPlanDetail(params.id);
+    } catch (error) {
+        // alert('로그인 후 이용해주세요.');
+        redirect('/login');
+    }
 
     return (
         <div className={styles.planDetail}>
