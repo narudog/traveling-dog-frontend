@@ -11,11 +11,11 @@ interface AuthState {
 
 // 액션 인터페이스
 interface AuthActions {
-  login: (email: string, password: string) => Promise<void>;
+  login: ({ email, password }: { email: string, password: string }) => Promise<void>;
   logout: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  signup: (nickname: string, email: string, password: string) => Promise<void>;
+  signup: ({ nickname, email, password }: { nickname: string, email: string, password: string }) => Promise<void>;
 }
 
 // 스토어 생성
@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
   loading: false,
   error: null,
 
-  signup: async (nickname: string, email: string, password: string) => {
+  signup: async ({ nickname, email, password }: { nickname: string, email: string, password: string }) => {
     set({ loading: true, error: null });
     try {
       // 헤더 정보는 세 번째 인자로 전달
@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
   },
 
   // 액션
-  login: async (email: string, password: string) => {
+  login: async ({ email, password }: { email: string, password: string }) => {
     // API 호출 시작: 로딩 상태 업데이트
     set((prev) => ({ ...prev, loading: true, error: null }));
     try {
