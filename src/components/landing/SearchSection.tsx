@@ -4,6 +4,8 @@ import { useState } from "react";
 import styles from "./SearchSection.module.scss";
 import { useForm } from "react-hook-form";
 import { usePlanStore } from "@/store/plan";
+import { useRouter } from "next/navigation";
+
 type SearchFormInputs = {
     country: string;
     city: string;
@@ -13,6 +15,7 @@ type SearchFormInputs = {
 
 export default function SearchSection() {
     const { createPlan } = usePlanStore();
+    const router = useRouter();
     const {
         register,
         handleSubmit,
@@ -43,9 +46,10 @@ export default function SearchSection() {
         }
     };
 
-    const onSubmit = (data: SearchFormInputs) => {
+    const onSubmit = async (data: SearchFormInputs) => {
+        const planList = JSON.parse(localStorage.getItem("planList") || "[]");
         console.log("일정 만들기:", data);
-        createPlan({
+        const plan = await createPlan({
             title: data.country + " / " + data.city,
             country: data.country,
             city: data.city,
@@ -53,6 +57,9 @@ export default function SearchSection() {
             endDate: data.endDate,
         });
         // 여기에 일정 만들기 로직 구현
+        planList.push(plan);
+        localStorage.setItem("planList", JSON.stringify(planList));
+        router.push(`/travel-plan/${plan.id}`); 
     };
 
     return (

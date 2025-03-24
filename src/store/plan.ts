@@ -4,17 +4,17 @@ import { TravelPlan, PlanCreateRequest, PlanUpdateRequest } from "@/types/plan";
 
 // 인터페이스 정의
 interface PlanState {
-    plan: any | null;
-    planList: TravelPlan[] | null;
+    plan: TravelPlan | null;
+    planList: TravelPlan[];
     loading: boolean;
     error: string | null;
 }
 
 // 액션 인터페이스
 interface PlanActions {
-    createPlan: (plan: PlanCreateRequest) => Promise<void>;
+    createPlan: (plan: PlanCreateRequest) => Promise<TravelPlan>;
     getPlanList: () => Promise<void>;
-    getPlanDetail: (planId: string) => Promise<void>;
+    getPlanDetail: (planId: string) => Promise<TravelPlan>;
     updatePlan: (planId: string, plan: PlanUpdateRequest) => Promise<void>;
     deletePlan: (planId: string) => Promise<void>;
     setLoading: (loading: boolean) => void;
@@ -25,7 +25,7 @@ interface PlanActions {
 export const usePlanStore = create<PlanState & PlanActions>((set) => ({
     // 초기 상태
     plan: null,
-    planList: null,
+    planList: [],
     loading: false,
     error: null,
     createPlan: async (plan: PlanCreateRequest) => {
@@ -63,6 +63,7 @@ export const usePlanStore = create<PlanState & PlanActions>((set) => ({
         try {
             const { data } = await axiosInstance.get(`/travel/plan/${planId}`);
             set({ plan: data, loading: false, error: null });
+            return data;
         } catch (error: any) {
             set({ loading: false, error: error?.message || "플랜 상세 조회 실패" });
             throw error;
