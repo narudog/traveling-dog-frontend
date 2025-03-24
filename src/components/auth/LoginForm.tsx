@@ -68,7 +68,7 @@ function LoginForm() {
         }
 
         try {
-            await auth.login(email, password);
+            await auth.login({ email, password });
 
             setFormError("");
             await handleAirplane();

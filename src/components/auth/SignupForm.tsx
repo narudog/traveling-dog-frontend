@@ -47,7 +47,7 @@ export default function SignupForm() {
         try {
             setIsLoading(true);
 
-            await auth.signup(email, password, nickname);
+            await auth.signup({ email, password, nickname });
 
             // 홈페이지로 리다이렉트
             router.push("/");
