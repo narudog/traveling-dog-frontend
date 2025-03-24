@@ -1,9 +1,10 @@
 import axiosInstance from "@/lib/axios";
+import { Profile } from "@/types/auth";
 import { create } from "zustand";
 
 // 인터페이스 정의
 interface AuthState {
-  user: any | null;
+  user: Profile | null;
   token: string | null;
   loading: boolean;
   error: string | null;
@@ -16,6 +17,7 @@ interface AuthActions {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   signup: (nickname: string, email: string, password: string) => Promise<void>;
+  getUserProfile: () => Promise<void>;
 }
 
 // 스토어 생성
@@ -42,6 +44,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
       // 실패 시 에러 업데이트
       set((prev) => ({
         ...prev,
+        user: {id: null, email: null, nickname: null, preferredTravelStyle: null, favoriteDestinations: null},
         loading: false,
         error: error?.message || "회원가입 실패",
       }));
@@ -72,6 +75,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
       // 실패 시 에러 업데이트
       set((prev) => ({
         ...prev,
+        user: {id: null, email: null, nickname: null, preferredTravelStyle: null, favoriteDestinations: null},
         loading: false,
         error: error?.message || "로그인 실패",
       }));
@@ -79,8 +83,13 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
     }
   },
 
-  logout: () => {
-    set({ user: null, token: null });
+  logout: async () => {
+    try {
+      await axiosInstance.post("/auth/logout");
+      set({ user: {id: null, email: null, nickname: null, preferredTravelStyle: null, favoriteDestinations: null}, token: null });
+    } catch (error) {
+      console.error("로그아웃 중 오류 발생:", error);
+    }
   },
 
   setLoading: (loading: boolean) => {
@@ -89,5 +98,16 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
 
   setError: (error: string | null) => {
     set({ error });
+  },
+
+  getUserProfile: async () => {
+    set((prev) => ({ ...prev, loading: true }));
+    try {
+      const response = await axiosInstance.get("/user/profile");
+      set({ user: response.data, loading: false });
+    } catch (error) {
+      set((prev) => ({ ...prev, loading: false, user: {id: null, email: null, nickname: null, preferredTravelStyle: null, favoriteDestinations: null} }));
+      console.error("유저 프로필 조회 중 오류 발생:", error);
+    }
   },
 }));

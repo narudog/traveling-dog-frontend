@@ -1,10 +1,21 @@
+'use client'
+
 import styles from "./Header.module.scss";
 import Image from "next/image";
 import Link from "next/link";
+// import { getUserProfile } from "@/app/actions/authActions";
 import ClientLogoutButton from "./ClientLogoutButton";
+import { useAuthStore } from "@/store/auth";
+import { useEffect } from "react";
 
-// 서버 컴포넌트로 변경
-const Header = async () => {
+const Header = () => {
+    const { user, getUserProfile } = useAuthStore();
+
+    useEffect(() => {
+        if (!user) {
+            getUserProfile();
+        }
+    }, []);
 
     return (
         <header className={styles.header}>
@@ -14,12 +25,27 @@ const Header = async () => {
                 </Link>
             </div>
             <div className={styles.authButtons}>
+                {!user ? (
+                    <div className={styles.skeleton}>
+                        <div className={styles.skeletonButton}></div>
+                        <div className={styles.skeletonButton}></div>
+                    </div>
+                ) : (
+                    <>
+                        {user.id ? (
+                            <ClientLogoutButton />
+                        ) : (
+                    <>
                         <Link href="/login" className={styles.loginButton}>
                             로그인
                         </Link>
                         <Link href="/signup" className={styles.signupButton}>
                             회원가입
                         </Link>
+                    </>
+                        )}
+                    </>
+                )}
             </div>
         </header>
     );
