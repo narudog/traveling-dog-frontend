@@ -3,6 +3,8 @@ import SearchSection from "@/components/landing/SearchSection";
 import PolylineMap from "@/components/map/PolylineMap";
 import styles from "./page.module.scss";
 import { LatLngLiteral } from "leaflet";
+import PlanList from "@/components/travelPlan/PlanList";
+
 const positions: LatLngLiteral[] = [
   { lat: 37.5665, lng: 126.978 }, // 서울
   { lat: 35.1796, lng: 129.0756 }, // 부산
@@ -15,8 +17,8 @@ export default function Home() {
 
       <main className={styles.main}>
         {/* Hero Section */}
-        <section className={styles.hero}>
-          <div className={styles.heroContent}>
+        <section className={styles.planContainer}>
+          <div className={styles.planContent}>
             <h1>AI와 함께 만드는 완벽한 여행 계획</h1>
             <p>
               복잡한 여행 계획은 이제 그만! AI가 당신의 여행 스타일에 맞는
@@ -25,9 +27,13 @@ export default function Home() {
 
             {/* Search Section */}
             <SearchSection />
+            <div className={styles.mapWrapper}>
+              <PolylineMap positions={positions} />
+            </div>
           </div>
-          <div className={styles.heroImage}>
-            <PolylineMap positions={positions} />
+          <div className={styles.planContent}>
+            <h1>여행 목록</h1>
+            <PlanList planList={[]} />
           </div>
         </section>
 

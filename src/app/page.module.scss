@@ -3,14 +3,14 @@
   overflow-x: hidden;
 }
 
-.hero {
+.planContainer {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   padding: 4rem 8rem;
   background: linear-gradient(135deg, #f6f9fc 0%, #e9f1f9 100%);
 
-  .heroContent {
+  .planContent {
     width: 100%;
     text-align: center;
 
@@ -28,7 +28,7 @@
     }
   }
 
-  .heroImage {
+  .mapWrapper {
     width: 100%;
     display: flex;
     justify-content: center;

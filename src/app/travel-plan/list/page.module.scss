@@ -1,58 +1,20 @@
 .travel-plan-list {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #f0f9ff 0%, #fff1f2 100%);
+
+  &__title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    position: sticky;
+    top: 0;
     background: linear-gradient(135deg, #f0f9ff 0%, #fff1f2 100%);
-
-    &__title {
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin-bottom: 1rem;
-        position: sticky;
-        top: 0;
-        background: linear-gradient(135deg, #f0f9ff 0%, #fff1f2 100%);
-        z-index: 10;
-        color: #44afe9;
-        text-align: center;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    &__container {
-        overflow-y: auto;
-        padding-right: 0.2rem;
-        padding-top: 0.3rem;
-
-        &::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        &::-webkit-scrollbar-track {
-            background: #e0f2fe;
-            border-radius: 4px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background: #7dd3fc;
-            border-radius: 4px;
-
-            &:hover {
-                background: #38bdf8;
-            }
-        }
-    }
-
-    &__grid {
-        display: grid;
-        grid-template-columns: repeat(1, 1fr);
-        gap: 1rem;
-
-        @media (min-width: 768px) {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        @media (min-width: 1024px) {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
+    z-index: 10;
+    color: #44afe9;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  }
 }
