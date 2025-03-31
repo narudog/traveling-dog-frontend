@@ -11,6 +11,9 @@
   background: linear-gradient(135deg, #f6f9fc 0%, #e9f1f9 100%);
 
   .planContent {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     width: 100%;
     text-align: center;
 
