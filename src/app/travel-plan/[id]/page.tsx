@@ -4,35 +4,35 @@ import PolylineMap from "@/components/map/PolylineMap";
 import { usePlanStore } from "@/store/plan";
 import { format } from "date-fns";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./page.module.scss";
 import { Itinerary, Location } from "@/types/plan";
 
 const TravelPlanDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { plan, getPlanDetail } = usePlanStore();
-  const [activities, setActivities] = useState<Location[]>([]);
-  const [selectedItinerary, setSelectedItinerary] = useState<number | null>(
-    null
-  );
+  const { loading, plan, getPlanDetail } = usePlanStore();
+  const [selectedItinerary, setSelectedItinerary] = useState<Itinerary>();
 
   useEffect(() => {
-    const fetchData = async () => {
-      await getPlanDetail(id);
-    };
-    fetchData();
-    setActivities(plan?.itineraries[0].activities || []);
-    setSelectedItinerary(plan?.itineraries[0].id || null);
+    getPlanDetail(id);
   }, [id, getPlanDetail]);
+
+  const onClickItinerary = (itinerary: Itinerary) => {
+    setSelectedItinerary(itinerary);
+  };
+
+  console.log(loading);
+  console.log(plan);
+
+  useEffect(() => {
+    if (plan) {
+      setSelectedItinerary(plan.itineraries[0]);
+    }
+  }, [plan]);
 
   if (!plan) {
     return <TravelPlanDetailSkeleton />;
   }
-
-  const onClickItinerary = (itinerary: Itinerary) => {
-    setActivities(itinerary.activities);
-    setSelectedItinerary(itinerary.id);
-  };
 
   return (
     <div className={styles.planDetail}>
@@ -78,7 +78,7 @@ const TravelPlanDetailPage = () => {
             <div
               key={itinerary.id}
               className={`${styles.planDetail__locationItem} ${
-                selectedItinerary === itinerary.id
+                selectedItinerary?.id === itinerary.id
                   ? styles.planDetail__locationItemActive
                   : ""
               }`}
@@ -103,7 +103,7 @@ const TravelPlanDetailPage = () => {
       </section>
       <section className={styles.planDetail__map}>
         <PolylineMap
-          positions={activities.map((activity) => ({
+          positions={selectedItinerary?.activities.map((activity) => ({
             lat: activity.latitude,
             lng: activity.longitude,
           }))}

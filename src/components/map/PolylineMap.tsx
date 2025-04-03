@@ -199,18 +199,26 @@ const calculateDistance = (p1: LatLngLiteral, p2: LatLngLiteral): number => {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos((p1.lat * Math.PI) / 180) *
-    Math.cos((p2.lat * Math.PI) / 180) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+      Math.cos((p2.lat * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 };
 
-export default function PolylineMap({ positions }: { positions: LatLngLiteral[] }) {
+export default function PolylineMap({
+  positions,
+}: {
+  positions?: LatLngLiteral[];
+}) {
   const defaultPosition = { lat: 36.5, lng: 127.8 }; // 한국 중심 좌표로 조정
 
   // 직선 경로와 도로 경로 전환 상태
   const [showDirectRoute, setShowDirectRoute] = useState(false);
+
+  if (!positions) {
+    return null;
+  }
 
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}>
