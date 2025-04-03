@@ -93,18 +93,13 @@ export default function SearchSection() {
           className={`${styles.textInput} ${errors.country ? styles.inputError : ""}`}
           {...register("country", { required: true })}
         />
-        {errors.country && (
-          <p className={styles.errorText}>여행 국가를 입력해주세요</p>
-        )}
+
         <input
           type="text"
           placeholder="여행 도시를 입력하세요 (예: 서울, 파리)"
           className={`${styles.textInput} ${errors.city ? styles.inputError : ""}`}
           {...register("city", { required: true })}
         />
-        {errors.city && (
-          <p className={styles.errorText}>여행 도시를 입력해주세요</p>
-        )}
 
         <input
           type="date"
@@ -116,9 +111,6 @@ export default function SearchSection() {
             onChange: handleStartDateChange,
           })}
         />
-        {errors.startDate && (
-          <p className={styles.errorText}>출발일을 선택해주세요</p>
-        )}
 
         <input
           type="date"
@@ -137,9 +129,6 @@ export default function SearchSection() {
           disabled={!startDate}
           {...register("endDate", { required: true })}
         />
-        {errors.endDate && (
-          <p className={styles.errorText}>도착일을 선택해주세요</p>
-        )}
 
         <input
           type="text"
@@ -147,9 +136,6 @@ export default function SearchSection() {
           placeholder="예산"
           {...register("budget", { required: true })}
         />
-        {errors.budget && (
-          <p className={styles.errorText}>예산을 입력해주세요</p>
-        )}
 
         <input
           type="text"
@@ -157,9 +143,6 @@ export default function SearchSection() {
           placeholder="여행 스타일(힐링, 맛집 탐방, 명소 방문, 지역 축제)"
           {...register("travelStyle", { required: true })}
         />
-        {errors.travelStyle && (
-          <p className={styles.errorText}>여행 스타일을 입력해주세요</p>
-        )}
 
         <input
           type="text"
@@ -167,9 +150,6 @@ export default function SearchSection() {
           placeholder="숙박 유형(호텔, 모텔, 펜션)"
           {...register("accommodation", { required: true })}
         />
-        {errors.accommodation && (
-          <p className={styles.errorText}>숙박 유형을 입력해주세요</p>
-        )}
 
         <input
           type="text"
@@ -177,9 +157,6 @@ export default function SearchSection() {
           placeholder="관심사(문화, 쇼핑, 카페 방문)"
           {...register("interests", { required: true })}
         />
-        {errors.interests && (
-          <p className={styles.errorText}>관심사를 입력해주세요</p>
-        )}
 
         <input
           type="text"
@@ -187,9 +164,6 @@ export default function SearchSection() {
           placeholder="계절(봄, 여름, 가을, 겨울)"
           {...register("season", { required: true })}
         />
-        {errors.season && (
-          <p className={styles.errorText}>계절을 입력해주세요</p>
-        )}
 
         <input
           type="text"
@@ -197,9 +171,6 @@ export default function SearchSection() {
           placeholder="교통수단(비행기, 기차, 버스, 자동차, 자전거)"
           {...register("transportation", { required: true })}
         />
-        {errors.transportation && (
-          <p className={styles.errorText}>교통수단을 입력해주세요</p>
-        )}
 
         <button
           type="submit"
