@@ -6,16 +6,26 @@ import { format } from "date-fns";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./page.module.scss";
-import { Itinerary, Location } from "@/types/plan";
+import { Itinerary, Location, TravelPlan } from "@/types/plan";
+import { useAuthStore } from "@/store/auth";
 
 const TravelPlanDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { plan, getPlanDetail } = usePlanStore();
+  const { plan, getPlanDetail, setPlan } = usePlanStore();
   const [selectedItinerary, setSelectedItinerary] = useState<Itinerary>();
+  const { user } = useAuthStore();
 
   useEffect(() => {
-    getPlanDetail(id);
-  }, [id, getPlanDetail]);
+    if (user) {
+      getPlanDetail(id);
+    } else {
+      setPlan(
+        JSON.parse(localStorage.getItem("planList") || "[]").find(
+          (plan: TravelPlan) => plan.id === Number(id)
+        )
+      );
+    }
+  }, [id, getPlanDetail, user, setPlan]);
 
   const onClickItinerary = (itinerary: Itinerary) => {
     setSelectedItinerary(itinerary);

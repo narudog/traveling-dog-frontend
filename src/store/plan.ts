@@ -21,6 +21,8 @@ interface PlanActions {
   getPlanDetail: (planId: string) => Promise<TravelPlan>;
   updatePlan: (planId: string, plan: PlanUpdateRequest) => Promise<void>;
   deletePlan: (planId: string) => Promise<void>;
+  setPlanList: (planList: TravelPlan[]) => void;
+  setPlan: (plan: TravelPlan) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }
@@ -94,6 +96,13 @@ export const usePlanStore = create<PlanState & PlanActions>((set) => ({
       set({ loading: false, error: error?.message || "플랜 삭제 실패" });
       throw error;
     }
+  },
+
+  setPlanList: (planList: TravelPlan[]) => {
+    set({ planList });
+  },
+  setPlan: (plan: TravelPlan) => {
+    set({ plan });
   },
 
   setLoading: (loading: boolean) => {
