@@ -7,7 +7,6 @@ import { usePlanStore } from "@/store/plan";
 import { useRouter } from "next/navigation";
 
 type SearchFormInputs = {
-  country: string;
   city: string;
   startDate: string;
   endDate: string;
@@ -15,7 +14,6 @@ type SearchFormInputs = {
   travelStyle: string;
   accommodation: string;
   interests: string;
-  season: string;
   transportation: string;
 };
 
@@ -31,7 +29,6 @@ export default function SearchSection() {
   } = useForm<SearchFormInputs>({
     mode: "onChange",
     defaultValues: {
-      country: "",
       city: "",
       startDate: "",
       endDate: "",
@@ -39,7 +36,6 @@ export default function SearchSection() {
       travelStyle: "",
       accommodation: "",
       interests: "",
-      season: "",
       transportation: "",
     },
   });
@@ -62,8 +58,6 @@ export default function SearchSection() {
     const planList = JSON.parse(localStorage.getItem("planList") || "[]");
     console.log("일정 만들기:", data);
     const plan = await createPlan({
-      title: data.country + " / " + data.city,
-      country: data.country,
       city: data.city,
       startDate: data.startDate,
       endDate: data.endDate,
@@ -71,7 +65,6 @@ export default function SearchSection() {
       travelStyle: data.travelStyle,
       accommodation: data.accommodation,
       interests: data.interests,
-      season: data.season,
       transportation: data.transportation,
     });
     // 여기에 일정 만들기 로직 구현
@@ -89,16 +82,16 @@ export default function SearchSection() {
       >
         <input
           type="text"
-          placeholder="여행 국가를 입력하세요 (예: 미국, 일본)"
-          className={`${styles.textInput} ${errors.country ? styles.inputError : ""}`}
-          {...register("country", { required: true })}
+          placeholder="여행 도시를 입력하세요 (예: 서울, 파리)"
+          className={`${styles.textInput} ${errors.city ? styles.inputError : ""}`}
+          {...register("city", { required: true })}
         />
 
         <input
           type="text"
-          placeholder="여행 도시를 입력하세요 (예: 서울, 파리)"
-          className={`${styles.textInput} ${errors.city ? styles.inputError : ""}`}
-          {...register("city", { required: true })}
+          className={`${styles.textInput} ${errors.budget ? styles.inputError : ""}`}
+          placeholder="예산"
+          {...register("budget", { required: true })}
         />
 
         <input
@@ -132,23 +125,9 @@ export default function SearchSection() {
 
         <input
           type="text"
-          className={`${styles.textInput} ${errors.budget ? styles.inputError : ""}`}
-          placeholder="예산"
-          {...register("budget", { required: true })}
-        />
-
-        <input
-          type="text"
           className={`${styles.textInput} ${errors.travelStyle ? styles.inputError : ""}`}
           placeholder="여행 스타일(힐링, 맛집 탐방, 명소 방문, 지역 축제)"
           {...register("travelStyle", { required: true })}
-        />
-
-        <input
-          type="text"
-          className={`${styles.textInput} ${errors.accommodation ? styles.inputError : ""}`}
-          placeholder="숙박 유형(호텔, 모텔, 펜션)"
-          {...register("accommodation", { required: true })}
         />
 
         <input
@@ -160,9 +139,9 @@ export default function SearchSection() {
 
         <input
           type="text"
-          className={`${styles.textInput} ${errors.season ? styles.inputError : ""}`}
-          placeholder="계절(봄, 여름, 가을, 겨울)"
-          {...register("season", { required: true })}
+          className={`${styles.textInput} ${errors.accommodation ? styles.inputError : ""}`}
+          placeholder="숙박 유형(호텔, 모텔, 펜션)"
+          {...register("accommodation", { required: true })}
         />
 
         <input

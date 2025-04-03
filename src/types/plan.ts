@@ -22,8 +22,6 @@ export interface TravelPlan {
 }
 
 export interface TravelPlanCreateRequest {
-  title: string;
-  country: string;
   city: string;
   startDate: string;
   endDate: string;
@@ -31,7 +29,6 @@ export interface TravelPlanCreateRequest {
   travelStyle: string;
   accommodation: string;
   interests: string;
-  season: string;
   transportation: string;
 }
 
