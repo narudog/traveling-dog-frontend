@@ -10,7 +10,7 @@ import { Itinerary, Location } from "@/types/plan";
 
 const TravelPlanDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { loading, plan, getPlanDetail } = usePlanStore();
+  const { plan, getPlanDetail } = usePlanStore();
   const [selectedItinerary, setSelectedItinerary] = useState<Itinerary>();
 
   useEffect(() => {
@@ -20,9 +20,6 @@ const TravelPlanDetailPage = () => {
   const onClickItinerary = (itinerary: Itinerary) => {
     setSelectedItinerary(itinerary);
   };
-
-  console.log(loading);
-  console.log(plan);
 
   useEffect(() => {
     if (plan) {
