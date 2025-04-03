@@ -93,6 +93,10 @@
     }
   }
 
+  &__locationItemActive {
+    background-color: #b2f5db;
+  }
+
   &__locationHeader {
     display: flex;
     justify-content: space-between;
