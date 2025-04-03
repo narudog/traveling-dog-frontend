@@ -15,6 +15,12 @@ interface LatLngLiteral {
   lng: number;
 }
 
+// 위치 정보 타입
+interface LocationInfo {
+  coords?: { lat: number; lng: number };
+  name: string;
+}
+
 // 직선 폴리라인 컴포넌트
 const StraightPolyline = ({ positions }: { positions: LatLngLiteral[] }) => {
   const map = useMap();
@@ -206,6 +212,133 @@ const calculateDistance = (p1: LatLngLiteral, p2: LatLngLiteral): number => {
   return R * c;
 };
 
+// 위치 정보 처리 내부 컴포넌트
+function LocationProcessor({
+  locations,
+}: {
+  locations: string[] | LocationInfo[];
+}) {
+  const map = useMap();
+  const placesLibrary = useMapsLibrary("places");
+
+  const [positions, setPositions] = useState<
+    Array<{ lat: number; lng: number; name: string }>
+  >([]);
+
+  // 문자열 배열인지 객체 배열인지 확인
+  const isStringArray =
+    locations.length > 0 && typeof locations[0] === "string";
+
+  useEffect(() => {
+    if (!placesLibrary || !map) return;
+
+    const placesService = new placesLibrary.PlacesService(map);
+
+    const processLocations = async () => {
+      if (isStringArray) {
+        // 문자열 위치 이름 배열 처리
+        const stringLocations = locations as string[];
+        const results: Array<{ lat: number; lng: number; name: string }> = [];
+
+        for (const name of stringLocations) {
+          placesService.findPlaceFromQuery(
+            {
+              query: name,
+              fields: ["name", "geometry"],
+            },
+            (places, status) => {
+              if (
+                status === placesLibrary.PlacesServiceStatus.OK &&
+                places &&
+                places.length > 0
+              ) {
+                const place = places[0];
+                if (place.geometry?.location) {
+                  results.push({
+                    lat: place.geometry.location.lat(),
+                    lng: place.geometry.location.lng(),
+                    name: place.name || name,
+                  });
+
+                  if (results.length === stringLocations.length) {
+                    setPositions(results);
+                  }
+                }
+              }
+            }
+          );
+        }
+      } else {
+        // LocationInfo 객체 배열 처리
+        const locInfoArray = locations as LocationInfo[];
+        const results: Array<{ lat: number; lng: number; name: string }> = [];
+
+        for (const loc of locInfoArray) {
+          if (loc.coords) {
+            // 이미 좌표가 있는 경우
+            results.push({
+              lat: loc.coords.lat,
+              lng: loc.coords.lng,
+              name: loc.name,
+            });
+          } else {
+            // 좌표가 없고 이름만 있는 경우
+            placesService.findPlaceFromQuery(
+              {
+                query: loc.name,
+                fields: ["name", "geometry"],
+              },
+              (places, status) => {
+                if (
+                  status === placesLibrary.PlacesServiceStatus.OK &&
+                  places &&
+                  places.length > 0
+                ) {
+                  const place = places[0];
+                  if (place.geometry?.location) {
+                    results.push({
+                      lat: place.geometry.location.lat(),
+                      lng: place.geometry.location.lng(),
+                      name: place.name || loc.name,
+                    });
+                  }
+                }
+
+                if (results.length === locInfoArray.length) {
+                  setPositions(results);
+                }
+              }
+            );
+          }
+        }
+      }
+    };
+
+    processLocations();
+  }, [placesLibrary, map, locations, isStringArray]);
+
+  return (
+    <>
+      {positions.map((position, index) => (
+        <AdvancedMarker key={index} position={position}>
+          <div
+            style={{
+              background: "white",
+              padding: "5px",
+              borderRadius: "4px",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+            }}
+          >
+            {position.name}
+          </div>
+        </AdvancedMarker>
+      ))}
+
+      {positions.length > 1 && <RoadDirections positions={positions} />}
+    </>
+  );
+}
+
 export default function PolylineMap({
   positions,
 }: {
@@ -223,22 +356,24 @@ export default function PolylineMap({
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}>
       <Map
-        defaultCenter={defaultPosition}
+        defaultCenter={{ lat: 36.5, lng: 127.8 }} // 한국 중심 좌표
         defaultZoom={7}
         mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID}
-        data-testid="google-map-container"
-        style={{ width: "100%", height: "100%", position: "relative" }}
+        style={{ width: "100%", height: "100%" }}
       >
-        {/* 마커 추가 */}
+        {/* 마커 추가
         {positions.map((position, index) => (
           <AdvancedMarker key={index} position={position} />
-        ))}
+        ))} */}
 
         {/* 경로 표시 (직선 또는 도로) */}
         {showDirectRoute ? (
           <StraightPolyline positions={positions} />
         ) : (
-          <RoadDirections positions={positions} />
+          // <RoadDirections positions={positions} />
+          <LocationProcessor
+            locations={["스시젠 본점", "오타루 운하", "카이센동 오타루"]}
+          />
         )}
       </Map>
     </APIProvider>
