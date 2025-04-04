@@ -3,7 +3,7 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # 의존성 설치를 위해 package.json 복사
-COPY package.json package-lock.json* ./
+COPY package.json ./
 
 # 전체 의존성을 설치
 RUN npm install
@@ -33,13 +33,10 @@ ENV NODE_ENV=development
 ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
 ENV NEXT_PUBLIC_GOOGLE_MAPS_ID=""
 
-# 필요한 의존성만 설치
-COPY package.json package-lock.json* ./
-RUN npm install --only=production
-
 # 빌드된 결과물 및 정적 파일 복사
-COPY --from=builder /app/.next .next
-COPY --from=builder /app/public public
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
 # 컨테이너가 사용할 포트 노출
 EXPOSE 3000
