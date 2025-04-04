@@ -3,7 +3,7 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # 의존성 설치를 위해 package.json 복사
-COPY package.json ./
+COPY package.json package-lock.json* ./
 
 # 전체 의존성을 설치
 RUN npm install
@@ -34,12 +34,12 @@ ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
 ENV NEXT_PUBLIC_GOOGLE_MAPS_ID=""
 
 # 빌드된 결과물 및 정적 파일 복사
-COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
 # 컨테이너가 사용할 포트 노출
 EXPOSE 3000
 
 # 컨테이너 시작 시 애플리케이션 실행 명령어
-CMD ["npm", "run", "start"]
+CMD ["node", "server.js"]
