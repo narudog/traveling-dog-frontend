@@ -98,7 +98,7 @@ const TravelPlanDetailPage = () => {
               </div>
               <p className={styles.planDetail__locationDesc}>
                 {itinerary.activities
-                  .map((activity) => activity.name)
+                  .map((activity) => activity.title)
                   .join(", ")}
               </p>
               <div className={styles.planDetail__locationOrder}>
@@ -110,10 +110,9 @@ const TravelPlanDetailPage = () => {
       </section>
       <section className={styles.planDetail__map}>
         <PolylineMap
-          positions={selectedItinerary?.activities.map((activity) => ({
-            lat: activity.latitude,
-            lng: activity.longitude,
-          }))}
+          locationNames={selectedItinerary?.activities.map(
+            (activity) => activity.locationName
+          )}
         />
       </section>
     </div>

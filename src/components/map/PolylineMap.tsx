@@ -340,16 +340,16 @@ function LocationProcessor({
 }
 
 export default function PolylineMap({
-  positions,
+  locationNames,
 }: {
-  positions?: LatLngLiteral[];
+  locationNames?: string[];
 }) {
   const defaultPosition = { lat: 36.5, lng: 127.8 }; // 한국 중심 좌표로 조정
 
   // 직선 경로와 도로 경로 전환 상태
   const [showDirectRoute, setShowDirectRoute] = useState(false);
 
-  if (!positions) {
+  if (!locationNames) {
     return null;
   }
 
@@ -367,14 +367,7 @@ export default function PolylineMap({
         ))} */}
 
         {/* 경로 표시 (직선 또는 도로) */}
-        {showDirectRoute ? (
-          <StraightPolyline positions={positions} />
-        ) : (
-          // <RoadDirections positions={positions} />
-          <LocationProcessor
-            locations={["스시젠 본점", "오타루 운하", "카이센동 오타루"]}
-          />
-        )}
+        <LocationProcessor locations={locationNames} />
       </Map>
     </APIProvider>
   );

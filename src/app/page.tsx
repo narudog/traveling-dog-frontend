@@ -2,14 +2,9 @@ import Header from "@/components/commons/Header";
 import SearchSection from "@/components/landing/SearchSection";
 import PolylineMap from "@/components/map/PolylineMap";
 import styles from "./page.module.scss";
-import { LatLngLiteral } from "leaflet";
 import PlanList from "@/components/travelPlan/PlanList";
 
-const positions: LatLngLiteral[] = [
-  { lat: 37.5665, lng: 126.978 }, // 서울
-  { lat: 35.1796, lng: 129.0756 }, // 부산
-  { lat: 35.8714, lng: 128.6014 }, // 대구
-];
+const locationNames: string[] = ["서울", "부산", "대구"];
 export default function Home() {
   return (
     <>
@@ -28,7 +23,7 @@ export default function Home() {
             {/* Search Section */}
             <SearchSection />
             <div className={styles.mapWrapper}>
-              <PolylineMap positions={positions} />
+              <PolylineMap locationNames={locationNames} />
             </div>
           </div>
           <div className={styles.planContent}>

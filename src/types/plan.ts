@@ -43,10 +43,9 @@ export interface Itinerary {
 
 export interface Location {
   id: number;
-  name: string;
+  title: string;
   description: string;
-  latitude: number;
-  longitude: number;
+  locationName: string;
 }
 
 export enum PlanStatus {
