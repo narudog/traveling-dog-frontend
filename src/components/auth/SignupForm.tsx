@@ -61,32 +61,30 @@ export default function SignupForm() {
 
     return (
         <form className={styles.form} onSubmit={handleSubmit}>
-            <h1>회원가입</h1>
-
             <div className={styles.inputGroup}>
-                <label htmlFor="email">이메일</label>
+                <label htmlFor="email">Email</label>
                 <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
 
             <div className={styles.inputGroup}>
-                <label htmlFor="nickname">닉네임</label>
+                <label htmlFor="nickname">Nickname</label>
                 <input id="nickname" type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} required />
             </div>
 
             <div className={styles.inputGroup}>
-                <label htmlFor="password">비밀번호</label>
+                <label htmlFor="password">Password</label>
                 <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
 
             <div className={styles.inputGroup}>
-                <label htmlFor="confirmPassword">비밀번호 확인</label>
+                <label htmlFor="confirmPassword">Confirm Password</label>
                 <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
             </div>
 
             {error && <p className={styles.error}>{error}</p>}
 
             <button type="submit" className={styles.button} disabled={isLoading}>
-                {isLoading ? "처리 중..." : "가입하기"}
+                {isLoading ? "Processing..." : "Sign Up"}
             </button>
         </form>
     );
