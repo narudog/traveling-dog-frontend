@@ -194,12 +194,20 @@
 @media (max-width: 768px) {
     .planContainer {
         flex-direction: column;
-        padding: 2rem 2rem;
+        padding: 0 2rem 2rem 2rem;
         text-align: center;
         word-break: keep-all;
 
         .planContent {
             margin-bottom: 2rem;
+
+            h1 {
+                display: none;
+            }
+
+            p {
+                display: none;
+            }
         }
     }
 
