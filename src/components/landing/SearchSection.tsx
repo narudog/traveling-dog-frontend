@@ -19,6 +19,7 @@ type SearchFormInputs = {
 
 export default function SearchSection() {
     const { createPlan } = usePlanStore();
+    const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const {
         register,
@@ -57,20 +58,27 @@ export default function SearchSection() {
     const onSubmit = async (data: SearchFormInputs) => {
         const planList = JSON.parse(localStorage.getItem("planList") || "[]");
         console.log("일정 만들기:", data);
-        const plan = await createPlan({
-            city: data.city,
-            startDate: data.startDate,
-            endDate: data.endDate,
-            budget: data.budget,
-            travelStyle: data.travelStyle,
-            accommodation: data.accommodation,
-            interests: data.interests,
-            transportation: data.transportation,
-        });
-        // 여기에 일정 만들기 로직 구현
-        planList.push(plan);
-        localStorage.setItem("planList", JSON.stringify(planList));
-        router.push(`/travel-plan/${plan.id}`);
+        try {
+            setIsLoading(true);
+            const plan = await createPlan({
+                city: data.city,
+                startDate: data.startDate,
+                endDate: data.endDate,
+                budget: data.budget,
+                travelStyle: data.travelStyle,
+                accommodation: data.accommodation,
+                interests: data.interests,
+                transportation: data.transportation,
+            });
+            // 여기에 일정 만들기 로직 구현
+            planList.push(plan);
+            localStorage.setItem("planList", JSON.stringify(planList));
+            router.push(`/travel-plan/${plan.id}`);
+        } catch (error) {
+            console.error("일정 만들기 오류:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -129,8 +137,8 @@ export default function SearchSection() {
 
                 <input type="text" className={`${styles.textInput} ${errors.transportation ? styles.inputError : ""}`} placeholder="교통수단(비행기, 기차, 버스, 자동차, 자전거)" {...register("transportation", { required: true })} />
 
-                <button type="submit" className={styles.searchButton} disabled={!isValid}>
-                    일정 만들기
+                <button type="submit" className={styles.searchButton} disabled={!isValid || isLoading}>
+                    {isLoading ? <span className={styles.spinner}></span> : "일정 만들기"}
                 </button>
             </form>
         </div>
