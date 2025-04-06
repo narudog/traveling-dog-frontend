@@ -87,7 +87,7 @@ const TravelPlanDetailPage = () => {
             </header>
 
             <section className={styles.locations}>
-                <Carousel slidesToShow={3} autoplay={false} showDots={true} showArrows={true}>
+                <Carousel slidesToShow={slidesToShow} autoplay={false} showDots={true} showArrows={true}>
                     {plan.itineraries.map((itinerary) => (
                         <div key={itinerary.id} className={`${styles.locationItem} ${selectedItinerary?.id === itinerary.id ? styles.locationItemActive : ""}`} onClick={() => onClickItinerary(itinerary)}>
                             <div className={styles.locationHeader}>

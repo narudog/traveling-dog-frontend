@@ -80,7 +80,7 @@ export default function Carousel({ children, slidesToShow = 1, autoplay = false,
                 <div
                     className={styles.carouselTrack}
                     style={{
-                        transform: hasNavigation ? `translateX(-${(currentIndex * 100) / slidesToShow}%)` : "translateX(0)",
+                        transform: hasNavigation ? `translateX(-${currentIndex * (100 / totalSlides)}%)` : "translateX(0)",
                         width: hasNavigation ? `${(100 * totalSlides) / slidesToShow}%` : "100%",
                         justifyContent: !hasNavigation ? "center" : "flex-start",
                     }}
@@ -90,7 +90,7 @@ export default function Carousel({ children, slidesToShow = 1, autoplay = false,
                             key={index}
                             className={styles.carouselItem}
                             style={{
-                                width: hasNavigation ? `${100 / totalSlides}%` : `${100 / slidesToShow}%`,
+                                width: `${100 / totalSlides}%`,
                                 maxWidth: !hasNavigation ? `${100 / slidesToShow}%` : "none",
                             }}
                         >
