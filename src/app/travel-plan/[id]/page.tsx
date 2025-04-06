@@ -107,7 +107,18 @@ const TravelPlanDetailPage = () => {
                 </Carousel>
             </section>
             <section className={styles.map}>
-                <PolylineMap locationNames={selectedItinerary ? selectedItinerary.activities.map((activity) => activity.locationName) : ["경복궁", "창덕궁", "종묘", "서울타워"]} />
+                <PolylineMap
+                    locationNames={
+                        selectedItinerary
+                            ? selectedItinerary.activities.map((activity) => {
+                                  return {
+                                      name: activity.locationName,
+                                      region: plan.city + ", " + plan.country,
+                                  };
+                              })
+                            : ["경복궁", "창덕궁", "종묘", "서울타워"]
+                    }
+                />
             </section>
         </div>
     );

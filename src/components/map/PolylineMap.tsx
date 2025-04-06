@@ -13,6 +13,7 @@ interface LatLngLiteral {
 interface LocationInfo {
     coords?: { lat: number; lng: number };
     name: string;
+    region?: string; // 지역 정보 추가 (도시, 국가 등)
 }
 
 // 직선 폴리라인 컴포넌트
@@ -203,9 +204,16 @@ function LocationProcessor({ locations, onPositionsChange }: { locations: string
                 const results: Array<{ lat: number; lng: number; name: string }> = [];
 
                 for (const name of stringLocations) {
+                    // 이름과 지역 분리 (형식: "이름, 지역")
+                    const parts = name.split(",");
+                    const placeName = parts[0].trim();
+                    const regionName = parts.length > 1 ? parts[1].trim() : "";
+
+                    const queryString = regionName ? `${placeName} ${regionName}` : placeName;
+
                     placesService.findPlaceFromQuery(
                         {
-                            query: name,
+                            query: queryString,
                             fields: ["name", "geometry"],
                         },
                         (places, status) => {
@@ -241,9 +249,11 @@ function LocationProcessor({ locations, onPositionsChange }: { locations: string
                         });
                     } else {
                         // 좌표가 없고 이름만 있는 경우
+                        const queryString = loc.region ? `${loc.name} ${loc.region}` : loc.name;
+
                         placesService.findPlaceFromQuery(
                             {
-                                query: loc.name,
+                                query: queryString,
                                 fields: ["name", "geometry"],
                             },
                             (places, status) => {
@@ -305,8 +315,8 @@ function MapCenterController({ positions }: { positions: Array<{ lat: number; ln
 
     useEffect(() => {
         if (map && positions.length > 0) {
-            // const center = calculateCenter(positions);
-            const center = positions[0];
+            const center = calculateCenter(positions);
+            // const center = positions[0];
             map.panTo(center); // 👈 지도 중심 이동
         }
     }, [positions, map]);
@@ -314,16 +324,23 @@ function MapCenterController({ positions }: { positions: Array<{ lat: number; ln
     return null;
 }
 
-export default function PolylineMap({ locationNames }: { locationNames: string[] }) {
+export default function PolylineMap({ locationNames }: { locationNames: string[] | LocationInfo[] }) {
     const [positions, setPositions] = useState<Array<{ lat: number; lng: number; name: string }>>([]);
 
     const defaultPosition = calculateCenter(positions);
 
     return (
         <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}>
-            <Map defaultCenter={defaultPosition} defaultZoom={9} mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID} style={{ width: "100%", height: "100%" }}>
+            <Map
+                key={JSON.stringify(defaultPosition)} // 👉 여기가 포인트!
+                defaultCenter={defaultPosition}
+                defaultZoom={9}
+                mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID}
+                style={{ width: "100%", height: "100%" }}
+            >
                 {/* 중심 자동 이동 제어 */}
-                <MapCenterController positions={positions} />
+                {/* <MapCenterController positions={positions} /> */}
+
                 {/* 경로 표시 (직선 또는 도로) */}
                 <LocationProcessor locations={locationNames} onPositionsChange={setPositions} />
             </Map>
