@@ -181,18 +181,8 @@ const RoadDirections = ({ positions }: { positions: LatLngLiteral[] }) => {
     );
 };
 
-// 직선 거리 계산 함수 (Haversine 공식)
-const calculateDistance = (p1: LatLngLiteral, p2: LatLngLiteral): number => {
-    const R = 6371; // 지구 반경 (km)
-    const dLat = ((p2.lat - p1.lat) * Math.PI) / 180;
-    const dLon = ((p2.lng - p1.lng) * Math.PI) / 180;
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos((p1.lat * Math.PI) / 180) * Math.cos((p2.lat * Math.PI) / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-};
-
 // 위치 정보 처리 내부 컴포넌트
-function LocationProcessor({ locations }: { locations: string[] | LocationInfo[] }) {
+function LocationProcessor({ locations, onPositionsChange }: { locations: string[] | LocationInfo[]; onPositionsChange: (positions: Array<{ lat: number; lng: number; name: string }>) => void }) {
     const map = useMap();
     const placesLibrary = useMapsLibrary("places");
 
@@ -281,6 +271,12 @@ function LocationProcessor({ locations }: { locations: string[] | LocationInfo[]
         processLocations();
     }, [placesLibrary, map, locations, isStringArray]);
 
+    useEffect(() => {
+        if (positions.length > 0) {
+            onPositionsChange(positions);
+        }
+    }, [positions]);
+
     return (
         <>
             {positions.map((position, index) => (
@@ -303,32 +299,48 @@ function LocationProcessor({ locations }: { locations: string[] | LocationInfo[]
     );
 }
 
-export default function PolylineMap({ locationNames }: { locationNames?: string[] }) {
-    const defaultPosition = { lat: 36.5, lng: 127.8 }; // 한국 중심 좌표로 조정
+// 🧠 중심 이동 전용 서브 컴포넌트
+function MapCenterController({ positions }: { positions: Array<{ lat: number; lng: number; name: string }> }) {
+    const map = useMap();
 
-    // 직선 경로와 도로 경로 전환 상태
-    const [showDirectRoute, setShowDirectRoute] = useState(false);
+    useEffect(() => {
+        if (map && positions.length > 0) {
+            const center = calculateCenter(positions);
+            map.panTo(center); // 👈 지도 중심 이동
+        }
+    }, [positions, map]);
 
-    if (!locationNames) {
-        return null;
-    }
+    return null;
+}
+
+export default function PolylineMap({ locationNames }: { locationNames: string[] }) {
+    const [positions, setPositions] = useState<Array<{ lat: number; lng: number; name: string }>>([]);
+
+    const defaultPosition = calculateCenter(positions);
 
     return (
         <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}>
-            <Map
-                defaultCenter={{ lat: 36.5, lng: 127.8 }} // 한국 중심 좌표
-                defaultZoom={10}
-                mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID}
-                style={{ width: "100%", height: "100%" }}
-            >
-                {/* 마커 추가
-        {positions.map((position, index) => (
-          <AdvancedMarker key={index} position={position} />
-        ))} */}
-
+            <Map defaultCenter={defaultPosition} defaultZoom={10} mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID} style={{ width: "100%", height: "100%" }}>
+                {/* 중심 자동 이동 제어 */}
+                <MapCenterController positions={positions} />
                 {/* 경로 표시 (직선 또는 도로) */}
-                <LocationProcessor locations={locationNames} />
+                <LocationProcessor locations={locationNames} onPositionsChange={setPositions} />
             </Map>
         </APIProvider>
     );
 }
+
+// 중심 좌표 계산 함수
+const calculateCenter = (positions: Array<{ lat: number; lng: number; name: string }>): { lat: number; lng: number } => {
+    if (positions.length === 0) {
+        return { lat: 36.5, lng: 127.8 }; // 기본값: 한국 중심 좌표
+    }
+
+    const totalLat = positions.reduce((sum, pos) => sum + pos.lat, 0);
+    const totalLng = positions.reduce((sum, pos) => sum + pos.lng, 0);
+
+    return {
+        lat: totalLat / positions.length,
+        lng: totalLng / positions.length,
+    };
+};
