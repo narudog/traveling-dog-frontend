@@ -80,12 +80,21 @@
         gap: 1rem;
     }
 
+    .carouselSkeleton {
+        display: flex;
+        gap: 1rem;
+        overflow: hidden;
+    }
+
     .locationItem {
         padding: 1rem;
         border-radius: 8px;
         background-color: #f8fafc;
         border: 1px solid #e2e8f0;
         transition: all 0.2s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
 
         &:hover {
             transform: translateY(-2px);
@@ -117,8 +126,21 @@
 
     .locationDesc {
         color: #475569;
-        margin-bottom: 1rem;
         line-height: 1.6;
+        list-style-type: none;
+        flex-grow: 1;
+
+        li {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background-color: rgba(226, 232, 240, 0.3);
+            border-radius: 4px;
+            font-size: 0.9rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
     }
 
     .locationOrder {

@@ -8,12 +8,14 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./page.module.scss";
 import { Itinerary, Location, TravelPlan } from "@/types/plan";
 import { useAuthStore } from "@/store/auth";
+import Carousel from "@/components/carousel/Carousel";
 
 const TravelPlanDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const { plan, getPlanDetail, setPlan } = usePlanStore();
     const [selectedItinerary, setSelectedItinerary] = useState<Itinerary>();
     const { user } = useAuthStore();
+    const [slidesToShow, setSlidesToShow] = useState(3);
 
     useEffect(() => {
         if (user) {
@@ -22,6 +24,23 @@ const TravelPlanDetailPage = () => {
             setPlan(JSON.parse(localStorage.getItem("planList") || "[]").find((plan: TravelPlan) => plan.id === Number(id)));
         }
     }, [id, getPlanDetail, user, setPlan]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setSlidesToShow(window.innerWidth < 768 ? 1 : 3);
+        };
+
+        // 초기 설정
+        handleResize();
+
+        // 리사이즈 이벤트 리스너 추가
+        window.addEventListener("resize", handleResize);
+
+        // 컴포넌트 언마운트 시 리스너 제거
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
     const onClickItinerary = (itinerary: Itinerary) => {
         setSelectedItinerary(itinerary);
@@ -68,8 +87,7 @@ const TravelPlanDetailPage = () => {
             </header>
 
             <section className={styles.locations}>
-                <h2 className={styles.sectionTitle}>여행 장소</h2>
-                <div className={styles.locationList}>
+                <Carousel slidesToShow={3} autoplay={false} showDots={true} showArrows={true}>
                     {plan.itineraries.map((itinerary) => (
                         <div key={itinerary.id} className={`${styles.locationItem} ${selectedItinerary?.id === itinerary.id ? styles.locationItemActive : ""}`} onClick={() => onClickItinerary(itinerary)}>
                             <div className={styles.locationHeader}>
@@ -77,13 +95,16 @@ const TravelPlanDetailPage = () => {
                                     {itinerary.date}일차 / {itinerary.location}
                                 </h3>
                             </div>
-                            <p className={styles.locationDesc}>{itinerary.activities.map((activity) => activity.title).join(", ")}</p>
-                            <div className={styles.locationOrder}>
-                                <span>순서: {itinerary.date}</span>
-                            </div>
+                            <ul className={styles.locationDesc}>
+                                {itinerary.activities.map((activity, index) => (
+                                    <li key={activity.id}>
+                                        {index + 1}. {activity.title}
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     ))}
-                </div>
+                </Carousel>
             </section>
             <section className={styles.map}>
                 <PolylineMap locationNames={selectedItinerary?.activities.map((activity) => activity.locationName)} />
@@ -123,7 +144,7 @@ const TravelPlanDetailSkeleton = () => {
 
             <section className={`${styles.locations} ${styles.skeleton}`}>
                 <h2 className={styles.sectionTitle}>여행 장소</h2>
-                <div className={styles.locationList}>
+                <div className={styles.carouselSkeleton}>
                     {[...Array(3)].map((_, index) => (
                         <div key={index} className={`${styles.locationItem} ${styles.item}`}>
                             <div className={styles.locationHeader}>

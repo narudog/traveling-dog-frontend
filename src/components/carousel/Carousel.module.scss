@@ -1,0 +1,105 @@
+.carouselContainer {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.carousel {
+    width: 100%;
+    overflow: hidden;
+    touch-action: pan-y;
+    user-select: none;
+    border-radius: 8px;
+}
+
+.carouselTrack {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+
+.carouselItem {
+    flex-shrink: 0;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+}
+
+.carouselControls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+    gap: 1.5rem;
+}
+
+.carouselDots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.carouselArrows {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.carouselButton {
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    color: #0ea5e9;
+    font-size: 1.2rem;
+    font-weight: bold;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &:hover:not(:disabled) {
+        background-color: #0ea5e9;
+        color: white;
+    }
+
+    &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+}
+
+.carouselDot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: #e2e8f0;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: #94a3b8;
+    }
+}
+
+.activeDot {
+    background-color: #0ea5e9;
+    transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+    .carouselControls {
+        margin-top: 0.5rem;
+    }
+
+    .carouselButton {
+        width: 1.8rem;
+        height: 1.8rem;
+        font-size: 0.8rem;
+    }
+}
