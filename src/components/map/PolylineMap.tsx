@@ -305,7 +305,8 @@ function MapCenterController({ positions }: { positions: Array<{ lat: number; ln
 
     useEffect(() => {
         if (map && positions.length > 0) {
-            const center = calculateCenter(positions);
+            // const center = calculateCenter(positions);
+            const center = positions[0];
             map.panTo(center); // 👈 지도 중심 이동
         }
     }, [positions, map]);
@@ -320,7 +321,7 @@ export default function PolylineMap({ locationNames }: { locationNames: string[]
 
     return (
         <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}>
-            <Map defaultCenter={defaultPosition} defaultZoom={10} mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID} style={{ width: "100%", height: "100%" }}>
+            <Map defaultCenter={defaultPosition} defaultZoom={9} mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID} style={{ width: "100%", height: "100%" }}>
                 {/* 중심 자동 이동 제어 */}
                 <MapCenterController positions={positions} />
                 {/* 경로 표시 (직선 또는 도로) */}
