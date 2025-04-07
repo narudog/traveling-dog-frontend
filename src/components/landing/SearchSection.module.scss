@@ -1,128 +1,315 @@
 @use "@/styles/variables" as *;
 
 .searchSection {
-    margin-top: 2rem;
-    background: white;
-    padding: 1.5rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    width: 100%;
+  width: 100%;
+  margin: 2rem auto;
+  position: relative;
+  max-width: $container-xl;
+  transition: all 0.3s ease;
 
-    .searchBox {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-        align-items: center;
-        width: 100%;
+  .searchBox {
+    background: $text-color-white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    padding: $desktop-padding;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-medium;
 
-        .searchButton {
-            grid-column: 1 / -1;
-        }
-
-        input {
-            width: 100%;
-            padding: 0.8rem;
-            font-size: 0.95rem;
-            border: 1px solid $border-color;
-            border-radius: 8px;
-            background: #fff;
-            box-sizing: border-box;
-
-            &:focus {
-                border-color: #4caf50;
-                outline: none;
-                box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
-            }
-        }
-
-        .textInput {
-            &::placeholder {
-                color: #999;
-                font-size: 0.9rem;
-            }
-        }
-
-        .dateInput {
-            &:disabled {
-                background: #f5f5f5;
-                cursor: not-allowed;
-            }
-        }
-
-        .inputError {
-            border-color: red;
-        }
-
-        .searchButton {
-            height: 48px;
-            padding: 0 1.5rem;
-            background: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            .spinner {
-                width: 20px;
-                height: 20px;
-                border: 2px solid rgba(255, 255, 255, 0.3);
-                border-radius: 50%;
-                border-top-color: white;
-                animation: spin 0.8s linear infinite;
-            }
-
-            @keyframes spin {
-                to {
-                    transform: rotate(360deg);
-                }
-            }
-
-            &:hover:not(:disabled) {
-                background: #45a049;
-                transform: translateY(-2px);
-            }
-
-            &:disabled {
-                background: #cccccc;
-                cursor: not-allowed;
-                transform: none;
-            }
-        }
+    .formStep {
+      display: none;
+      &.active {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-large;
+        animation: fadeIn 0.5s ease-in-out;
+      }
     }
+
+    .stepsIndicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: $spacing-medium;
+      position: relative;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: $border-color;
+        transform: translateY(-50%);
+        z-index: 1;
+      }
+
+      .step {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: $text-color-white;
+        border: 2px solid $border-color;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s ease;
+
+        &.active {
+          background-color: $primary-color;
+          border-color: $primary-color;
+          color: $text-color-white;
+        }
+
+        &.completed {
+          background-color: $primary-color;
+          border-color: $primary-color;
+          color: $text-color-white;
+          &::after {
+            content: "✓";
+          }
+        }
+      }
+    }
+
+    .inputGroup {
+      label {
+        display: block;
+        margin-bottom: $spacing-small;
+        font-weight: 500;
+        color: $text-color;
+      }
+
+      .inputHint {
+        font-size: $font-size-small;
+        color: rgba($text-color, 0.7);
+        margin-top: 0.25rem;
+      }
+    }
+
+    .textInput,
+    .dateInput,
+    select {
+      width: 100%;
+      padding: $spacing-medium;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      font-size: $font-size-base;
+      transition: border-color 0.3s;
+      height: $button-height-desktop;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+      }
+
+      &.inputError {
+        border-color: $text-color-error;
+
+        &:focus {
+          box-shadow: 0 0 0 2px rgba($text-color-error, 0.2);
+        }
+      }
+    }
+
+    /* 태그 선택 방식 스타일 */
+    .tagGroup {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+
+      .tagItem {
+        display: inline-block;
+        padding: 0.6rem 1.2rem;
+        border-radius: 50px;
+        background-color: #f0f4f8;
+        border: 1px solid transparent;
+        color: $text-color;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+        white-space: nowrap;
+        height: $button-height-desktop;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+
+        &:hover {
+          background-color: #e7edf3;
+        }
+
+        &.selected {
+          background-color: rgba($primary-color, 0.1);
+          border-color: rgba($primary-color, 0.6);
+          color: $primary-color;
+          font-weight: 500;
+          box-shadow: 0 2px 4px rgba($primary-color, 0.1);
+
+          // 체크 표시 추가
+          &::before {
+            content: "✓";
+            position: absolute;
+            top: 2px;
+            right: 6px;
+            font-size: 0.7rem;
+            line-height: 1;
+            color: $primary-color;
+          }
+        }
+      }
+    }
+
+    // 선택된 태그 요약 표시
+    .selectedTags {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: $primary-color;
+      font-weight: 500;
+    }
+
+    /* 태그 에러 표시 */
+    .tagGroupError {
+      border-radius: 8px;
+      border: 1px dashed $text-color-error;
+      padding: 0.5rem;
+    }
+
+    .errorMessage {
+      color: $text-color-error;
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+    }
+
+    .buttonContainer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: $spacing-medium;
+
+      .prevButton,
+      .nextButton,
+      .searchButton {
+        padding: $spacing-medium $spacing-large;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: $button-height-desktop;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 100px;
+      }
+
+      .prevButton {
+        background-color: $text-color-white;
+        border: 1px solid $border-color;
+        color: $text-color;
+
+        &:hover {
+          background-color: $background-color-hover;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+
+      .nextButton,
+      .searchButton {
+        background-color: $primary-color;
+        border: none;
+        color: $text-color-white;
+
+        &:hover {
+          background-color: $primary-color-hover;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: $text-color-white;
+      animation: spin 1s ease-in-out infinite;
+    }
+  }
 }
 
-@media (max-width: 700px) {
-    .searchSection {
-        padding: 1.5rem;
-        .searchBox {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
-            input,
-            .searchButton {
-                width: 100%;
-                min-width: 100%;
-            }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-            input {
-                padding: 1rem;
-                font-size: 1.3rem;
-            }
+// 모바일 & 태블릿 반응형
+@media (max-width: $breakpoint-md) {
+  .searchSection {
+    margin: 1rem auto;
 
-            .textInput {
-                font-size: 1.3rem;
-                &::placeholder {
-                    font-size: 1.3rem;
-                }
-            }
+    .searchBox {
+      padding: $mobile-padding;
+      border-radius: 8px;
+
+      .textInput,
+      .dateInput,
+      select {
+        height: $button-height-mobile;
+      }
+
+      .buttonContainer {
+        .prevButton,
+        .nextButton,
+        .searchButton {
+          height: $button-height-mobile;
         }
+      }
+
+      .tagGroup {
+        .tagItem {
+          padding: 0.5rem 1rem;
+          font-size: 0.9rem;
+          height: $button-height-mobile;
+        }
+      }
     }
+  }
+}
+
+// 태블릿 & 데스크톱 소형
+@media (min-width: $breakpoint-md) and (max-width: $breakpoint-lg) {
+  .searchSection {
+    margin: 1.5rem auto;
+
+    .searchBox {
+      padding: $tablet-padding;
+    }
+  }
 }
