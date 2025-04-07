@@ -8,9 +8,18 @@
     "build:dev": "cp .env.dev .env.local && next build",
     "build:prod": "cp .env.prod .env.local && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "ionic:serve": "npm run start"
   },
   "dependencies": {
+    "@capacitor/android": "7.2.0",
+    "@capacitor/app": "7.0.1",
+    "@capacitor/cli": "7.2.0",
+    "@capacitor/core": "7.2.0",
+    "@capacitor/haptics": "7.0.1",
+    "@capacitor/ios": "7.2.0",
+    "@capacitor/keyboard": "7.0.1",
+    "@capacitor/status-bar": "7.0.1",
     "@vis.gl/react-google-maps": "^1.5.1",
     "axios": "^1.7.9",
     "date-fns": "^4.1.0",
