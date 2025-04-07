@@ -27,3 +27,26 @@ $breakpoint-sm: 576px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 992px;
 $breakpoint-xl: 1200px;
+
+// 모바일 최적화 변수
+$mobile-padding: 1rem;
+$tablet-padding: 2rem;
+$desktop-padding: 3rem;
+
+// 반응형 컨테이너 크기
+$container-sm: 100%;
+$container-md: 720px;
+$container-lg: 960px;
+$container-xl: 1140px;
+
+// 터치 인터페이스 최적화
+$touch-target-size: 44px; // 모바일 터치 타겟 최소 크기
+$button-height-mobile: 48px; // 모바일 버튼 높이
+$button-height-desktop: 40px; // 데스크톱 버튼 높이
+
+// z-index 레이어
+$z-index-base: 1;
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-modal: 1030;
+$z-index-tooltip: 1040;
