@@ -1,225 +1,232 @@
 .main {
-  min-height: 100vh;
-  overflow-x: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
 .planContainer {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 4rem 8rem;
-  background: linear-gradient(135deg, #f6f9fc 0%, #e9f1f9 100%);
-
-  .planContent {
     display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    text-align: center;
+    flex-direction: row;
+    align-items: center;
+    padding: 4rem 8rem;
+    background: linear-gradient(135deg, #f6f9fc 0%, #e9f1f9 100%);
 
-    h1 {
-      font-size: 2.5rem;
-      color: #1a1a1a;
-      margin-bottom: 1.5rem;
-      line-height: 1.2;
+    .planContent {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+        text-align: center;
+
+        h1 {
+            font-size: 2.5rem;
+            color: #1a1a1a;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        p {
+            font-size: 1.25rem;
+            color: #666;
+        }
     }
 
-    p {
-      font-size: 1.25rem;
-      color: #666;
-      margin-bottom: 2rem;
+    .mapWrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+        height: 500px;
     }
-  }
-
-  .mapWrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 2rem;
-    height: 500px;
-  }
 }
 
 .ctaButton {
-  display: inline-block;
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: white;
-  background: linear-gradient(45deg, #4caf50, #45a049);
-  border-radius: 50px;
-  text-decoration: none;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
-  }
-}
-
-.features {
-  padding: 6rem 8rem;
-  background: white;
-
-  h2 {
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 4rem;
-    color: #1a1a1a;
-  }
-
-  .featureGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-  }
-
-  .featureCard {
-    padding: 2rem;
-    text-align: center;
-    background: #fff;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    display: inline-block;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(45deg, #4caf50, #45a049);
+    border-radius: 50px;
+    text-decoration: none;
     transition: transform 0.3s ease;
 
     &:hover {
-      transform: translateY(-5px);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    }
+}
+
+.features {
+    padding: 6rem 8rem;
+    background: white;
+
+    h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 4rem;
+        color: #1a1a1a;
     }
 
-    .iconWrapper {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 1.5rem;
-      background: #f6f9fc;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      i {
-        font-size: 2rem;
-        color: #4caf50;
-      }
+    .featureGrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
     }
 
-    h3 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: #1a1a1a;
-    }
+    .featureCard {
+        padding: 2rem;
+        text-align: center;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
 
-    p {
-      color: #666;
-      line-height: 1.6;
+        &:hover {
+            transform: translateY(-5px);
+        }
+
+        .iconWrapper {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: #f6f9fc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            i {
+                font-size: 2rem;
+                color: #4caf50;
+            }
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
     }
-  }
 }
 
 .howItWorks {
-  padding: 6rem 8rem;
-  background: #f6f9fc;
+    padding: 6rem 8rem;
+    background: #f6f9fc;
 
-  h2 {
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 4rem;
-    color: #1a1a1a;
-  }
-
-  .steps {
-    display: flex;
-    justify-content: space-between;
-    gap: 2rem;
-  }
-
-  .step {
-    flex: 1;
-    text-align: center;
-    position: relative;
-
-    .stepNumber {
-      width: 50px;
-      height: 50px;
-      background: #4caf50;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin: 0 auto 1.5rem;
+    h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 4rem;
+        color: #1a1a1a;
     }
 
-    h3 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: #1a1a1a;
+    .steps {
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem;
     }
 
-    p {
-      color: #666;
-      line-height: 1.6;
+    .step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+
+        .stepNumber {
+            width: 50px;
+            height: 50px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 auto 1.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
     }
-  }
 }
 
 .cta {
-  padding: 6rem 8rem;
-  text-align: center;
-  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-  color: white;
+    padding: 6rem 8rem;
+    text-align: center;
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
 
-  h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    opacity: 0.9;
-  }
-
-  .ctaButton {
-    background: white;
-    color: #4caf50;
-
-    &:hover {
-      box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+    h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
     }
-  }
+
+    p {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .ctaButton {
+        background: white;
+        color: #4caf50;
+
+        &:hover {
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
+    }
 }
 
 @media (max-width: 768px) {
-  .hero {
-    flex-direction: column;
-    padding: 2rem 2rem;
-    text-align: center;
-    word-break: keep-all;
+    .planContainer {
+        flex-direction: column;
+        padding: 0 2rem 2rem 2rem;
+        text-align: center;
+        word-break: keep-all;
 
-    .heroContent {
-      margin-bottom: 2rem;
+        .planContent {
+            margin-bottom: 2rem;
+
+            h1 {
+                display: none;
+            }
+
+            p {
+                display: none;
+            }
+        }
     }
-  }
 
-  .features {
-    padding: 4rem 2rem;
+    .features {
+        padding: 4rem 2rem;
 
-    .featureGrid {
-      grid-template-columns: 1fr;
+        .featureGrid {
+            grid-template-columns: 1fr;
+        }
     }
-  }
 
-  .howItWorks {
-    padding: 4rem 2rem;
+    .howItWorks {
+        padding: 4rem 2rem;
 
-    .steps {
-      flex-direction: column;
+        .steps {
+            flex-direction: column;
+        }
     }
-  }
 
-  .cta {
-    padding: 4rem 2rem;
-  }
+    .cta {
+        padding: 4rem 2rem;
+    }
 }

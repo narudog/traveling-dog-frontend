@@ -30,3 +30,10 @@
         transform: translateY(0);
     }
 }
+
+@media (max-width: 768px) {
+    .container {
+        justify-content: center;
+        padding: 1rem;
+    }
+}
