@@ -45,6 +45,7 @@ const accommodationOptions = [
 const transportationOptions = [
   { value: "비행기", label: "비행기" },
   { value: "기차", label: "기차" },
+  { value: "지하철", label: "지하철" },
   { value: "버스", label: "버스" },
   { value: "자동차", label: "자동차" },
   { value: "자전거", label: "자전거" },
@@ -95,7 +96,6 @@ export default function SearchSection() {
 
   // 시작일 값 감시
   const startDate = watch("startDate");
-  const formValues = watch();
 
   // 태그 선택 핸들러 (다중 선택 지원)
   const handleTagSelect = (field: keyof SearchFormInputs, value: string) => {
@@ -116,6 +116,7 @@ export default function SearchSection() {
           }
           return newValues;
         });
+        trigger(field);
         break;
       case "interests":
         setSelectedInterests((prev) => {
@@ -131,6 +132,7 @@ export default function SearchSection() {
           }
           return newValues;
         });
+        trigger(field);
         break;
       case "accommodation":
         setSelectedAccommodations((prev) => {
@@ -146,6 +148,7 @@ export default function SearchSection() {
           }
           return newValues;
         });
+        trigger(field);
         break;
       case "transportation":
         setSelectedTransportations((prev) => {
@@ -161,6 +164,7 @@ export default function SearchSection() {
           }
           return newValues;
         });
+        trigger(field);
         break;
     }
   };
@@ -241,6 +245,10 @@ export default function SearchSection() {
   };
 
   const onSubmit = async (data: SearchFormInputs) => {
+    const isStepValid = await validateCurrentStep();
+    if (!isStepValid) {
+      return;
+    }
     const planList = JSON.parse(localStorage.getItem("planList") || "[]");
     console.log("일정 만들기:", data);
     try {
@@ -264,78 +272,6 @@ export default function SearchSection() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // 태그 그룹 렌더링 함수 (다중 선택용으로 수정)
-  const renderTagGroup = (
-    options: { value: string; label: string }[],
-    field: keyof SearchFormInputs,
-    selectedValues: string[],
-    errorState: boolean
-  ) => {
-    // 선택된 태그 레이블 가져오기
-    const selectedLabels = options
-      .filter((option) => selectedValues.includes(option.value))
-      .map((option) => option.label);
-
-    return (
-      <>
-        <div
-          className={`${styles.tagGroup} ${errorState ? styles.tagGroupError : ""}`}
-        >
-          {options.map((option) => (
-            <div
-              key={option.value}
-              className={`${styles.tagItem} ${
-                selectedValues.includes(option.value) ? styles.selected : ""
-              }`}
-              onClick={() => handleTagSelect(field, option.value)}
-            >
-              {option.label}
-            </div>
-          ))}
-        </div>
-      </>
-    );
-  };
-
-  // 단계별 버튼 렌더링
-  const renderButtons = () => {
-    return (
-      <div className={styles.buttonContainer}>
-        {currentStep > 1 && (
-          <button
-            type="button"
-            className={styles.prevButton}
-            onClick={prevStep}
-          >
-            이전
-          </button>
-        )}
-
-        {currentStep < totalSteps ? (
-          <button
-            type="button"
-            className={styles.nextButton}
-            onClick={nextStep}
-          >
-            다음
-          </button>
-        ) : (
-          <button
-            type="submit"
-            className={styles.searchButton}
-            disabled={!isValid || isLoading}
-          >
-            {isLoading ? (
-              <span className={styles.spinner}></span>
-            ) : (
-              "일정 만들기"
-            )}
-          </button>
-        )}
-      </div>
-    );
   };
 
   return (
@@ -449,12 +385,13 @@ export default function SearchSection() {
           className={`${styles.formStep} ${currentStep === 3 ? styles.active : ""}`}
         >
           <div className={styles.inputGroup}>
-            {renderTagGroup(
-              travelStyleOptions,
-              "travelStyle",
-              selectedTravelStyles,
-              !!errors.travelStyle
-            )}
+            <RenderTagGroup
+              options={travelStyleOptions}
+              field="travelStyle"
+              selectedValues={selectedTravelStyles}
+              errorState={!!errors.travelStyle}
+              handleTagSelect={handleTagSelect}
+            />
             {errors.travelStyle && (
               <div className={styles.errorMessage}>
                 {errors.travelStyle.message}
@@ -466,12 +403,13 @@ export default function SearchSection() {
           </div>
 
           <div className={styles.inputGroup}>
-            {renderTagGroup(
-              interestsOptions,
-              "interests",
-              selectedInterests,
-              !!errors.interests
-            )}
+            <RenderTagGroup
+              options={interestsOptions}
+              field="interests"
+              selectedValues={selectedInterests}
+              errorState={!!errors.interests}
+              handleTagSelect={handleTagSelect}
+            />
             {errors.interests && (
               <div className={styles.errorMessage}>
                 {errors.interests.message}
@@ -488,12 +426,13 @@ export default function SearchSection() {
           className={`${styles.formStep} ${currentStep === 4 ? styles.active : ""}`}
         >
           <div className={styles.inputGroup}>
-            {renderTagGroup(
-              accommodationOptions,
-              "accommodation",
-              selectedAccommodations,
-              !!errors.accommodation
-            )}
+            <RenderTagGroup
+              options={accommodationOptions}
+              field="accommodation"
+              selectedValues={selectedAccommodations}
+              errorState={!!errors.accommodation}
+              handleTagSelect={handleTagSelect}
+            />
             {errors.accommodation && (
               <div className={styles.errorMessage}>
                 {errors.accommodation.message}
@@ -505,12 +444,13 @@ export default function SearchSection() {
           </div>
 
           <div className={styles.inputGroup}>
-            {renderTagGroup(
-              transportationOptions,
-              "transportation",
-              selectedTransportations,
-              !!errors.transportation
-            )}
+            <RenderTagGroup
+              options={transportationOptions}
+              field="transportation"
+              selectedValues={selectedTransportations}
+              errorState={!!errors.transportation}
+              handleTagSelect={handleTagSelect}
+            />
             {errors.transportation && (
               <div className={styles.errorMessage}>
                 {errors.transportation.message}
@@ -523,8 +463,76 @@ export default function SearchSection() {
         </div>
 
         {/* 단계별 버튼 */}
-        {renderButtons()}
+        <div className={styles.buttonContainer}>
+          {currentStep > 1 && (
+            <button
+              type="button"
+              className={styles.prevButton}
+              onClick={prevStep}
+            >
+              이전
+            </button>
+          )}
+
+          {currentStep < totalSteps && (
+            <button
+              type="button"
+              className={styles.nextButton}
+              onClick={nextStep}
+            >
+              다음
+            </button>
+          )}
+          {currentStep === totalSteps && (
+            <button
+              type="submit"
+              className={styles.searchButton}
+              disabled={!isValid || isLoading}
+            >
+              {isLoading ? (
+                <span className={styles.spinner}></span>
+              ) : (
+                "일정 만들기"
+              )}
+            </button>
+          )}
+        </div>
       </form>
     </div>
+  );
+}
+
+// 태그 그룹 렌더링 함수 (다중 선택용으로 수정)
+function RenderTagGroup({
+  options,
+  field,
+  selectedValues,
+  errorState,
+  handleTagSelect,
+}: {
+  options: { value: string; label: string }[];
+  field: keyof SearchFormInputs;
+  selectedValues: string[];
+  errorState: boolean;
+  handleTagSelect: (field: keyof SearchFormInputs, value: string) => void;
+}) {
+  return (
+    <>
+      <div
+        className={`${styles.tagGroup} ${errorState ? styles.tagGroupError : ""}`}
+      >
+        {options.map((option) => (
+          <div
+            key={option.value}
+            className={`${styles.tagItem} ${
+              selectedValues.includes(option.value) ? styles.selected : ""
+            }`}
+            onClick={() => handleTagSelect(field, option.value)}
+          >
+            {option.label}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
