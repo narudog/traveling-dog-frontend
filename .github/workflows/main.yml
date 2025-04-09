@@ -24,6 +24,7 @@ jobs:
           docker build --no-cache -f Dockerfile.development \
                     --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}" \
                     --build-arg NEXT_PUBLIC_GOOGLE_MAPS_ID="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_ID }}" \
+                    --build-arg NEXT_PUBLIC_RAPIDAPI_KEY="${{ secrets.NEXT_PUBLIC_RAPIDAPI_KEY }}" \
                     -t ${{ secrets.DOCKER_USERNAME }}/travelingdog-dev-frontend:latest .
 
       - name: Push Docker image to Docker Hub
@@ -40,5 +41,6 @@ jobs:
           docker-compose down
           NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}" \
           NEXT_PUBLIC_GOOGLE_MAPS_ID="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_ID }}" \
+          NEXT_PUBLIC_RAPIDAPI_KEY="${{ secrets.NEXT_PUBLIC_RAPIDAPI_KEY }}" \
           docker-compose up -d
           EOF

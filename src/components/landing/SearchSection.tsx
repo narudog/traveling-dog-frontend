@@ -5,6 +5,8 @@ import styles from "./SearchSection.module.scss";
 import { useForm } from "react-hook-form";
 import { usePlanStore } from "@/store/plan";
 import { useRouter } from "next/navigation";
+import AccommodationSelector from "./AccommodationSelector";
+import { Hotel } from "@/types/booking";
 
 type SearchFormInputs = {
   city: string;
@@ -16,6 +18,11 @@ type SearchFormInputs = {
   interests: string;
   transportation: string;
 };
+
+// 선택된 호텔 인터페이스 정의
+interface SelectedHotelsByDate {
+  [date: string]: Hotel;
+}
 
 // 태그 옵션 데이터
 const travelStyleOptions = [
@@ -58,6 +65,13 @@ export default function SearchSection() {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
   const router = useRouter();
+
+  // 숙소 선택 관련 상태
+  const [selectedHotels, setSelectedHotels] = useState<SelectedHotelsByDate>(
+    {}
+  );
+  const [showAccommodationSelector, setShowAccommodationSelector] =
+    useState(false);
 
   // 선택된 태그 상태 관리 (다중 선택을 위해 배열로 변경)
   const [selectedTravelStyles, setSelectedTravelStyles] = useState<string[]>(
@@ -244,6 +258,13 @@ export default function SearchSection() {
     }
   };
 
+  // 호텔 선택 처리 함수
+  const handleHotelSelection = (hotels: SelectedHotelsByDate) => {
+    setSelectedHotels(hotels);
+    console.log("선택된 호텔:", hotels);
+    // 여기서 선택된 호텔 정보를 필요에 따라 활용할 수 있습니다
+  };
+
   const onSubmit = async (data: SearchFormInputs) => {
     const isStepValid = await validateCurrentStep();
     if (!isStepValid) {
@@ -251,6 +272,12 @@ export default function SearchSection() {
     }
     const planList = JSON.parse(localStorage.getItem("planList") || "[]");
     console.log("일정 만들기:", data);
+
+    // 선택된 호텔 정보도 함께 기록
+    if (Object.keys(selectedHotels).length > 0) {
+      console.log("선택된 숙소 정보:", selectedHotels);
+    }
+
     try {
       setIsLoading(true);
       const plan = await createPlan({
@@ -459,6 +486,32 @@ export default function SearchSection() {
             <div className={styles.inputHint}>
               이용하고 싶은 교통수단을 모두 선택해주세요
             </div>
+          </div>
+
+          {/* 숙소 선택 섹션 */}
+          <div className={styles.accommodationSelectorContainer}>
+            <button
+              type="button"
+              className={styles.toggleButton}
+              onClick={() =>
+                setShowAccommodationSelector(!showAccommodationSelector)
+              }
+            >
+              {showAccommodationSelector
+                ? "숙소 선택 닫기"
+                : "날짜별 숙소 선택하기"}
+            </button>
+
+            {showAccommodationSelector &&
+              watch("startDate") &&
+              watch("endDate") && (
+                <AccommodationSelector
+                  city={watch("city")}
+                  startDate={watch("startDate")}
+                  endDate={watch("endDate")}
+                  onSelect={handleHotelSelection}
+                />
+              )}
           </div>
         </div>
 
