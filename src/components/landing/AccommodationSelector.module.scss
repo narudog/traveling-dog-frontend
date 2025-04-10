@@ -1,3 +1,4 @@
+@use "sass:color";
 @import "@/styles/variables.scss";
 
 .accommodationSelector {
@@ -262,7 +263,7 @@
       transition: all 0.2s ease;
 
       &:hover:not(:disabled) {
-        background-color: darken($primary-color, 5%);
+        background-color: color.scale($primary-color, $lightness: -5%);
       }
 
       &:disabled {
