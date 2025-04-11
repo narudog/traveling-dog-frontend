@@ -212,6 +212,7 @@ export default function AccommodationSelector({
       {/* 완료 버튼 */}
       <div className={styles.actionButtons}>
         <button
+          type="button"
           className={styles.completeButton}
           disabled={Object.keys(selectedHotels).length !== dateRange.length}
           onClick={() => onSelect(selectedHotels)}
