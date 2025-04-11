@@ -30,6 +30,12 @@ export interface TravelPlanCreateRequest {
   accommodation: string;
   interests: string;
   transportation: string;
+  userSpecifiedAccommodations: SelectedHotelByDate[];
+}
+
+export interface SelectedHotelByDate {
+  date: string;
+  accommodation: string;
 }
 
 export interface Itinerary {

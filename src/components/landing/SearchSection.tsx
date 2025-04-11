@@ -7,6 +7,7 @@ import { usePlanStore } from "@/store/plan";
 import { useRouter } from "next/navigation";
 import AccommodationSelector from "./AccommodationSelector";
 import { Hotel } from "@/types/booking";
+import { SelectedHotelByDate } from "@/types/plan";
 
 type SearchFormInputs = {
   city: string;
@@ -20,9 +21,6 @@ type SearchFormInputs = {
 };
 
 // 선택된 호텔 인터페이스 정의
-interface SelectedHotelsByDate {
-  [date: string]: Hotel;
-}
 
 // 태그 옵션 데이터
 const travelStyleOptions = [
@@ -67,8 +65,8 @@ export default function SearchSection() {
   const router = useRouter();
 
   // 숙소 선택 관련 상태
-  const [selectedHotels, setSelectedHotels] = useState<SelectedHotelsByDate>(
-    {}
+  const [selectedHotels, setSelectedHotels] = useState<SelectedHotelByDate[]>(
+    []
   );
   const [showAccommodationSelector, setShowAccommodationSelector] =
     useState(false);
@@ -259,7 +257,7 @@ export default function SearchSection() {
   };
 
   // 호텔 선택 처리 함수
-  const handleHotelSelection = (hotels: SelectedHotelsByDate) => {
+  const handleHotelSelection = (hotels: SelectedHotelByDate[]) => {
     setSelectedHotels(hotels);
     console.log("선택된 호텔:", hotels);
     // 여기서 선택된 호텔 정보를 필요에 따라 활용할 수 있습니다
@@ -289,6 +287,7 @@ export default function SearchSection() {
         accommodation: data.accommodation,
         interests: data.interests,
         transportation: data.transportation,
+        userSpecifiedAccommodations: selectedHotels,
       });
       // 여기에 일정 만들기 로직 구현
       planList.push(plan);

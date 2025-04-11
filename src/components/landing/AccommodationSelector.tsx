@@ -4,16 +4,13 @@ import { useBookingStore } from "@/store/booking";
 import { Hotel } from "@/types/booking";
 import { format, addDays, differenceInDays } from "date-fns";
 import styles from "./AccommodationSelector.module.scss";
+import { SelectedHotelByDate } from "@/types/plan";
 
 interface AccommodationSelectorProps {
   city: string;
   startDate: string;
   endDate: string;
-  onSelect: (selectedHotels: SelectedHotelsByDate) => void;
-}
-
-interface SelectedHotelsByDate {
-  [date: string]: Hotel;
+  onSelect: (selectedHotels: SelectedHotelByDate[]) => void;
 }
 
 export default function AccommodationSelector({
@@ -25,8 +22,8 @@ export default function AccommodationSelector({
   const { searchHotelsDestination, searchHotels, loading } = useBookingStore();
   const [currentDate, setCurrentDate] = useState(startDate);
   const [hotels, setHotels] = useState<Hotel[]>([]);
-  const [selectedHotels, setSelectedHotels] = useState<SelectedHotelsByDate>(
-    {}
+  const [selectedHotels, setSelectedHotels] = useState<SelectedHotelByDate[]>(
+    []
   );
   const [destId, setDestId] = useState("");
   const [searchingDestId, setSearchingDestId] = useState(false);
@@ -58,17 +55,20 @@ export default function AccommodationSelector({
 
   // 호텔 선택 핸들러
   const selectHotel = (hotel: Hotel) => {
-    setSelectedHotels((prev) => ({
+    setSelectedHotels((prev) => [
       ...prev,
-      [currentDate]: hotel,
-    }));
+      {
+        date: currentDate,
+        accommodation: hotel.name,
+      },
+    ]);
 
     // 마지막 날짜가 아니면 자동으로 다음 날짜로 이동
     if (currentDate !== dateRange[dateRange.length - 1]) {
       goToNextDate();
     } else {
       // 모든 날짜에 대한 호텔 선택이 완료되면 부모 컴포넌트에 전달
-      onSelect({ ...selectedHotels, [currentDate]: hotel });
+      onSelect(selectedHotels);
     }
   };
 
@@ -176,7 +176,13 @@ export default function AccommodationSelector({
           hotels.map((hotel) => (
             <div
               key={hotel.id}
-              className={`${styles.hotelCard} ${selectedHotels[currentDate]?.id === hotel.id ? styles.selected : ""}`}
+              className={`${styles.hotelCard} ${
+                selectedHotels.find(
+                  (selectedHotel) => selectedHotel.accommodation === hotel.name
+                )
+                  ? styles.selected
+                  : ""
+              }`}
               onClick={() => selectHotel(hotel)}
             >
               <div className={styles.hotelImage}>
