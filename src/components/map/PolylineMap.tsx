@@ -66,6 +66,10 @@ export default function PolylineMap({ locationNames, allItineraryLocations, sele
                 defaultZoom={13}
                 mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID}
                 style={{ width: "100%", height: "100%" }}
+                mapTypeControl={false}
+                zoomControl={true}
+                fullscreenControl={false}
+                streetViewControl={false}
             >
                 {/* 다중 일정 표시 모드 - 정렬된 순서대로 렌더링 (선택된 것이 마지막에) */}
                 {sortedItineraries.map((itinerary, index) => (
