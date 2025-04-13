@@ -52,6 +52,37 @@ const TravelPlanDetailPage = () => {
         }
     }, [plan]);
 
+    // 모든 itinerary의 위치 정보를 하나의 배열로 변환
+    const allItineraryLocations = useMemo(() => {
+        if (!plan) return [];
+
+        return plan.itineraries.map((itinerary, index) => {
+            // 각 itinerary에 대한 색상 생성 (다른 색상을 사용하기 위해)
+            const colors = [
+                "#FF3D00", // 심홍색
+                "#FF9100", // 주황
+                "#00B0FF", // 하늘색
+                "#D500F9", // 밝은 보라
+                "#304FFE", // 어두운 파랑
+                "#FF1744", // 밝은 빨강
+                "#7C4DFF", // 진한 보라
+                "#FF6D00", // 진한 주황,
+                "#F50057", // 분홍
+                "#AA00FF", // 보라
+            ];
+            const color = colors[index % colors.length];
+
+            return {
+                locations: itinerary.activities.map((activity) => ({
+                    name: activity.locationName,
+                    region: plan.city + ", " + plan.country,
+                })),
+                color: color,
+                dayNumber: index + 1,
+            };
+        });
+    }, [plan]);
+
     if (!plan) {
         return <TravelPlanDetailSkeleton />;
     }
@@ -107,18 +138,7 @@ const TravelPlanDetailPage = () => {
                 </Carousel>
             </section>
             <section className={styles.map}>
-                <PolylineMap
-                    locationNames={
-                        selectedItinerary
-                            ? selectedItinerary.activities.map((activity) => {
-                                  return {
-                                      name: activity.locationName,
-                                      region: plan.city + ", " + plan.country,
-                                  };
-                              })
-                            : ["경복궁", "창덕궁", "종묘", "서울타워"]
-                    }
-                />
+                <PolylineMap allItineraryLocations={allItineraryLocations} selectedDayNumber={selectedItinerary ? plan.itineraries.findIndex((i) => i.id === selectedItinerary.id) + 1 : 1} />
             </section>
         </div>
     );

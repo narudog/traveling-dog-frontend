@@ -9,7 +9,7 @@ import StraightPolyline from "./StraightPolyline";
 import { fitMapToPositions } from "@/lib/mapUtils";
 
 // 실제 도로 경로 컴포넌트
-const RoadDirections = ({ positions }: { positions: LatLngLiteral[] }) => {
+const RoadDirections = ({ positions, color = "red", isHighlighted = true }: { positions: LatLngLiteral[]; color?: string; isHighlighted?: boolean }) => {
     const map = useMap();
     const routesLibrary = useMapsLibrary("routes");
     const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService | null>(null);
@@ -30,9 +30,20 @@ const RoadDirections = ({ positions }: { positions: LatLngLiteral[] }) => {
                 map,
                 suppressMarkers: true, // 마커는 별도로 표시하므로 숨김
                 polylineOptions: {
-                    strokeColor: "red",
-                    strokeOpacity: 0.8,
-                    strokeWeight: 3,
+                    strokeOpacity: 0,
+                    icons: [
+                        {
+                            icon: {
+                                path: "M 0,-0.5 0,0.5", // 짧은 선 대시 패턴
+                                strokeColor: color,
+                                strokeOpacity: isHighlighted ? 1 : 0.4,
+                                strokeWeight: isHighlighted ? 3 : 2,
+                                scale: 4,
+                            },
+                            offset: "0",
+                            repeat: "8px",
+                        },
+                    ],
                 },
             })
         );
@@ -42,7 +53,7 @@ const RoadDirections = ({ positions }: { positions: LatLngLiteral[] }) => {
                 directionsRenderer.setMap(null);
             }
         };
-    }, [routesLibrary, map]);
+    }, [routesLibrary, map, color, isHighlighted]);
 
     // 경로 계산 및 표시
     useEffect(() => {
@@ -108,10 +119,10 @@ const RoadDirections = ({ positions }: { positions: LatLngLiteral[] }) => {
     return (
         <>
             {/* 오류 발생 시 직선 폴리라인 표시 */}
-            {error && <StraightPolyline positions={positions} />}
+            {error && <StraightPolyline positions={positions} color={color} isHighlighted={isHighlighted} />}
 
-            {/* 경로 정보 표시 */}
-            {(routeInfo || error) && (
+            {/* 경로 정보 표시 - 하이라이트된 경로만 정보 표시 */}
+            {isHighlighted && (routeInfo || error) && (
                 <div
                     className="route-info"
                     style={{
@@ -123,6 +134,8 @@ const RoadDirections = ({ positions }: { positions: LatLngLiteral[] }) => {
                         borderRadius: "4px",
                         boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
                         zIndex: 1000,
+                        color: color,
+                        borderLeft: `4px solid ${color}`,
                     }}
                 >
                     {error ? (

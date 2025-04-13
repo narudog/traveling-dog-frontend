@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import RoadDirections from "./RoadDirections";
 
 // 위치 정보 처리 내부 컴포넌트
-function LocationProcessor({ locations, onPositionsChange }: { locations: string[] | LocationInfo[]; onPositionsChange: (positions: Array<{ lat: number; lng: number; name: string }>) => void }) {
+function LocationProcessor({ locations, onPositionsChange, color = "#E91E63", dayNumber = 1, isHighlighted = true }: { locations: string[] | LocationInfo[]; onPositionsChange: (positions: Array<{ lat: number; lng: number; name: string }>) => void; color?: string; dayNumber?: number; isHighlighted?: boolean }) {
     const map = useMap();
     const placesLibrary = useMapsLibrary("places");
 
@@ -126,18 +126,19 @@ function LocationProcessor({ locations, onPositionsChange }: { locations: string
                     >
                         <div
                             style={{
-                                background: "#E91E63",
+                                background: color,
                                 color: "white",
                                 padding: "5px 10px",
                                 borderRadius: "50%",
                                 fontWeight: "bold",
-                                zIndex: 2,
                                 boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-                                width: "20px",
-                                height: "20px",
+                                width: "25px",
+                                height: "25px",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
+                                opacity: isHighlighted ? 1 : 0.4,
+                                fontSize: "1rem",
                             }}
                         >
                             {index + 1}
@@ -148,16 +149,16 @@ function LocationProcessor({ locations, onPositionsChange }: { locations: string
                                 height: "0",
                                 borderLeft: "8px solid transparent",
                                 borderRight: "8px solid transparent",
-                                borderTop: "12px solid #E91E63",
+                                borderTop: `12px solid ${color}`,
                                 marginTop: "-4px",
-                                zIndex: 1,
+                                opacity: isHighlighted ? 1 : 0.4,
                             }}
                         />
                     </div>
                 </AdvancedMarker>
             ))}
 
-            {positions.length > 1 && <RoadDirections positions={positions} />}
+            {positions.length > 1 && <RoadDirections positions={positions} color={color} isHighlighted={isHighlighted} />}
         </>
     );
 }

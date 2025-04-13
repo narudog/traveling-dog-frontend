@@ -7,7 +7,7 @@ import { LatLngLiteral } from "leaflet";
 import { useState } from "react";
 
 // 직선 폴리라인 컴포넌트
-const StraightPolyline = ({ positions }: { positions: LatLngLiteral[] }) => {
+const StraightPolyline = ({ positions, color = "red", isHighlighted = true }: { positions: LatLngLiteral[]; color?: string; isHighlighted?: boolean }) => {
     const map = useMap();
     const mapsLibrary = useMapsLibrary("maps");
     const [polyline, setPolyline] = useState<google.maps.Polyline | null>(null);
@@ -24,9 +24,20 @@ const StraightPolyline = ({ positions }: { positions: LatLngLiteral[] }) => {
         const newPolyline = new mapsLibrary.Polyline({
             path: positions,
             geodesic: true,
-            strokeColor: "red", // 직선은 빨간색으로 표시
-            strokeOpacity: 0.8,
-            strokeWeight: 3,
+            strokeOpacity: 0,
+            icons: [
+                {
+                    icon: {
+                        path: "M 0,-0.5 0,0.5", // 짧은 선 대시 패턴
+                        strokeColor: color,
+                        strokeOpacity: isHighlighted ? 1 : 0.4,
+                        strokeWeight: isHighlighted ? 3 : 2,
+                        scale: 4,
+                    },
+                    offset: "0",
+                    repeat: "8px",
+                },
+            ],
         });
 
         // 지도에 폴리라인 추가
@@ -39,7 +50,7 @@ const StraightPolyline = ({ positions }: { positions: LatLngLiteral[] }) => {
                 newPolyline.setMap(null);
             }
         };
-    }, [mapsLibrary, map, positions]);
+    }, [mapsLibrary, map, positions, color, isHighlighted]);
 
     return null;
 };
