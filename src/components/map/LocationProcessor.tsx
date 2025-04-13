@@ -137,7 +137,7 @@ function LocationProcessor({ locations, onPositionsChange, color = "#E91E63", da
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                opacity: isHighlighted ? 1 : 0.4,
+                                opacity: isHighlighted ? 1 : 0.3,
                                 fontSize: "1rem",
                             }}
                         >
@@ -151,7 +151,7 @@ function LocationProcessor({ locations, onPositionsChange, color = "#E91E63", da
                                 borderRight: "8px solid transparent",
                                 borderTop: `12px solid ${color}`,
                                 marginTop: "-4px",
-                                opacity: isHighlighted ? 1 : 0.4,
+                                opacity: isHighlighted ? 1 : 0.3,
                             }}
                         />
                     </div>

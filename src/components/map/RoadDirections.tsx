@@ -25,32 +25,39 @@ const RoadDirections = ({ positions, color = "red", isHighlighted = true }: { po
         if (!routesLibrary || !map) return;
 
         setDirectionsService(new routesLibrary.DirectionsService());
-        setDirectionsRenderer(
-            new routesLibrary.DirectionsRenderer({
-                map,
-                suppressMarkers: true, // 마커는 별도로 표시하므로 숨김
-                polylineOptions: {
-                    strokeOpacity: 0,
-                    icons: [
-                        {
-                            icon: {
-                                path: "M 0,-0.5 0,0.5", // 짧은 선 대시 패턴
-                                strokeColor: color,
-                                strokeOpacity: isHighlighted ? 1 : 0.4,
-                                strokeWeight: isHighlighted ? 3 : 2,
-                                scale: 4,
-                            },
-                            offset: "0",
-                            repeat: "8px",
+
+        // 기존 렌더러가 있으면 제거
+        if (directionsRenderer) {
+            directionsRenderer.setMap(null);
+        }
+
+        // 새 렌더러 생성
+        const renderer = new routesLibrary.DirectionsRenderer({
+            map,
+            suppressMarkers: true, // 마커는 별도로 표시하므로 숨김
+            polylineOptions: {
+                strokeOpacity: 0,
+                icons: [
+                    {
+                        icon: {
+                            path: "M 0,-0.5 0,0.5", // 짧은 선 대시 패턴
+                            strokeColor: color,
+                            strokeOpacity: isHighlighted ? 1 : 0.3,
+                            strokeWeight: isHighlighted ? 4 : 1,
+                            scale: isHighlighted ? 5 : 3,
                         },
-                    ],
-                },
-            })
-        );
+                        offset: "0",
+                        repeat: isHighlighted ? "6px" : "10px",
+                    },
+                ],
+            },
+        });
+
+        setDirectionsRenderer(renderer);
 
         return () => {
-            if (directionsRenderer) {
-                directionsRenderer.setMap(null);
+            if (renderer) {
+                renderer.setMap(null);
             }
         };
     }, [routesLibrary, map, color, isHighlighted]);
@@ -111,7 +118,7 @@ const RoadDirections = ({ positions, color = "red", isHighlighted = true }: { po
                 }
 
                 // 오류 시에도 적절한 줌 레벨과 중심점을 계산하여 적용
-                fitMapToPositions(map, positions);
+                // fitMapToPositions(map, positions);
             });
     }, [directionsService, directionsRenderer, positions]);
 

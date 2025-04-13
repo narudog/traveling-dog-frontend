@@ -31,7 +31,7 @@ const StraightPolyline = ({ positions, color = "red", isHighlighted = true }: { 
                         path: "M 0,-0.5 0,0.5", // 짧은 선 대시 패턴
                         strokeColor: color,
                         strokeOpacity: isHighlighted ? 1 : 0.4,
-                        strokeWeight: isHighlighted ? 3 : 2,
+                        strokeWeight: isHighlighted ? 3 : 1,
                         scale: 4,
                     },
                     offset: "0",
