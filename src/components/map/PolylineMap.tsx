@@ -144,6 +144,9 @@ const RoadDirections = ({ positions }: { positions: LatLngLiteral[] }) => {
                     directionsRenderer.setMap(null);
                     directionsRenderer.setMap(map);
                 }
+
+                // 오류 시에도 적절한 줌 레벨과 중심점을 계산하여 적용
+                fitMapToPositions(map, positions);
             });
     }, [directionsService, directionsRenderer, positions]);
 
@@ -345,9 +348,7 @@ function MapCenterController({ positions }: { positions: Array<{ lat: number; ln
 
     useEffect(() => {
         if (map && positions.length > 0) {
-            const center = calculateCenter(positions);
-            // const center = positions[0];
-            map.panTo(center); // 👈 지도 중심 이동
+            fitMapToPositions(map, positions);
         }
     }, [positions, map]);
 
@@ -364,7 +365,7 @@ export default function PolylineMap({ locationNames }: { locationNames: string[]
             <Map
                 key={JSON.stringify(defaultPosition)} // 👉 여기가 포인트!
                 defaultCenter={defaultPosition}
-                defaultZoom={9}
+                defaultZoom={13}
                 mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID}
                 style={{ width: "100%", height: "100%" }}
             >
@@ -392,3 +393,31 @@ const calculateCenter = (positions: Array<{ lat: number; lng: number; name: stri
         lng: totalLng / positions.length,
     };
 };
+
+// 위치에 맞게 지도 뷰를 조정하는 함수
+function fitMapToPositions(map: google.maps.Map | null, positions: Array<{ lat: number; lng: number } | { lat: number; lng: number; name: string }>) {
+    if (!map || positions.length === 0) return;
+
+    const bounds = new google.maps.LatLngBounds();
+
+    // 모든 위치를 포함하는 경계 설정
+    positions.forEach((pos) => {
+        bounds.extend(new google.maps.LatLng(pos.lat, pos.lng));
+    });
+
+    // 지도 뷰를 경계에 맞게 조정
+    map.fitBounds(bounds);
+
+    // 위치가 한 개인 경우 적절한 줌 레벨 설정
+    if (positions.length === 1) {
+        map.setZoom(13); // 한 위치만 있을 경우 도시 수준의 줌 레벨
+    } else {
+        // 줌 레벨이 너무 가깝거나 멀면 조정
+        const currentZoom = map.getZoom();
+        if (currentZoom && currentZoom > 16) {
+            map.setZoom(16);
+        } else if (currentZoom && currentZoom < 4) {
+            map.setZoom(4);
+        }
+    }
+}
