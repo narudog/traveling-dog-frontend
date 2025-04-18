@@ -4,8 +4,10 @@ import "@/styles/variables.scss";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.scss";
-
+import styles from "./layout.module.scss";
 import localFont from "next/font/local";
+import BottomNavigation from "@/components/commons/BottomNavigation";
+import Header from "@/components/commons/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +40,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${pretendard.variable}`}
       >
-        {children}
+        <div className={styles.main}>
+          <div className={styles.content}>{children}</div>
+          <BottomNavigation />
+        </div>
       </body>
     </html>
   );

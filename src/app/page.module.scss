@@ -1,215 +1,209 @@
 @use "@/styles/variables" as *;
 
 .main {
-    min-height: 100vh;
-    overflow-x: hidden;
+  //   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* 히어로 섹션 */
 .hero {
-    display: flex;
-    flex-direction: column;
-    padding: $desktop-padding;
-    background: linear-gradient(135deg, #f6f9fc 0%, #e9f1f9 100%);
+  display: flex;
+  flex-direction: column;
+  padding: $desktop-padding;
+  background: linear-gradient(135deg, #f6f9fc 0%, #e9f1f9 100%);
 
-    .heroContent {
-        width: 100%;
-        text-align: center;
-        max-width: $container-xl;
-        margin: 0 auto;
+  .heroContent {
+    width: 100%;
+    text-align: center;
+    max-width: $container-xl;
+    margin: 0 auto;
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: $text-color;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        p {
-            font-size: 1.25rem;
-            color: rgba($text-color, 0.8);
-            margin-bottom: 2rem;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: $text-color;
+      margin-bottom: 1rem;
+      line-height: 1.2;
     }
+
+    p {
+      font-size: 1.25rem;
+      color: rgba($text-color, 0.8);
+      margin-bottom: 2rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
 }
 
 /* 이용 방법 섹션 */
 .howItWorks {
-    padding: $desktop-padding;
-    background-color: white;
+  padding: $desktop-padding;
+  background-color: white;
 
-    h2 {
-        text-align: center;
-        font-size: 2.25rem;
-        margin-bottom: 3rem;
-        color: $text-color;
+  h2 {
+    text-align: center;
+    font-size: 2.25rem;
+    margin-bottom: 3rem;
+    color: $text-color;
+  }
+
+  .steps {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    max-width: $container-lg;
+    margin: 0 auto;
+  }
+
+  .step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
     }
 
-    .steps {
-        display: flex;
-        justify-content: space-between;
-        gap: 2rem;
-        max-width: $container-lg;
-        margin: 0 auto;
+    .stepIcon {
+      width: 60px;
+      height: 60px;
+      background: rgba($primary-color, 0.1);
+      color: $primary-color;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 1.75rem;
     }
 
-    .step {
-        flex: 1;
-        text-align: center;
-        position: relative;
-        padding: 2rem;
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-        transition: transform 0.3s ease;
-
-        &:hover {
-            transform: translateY(-5px);
-        }
-
-        .stepIcon {
-            width: 60px;
-            height: 60px;
-            background: rgba($primary-color, 0.1);
-            color: $primary-color;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 1.75rem;
-        }
-
-        .stepNumber {
-            position: absolute;
-            top: -15px;
-            right: -15px;
-            width: 35px;
-            height: 35px;
-            background: $primary-color;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-            color: $text-color;
-        }
-
-        p {
-            color: rgba($text-color, 0.8);
-            line-height: 1.5;
-        }
+    .stepNumber {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      width: 35px;
+      height: 35px;
+      background: $primary-color;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 600;
     }
+
+    h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      color: $text-color;
+    }
+
+    p {
+      color: rgba($text-color, 0.8);
+      line-height: 1.5;
+    }
+  }
 }
 
 /* 인기 여행 일정 섹션 */
 .popularPlans {
-    padding: $desktop-padding;
-    background-color: #f9fafb;
+  padding: $desktop-padding;
+  background-color: #f9fafb;
 
-    h2 {
-        text-align: center;
-        font-size: 2.25rem;
-        margin-bottom: 3rem;
-        color: $text-color;
-    }
+  h2 {
+    text-align: center;
+    font-size: 2.25rem;
+    margin-bottom: 3rem;
+    color: $text-color;
+  }
 }
 
 /* 태블릿 & 모바일 반응형 */
 @media (max-width: $breakpoint-lg) {
-    .hero {
-        padding: $tablet-padding;
+  .hero {
+    padding: $tablet-padding;
 
-        .heroContent {
-            h1 {
-                font-size: 2rem;
-            }
+    .heroContent {
+      h1 {
+        font-size: 2rem;
+      }
 
-            p {
-                font-size: 1.1rem;
-            }
-        }
-
-        .mapWrapper {
-            height: 350px;
-        }
+      p {
+        font-size: 1.1rem;
+      }
     }
 
-    .howItWorks {
-        padding: $tablet-padding;
+    .mapWrapper {
+      height: 350px;
+    }
+  }
 
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 2.5rem;
-        }
+  .howItWorks {
+    padding: $tablet-padding;
 
-        .steps {
-            flex-direction: column;
-            max-width: 600px;
-        }
-
-        .step {
-            margin-bottom: 2rem;
-        }
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 2.5rem;
     }
 
-    .popularPlans {
-        padding: $tablet-padding;
-
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 2.5rem;
-        }
+    .steps {
+      flex-direction: column;
+      max-width: 600px;
     }
+
+    .step {
+      margin-bottom: 2rem;
+    }
+  }
+
+  .popularPlans {
+    padding: $tablet-padding;
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 2.5rem;
+    }
+  }
 }
 
 /* 모바일 반응형 */
 @media (max-width: $breakpoint-sm) {
-    .hero {
-        padding: $mobile-padding;
+  .hero {
+    padding: $mobile-padding;
 
-        .heroContent {
-            h1 {
-                display: none;
-            }
+    .heroContent {
+      h1 {
+        display: none;
+      }
 
-            p {
-                font-size: 1rem;
-                margin-bottom: 1.5rem;
-            }
-        }
-
-        .mapWrapper {
-            height: 250px;
-        }
+      p {
+        display: none;
+      }
     }
 
-    .howItWorks {
-        padding: $mobile-padding;
-
-        h2 {
-            font-size: 1.75rem;
-            margin-bottom: 2rem;
-        }
+    .mapWrapper {
+      height: 250px;
     }
+  }
 
-    .popularPlans {
-        padding: $mobile-padding;
+  .howItWorks {
+    display: none;
+  }
 
-        h2 {
-            font-size: 1.75rem;
-            margin-bottom: 2rem;
-        }
+  .popularPlans {
+    padding: $mobile-padding;
+
+    h2 {
+      font-size: 1.75rem;
+      margin-bottom: 2rem;
     }
+  }
 }
