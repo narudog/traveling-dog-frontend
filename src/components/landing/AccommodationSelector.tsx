@@ -1,5 +1,5 @@
 // src/components/booking/AccommodationSelector.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useBookingStore } from "@/store/booking";
 import { Hotel } from "@/types/booking";
 import { format, addDays, differenceInDays } from "date-fns";
@@ -11,113 +11,83 @@ interface AccommodationSelectorProps {
   startDate: string;
   endDate: string;
   onSelect: (selectedHotels: SelectedHotelByDate[]) => void;
+  hotels: Hotel[];
+  destId: string;
+  dateRange: string[];
 }
 
 export default function AccommodationSelector({
-  city,
   startDate,
-  endDate,
   onSelect,
+  hotels,
+  dateRange,
 }: AccommodationSelectorProps) {
-  const { searchHotelsDestination, searchHotels, loading } = useBookingStore();
+  const { loading } = useBookingStore();
   const [currentDate, setCurrentDate] = useState(startDate);
-  const [hotels, setHotels] = useState<Hotel[]>([]);
   const [selectedHotels, setSelectedHotels] = useState<SelectedHotelByDate[]>(
     []
   );
-  const [destId, setDestId] = useState("");
-  const [searchingDestId, setSearchingDestId] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const selectedHotelsRef = useRef<SelectedHotelByDate[]>([]);
 
-  // 날짜 범위 계산
-  const dateRange = Array.from(
-    { length: differenceInDays(new Date(endDate), new Date(startDate)) + 1 },
-    (_, i) => format(addDays(new Date(startDate), i), "yyyy-MM-dd")
-  );
+  // 선택된 호텔 정보가 변경될 때마다 ref 업데이트
+  useEffect(() => {
+    selectedHotelsRef.current = selectedHotels;
+  }, [selectedHotels]);
 
   // 다음 날짜로 이동
-  const goToNextDate = () => {
+  const goToNextDate = useCallback(() => {
     const currentIndex = dateRange.indexOf(currentDate);
     if (currentIndex < dateRange.length - 1) {
       setCurrentDate(dateRange[currentIndex + 1]);
       setCurrentStep((prev) => prev + 1);
     }
-  };
+  }, [currentDate, dateRange]);
 
   // 이전 날짜로 이동
-  const goToPrevDate = () => {
+  const goToPrevDate = useCallback(() => {
     const currentIndex = dateRange.indexOf(currentDate);
     if (currentIndex > 0) {
       setCurrentDate(dateRange[currentIndex - 1]);
       setCurrentStep((prev) => prev - 1);
     }
-  };
+  }, [currentDate, dateRange]);
 
   // 호텔 선택 핸들러
-  const selectHotel = (hotel: Hotel) => {
-    setSelectedHotels((prev) => [
-      ...prev,
-      {
-        date: currentDate,
-        accommodation: hotel.name,
-      },
-    ]);
+  const selectHotel = useCallback(
+    (hotel: Hotel) => {
+      setSelectedHotels((prev) => {
+        // 이미 같은 날짜에 다른 호텔이 선택되어 있다면 해당 항목 제거
+        const filtered = prev.filter((item) => item.date !== currentDate);
+        // 새로운 호텔 선택 추가
+        return [
+          ...filtered,
+          {
+            date: currentDate,
+            accommodation: hotel.name,
+          },
+        ];
+      });
 
-    // 마지막 날짜가 아니면 자동으로 다음 날짜로 이동
-    if (currentDate !== dateRange[dateRange.length - 1]) {
-      goToNextDate();
-    } else {
-      // 모든 날짜에 대한 호텔 선택이 완료되면 부모 컴포넌트에 전달
+      // 마지막 날짜가 아니면, 자동으로 다음 날짜로 이동
+      if (currentDate !== dateRange[dateRange.length - 1]) {
+        goToNextDate();
+      }
+    },
+    [currentDate, dateRange, goToNextDate]
+  );
+
+  // 선택된 호텔이 변경될 때마다 부모에게 알림
+  useEffect(() => {
+    // 최초 마운트시에는 호출하지 않음
+    if (selectedHotels.length > 0) {
       onSelect(selectedHotels);
     }
-  };
+  }, [selectedHotels, onSelect]);
 
-  // 목적지 ID 조회
-  useEffect(() => {
-    const fetchDestId = async () => {
-      if (!city) return;
-
-      setSearchingDestId(true);
-      try {
-        const id = await searchHotelsDestination({ city });
-        setDestId(id);
-      } catch (error) {
-        console.error("목적지 ID 조회 실패:", error);
-      } finally {
-        setSearchingDestId(false);
-      }
-    };
-
-    fetchDestId();
-  }, [city, searchHotelsDestination]);
-
-  // 호텔 검색
-  useEffect(() => {
-    const fetchHotels = async () => {
-      if (!destId || !currentDate) return;
-
-      try {
-        // 체크인 날짜는 현재 선택된 날짜
-        // 체크아웃 날짜는 다음 날짜 (1박 2일 기준)
-        const nextDay = format(addDays(new Date(currentDate), 1), "yyyy-MM-dd");
-
-        const results = await searchHotels({
-          destId,
-          checkInDate: currentDate,
-          checkOutDate: nextDay,
-          adults: 2,
-        });
-
-        setHotels(results);
-      } catch (error) {
-        console.error("호텔 검색 실패:", error);
-      }
-    };
-
-    if (destId && !searchingDestId) {
-      fetchHotels();
-    }
-  }, [destId, currentDate, searchHotels, searchingDestId]);
+  // 선택된 호텔 수 계산
+  const selectedDatesCount = selectedHotels.length;
+  const allDatesSelected = selectedDatesCount === dateRange.length;
 
   // 진행 상태 표시
   const progress = ((currentStep + 1) / dateRange.length) * 100;
@@ -178,7 +148,9 @@ export default function AccommodationSelector({
               key={hotel.id}
               className={`${styles.hotelCard} ${
                 selectedHotels.find(
-                  (selectedHotel) => selectedHotel.accommodation === hotel.name
+                  (selectedHotel) =>
+                    selectedHotel.date === currentDate &&
+                    selectedHotel.accommodation === hotel.name
                 )
                   ? styles.selected
                   : ""
@@ -207,19 +179,6 @@ export default function AccommodationSelector({
             <p>다른 날짜를 선택하거나 나중에 다시 시도해주세요.</p>
           </div>
         )}
-      </div>
-
-      {/* 완료 버튼 */}
-      <div className={styles.actionButtons}>
-        <button
-          type="button"
-          className={styles.completeButton}
-          disabled={Object.keys(selectedHotels).length !== dateRange.length}
-          onClick={() => onSelect(selectedHotels)}
-        >
-          숙소 선택 완료 ({Object.keys(selectedHotels).length}/
-          {dateRange.length})
-        </button>
       </div>
     </div>
   );

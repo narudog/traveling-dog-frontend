@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import styles from "./SearchSection.module.scss";
 import { useForm } from "react-hook-form";
 import { usePlanStore } from "@/store/plan";
@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import AccommodationSelector from "./AccommodationSelector";
 import { Hotel } from "@/types/booking";
 import { SelectedHotelByDate } from "@/types/plan";
+import { useBookingStore } from "@/store/booking";
+import { differenceInDays, format, addDays } from "date-fns";
 
 type SearchFormInputs = {
   city: string;
@@ -59,6 +61,7 @@ const transportationOptions = [
 
 export default function SearchSection() {
   const { createPlan } = usePlanStore();
+  const { searchHotelsDestination, searchHotels } = useBookingStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
@@ -70,6 +73,10 @@ export default function SearchSection() {
   );
   const [showAccommodationSelector, setShowAccommodationSelector] =
     useState(false);
+  const [destId, setDestId] = useState("");
+  const [hotels, setHotels] = useState<Hotel[]>([]);
+  const [isSearchingHotels, setIsSearchingHotels] = useState(false);
+  const [dateRange, setDateRange] = useState<string[]>([]);
 
   // 선택된 태그 상태 관리 (다중 선택을 위해 배열로 변경)
   const [selectedTravelStyles, setSelectedTravelStyles] = useState<string[]>(
@@ -108,6 +115,8 @@ export default function SearchSection() {
 
   // 시작일 값 감시
   const startDate = watch("startDate");
+  const endDate = watch("endDate");
+  const city = watch("city");
 
   // 태그 선택 핸들러 (다중 선택 지원)
   const handleTagSelect = (field: keyof SearchFormInputs, value: string) => {
@@ -257,11 +266,83 @@ export default function SearchSection() {
   };
 
   // 호텔 선택 처리 함수
-  const handleHotelSelection = (hotels: SelectedHotelByDate[]) => {
+  const handleHotelSelection = useCallback((hotels: SelectedHotelByDate[]) => {
     setSelectedHotels(hotels);
     console.log("선택된 호텔:", hotels);
-    // 여기서 선택된 호텔 정보를 필요에 따라 활용할 수 있습니다
-  };
+  }, []);
+
+  // 목적지 ID 및 호텔 검색
+  useEffect(() => {
+    let isMounted = true;
+
+    const searchDestinationAndHotels = async () => {
+      if (!city || !startDate || !endDate) return;
+
+      // 날짜가 변경되면 선택된 호텔 초기화
+      setSelectedHotels([]);
+      setIsSearchingHotels(true);
+
+      try {
+        // 1. 먼저 목적지 ID 검색
+        const destinationId = await searchHotelsDestination({ city });
+        if (!isMounted) return;
+
+        setDestId(destinationId);
+
+        if (!destinationId) {
+          return;
+        }
+
+        // 2. 전체 기간에 대한 호텔 정보 한 번에 검색
+        const results = await searchHotels({
+          destId: destinationId,
+          checkInDate: startDate,
+          checkOutDate: endDate,
+          adults: 2,
+        });
+
+        if (!isMounted) return;
+
+        // 날짜 범위 계산
+        const dates = Array.from(
+          {
+            length:
+              differenceInDays(new Date(endDate), new Date(startDate)) + 1,
+          },
+          (_, i) => format(addDays(new Date(startDate), i), "yyyy-MM-dd")
+        );
+
+        setDateRange(dates);
+        setHotels(results);
+      } catch (error) {
+        console.error("호텔 검색 실패:", error);
+      } finally {
+        if (isMounted) {
+          setIsSearchingHotels(false);
+        }
+      }
+    };
+
+    searchDestinationAndHotels();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [city, startDate, endDate, searchHotelsDestination, searchHotels]);
+
+  // 숙소 선택기 토글 시 리셋
+  useEffect(() => {
+    if (!showAccommodationSelector) {
+      // 선택 창이 닫힐 때는 기존 선택 유지
+      return;
+    }
+
+    // 처음 열릴 때 숙소 선택 창 초기화
+    if (hotels.length === 0) {
+      // 호텔 데이터가 없으면 초기화
+      setSelectedHotels([]);
+    }
+  }, [showAccommodationSelector, hotels]);
 
   const onSubmit = async (data: SearchFormInputs) => {
     const isStepValid = await validateCurrentStep();
@@ -495,22 +576,32 @@ export default function SearchSection() {
               onClick={() =>
                 setShowAccommodationSelector(!showAccommodationSelector)
               }
+              disabled={
+                isSearchingHotels ||
+                !city ||
+                !startDate ||
+                !endDate ||
+                hotels.length === 0
+              }
             >
-              {showAccommodationSelector
-                ? "숙소 선택 닫기"
-                : "날짜별 숙소 선택하기"}
+              {isSearchingHotels
+                ? "호텔 정보 로딩 중..."
+                : showAccommodationSelector
+                  ? "숙소 선택 닫기"
+                  : "날짜별 숙소 선택하기"}
             </button>
 
-            {showAccommodationSelector &&
-              watch("startDate") &&
-              watch("endDate") && (
-                <AccommodationSelector
-                  city={watch("city")}
-                  startDate={watch("startDate")}
-                  endDate={watch("endDate")}
-                  onSelect={handleHotelSelection}
-                />
-              )}
+            {showAccommodationSelector && city && startDate && endDate && (
+              <AccommodationSelector
+                city={city}
+                startDate={startDate}
+                endDate={endDate}
+                onSelect={handleHotelSelection}
+                hotels={hotels}
+                destId={destId}
+                dateRange={dateRange}
+              />
+            )}
           </div>
         </div>
 
