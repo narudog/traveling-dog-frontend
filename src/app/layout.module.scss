@@ -3,11 +3,7 @@
   flex-direction: column;
   position: relative;
   overflow-y: auto; /* 스크롤 컨텍스트를 생성하여 sticky 동작을 활성화 */
-  height: 100vh; /* 전체 높이를 차지하도록 설정 */
-
-  @supports (padding-bottom: env(safe-area-inset-bottom)) {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+  height: 100vh;
 
   // 데스크톱에서는 하단 패딩 제거
   @media (min-width: 768px) {

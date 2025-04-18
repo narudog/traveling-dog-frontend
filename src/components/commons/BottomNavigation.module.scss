@@ -1,13 +1,15 @@
 .bottomNavigation {
   position: sticky;
-  height: 60px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background-color: #ffffff;
   display: flex;
   justify-content: space-around;
   align-items: center;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   z-index: 100;
-  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-block: 16px;
 }
 
 .navItem {
@@ -52,13 +54,5 @@
 @media (min-width: 768px) {
   .bottomNavigation {
     display: none;
-  }
-}
-
-// iPhone X 이상의 기기에서 하단 safe area 고려
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .bottomNavigation {
-    padding-bottom: env(safe-area-inset-bottom);
-    height: calc(60px + env(safe-area-inset-bottom));
   }
 }

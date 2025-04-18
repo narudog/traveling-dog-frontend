@@ -43,16 +43,6 @@ const BottomNavigation = () => {
         </Link>
       </div>
 
-      <div className={styles.navItem}>
-        <Link
-          href="/search"
-          className={isActive("/search") ? styles.active : ""}
-        >
-          <FaSearch size={24} />
-          <span>검색</span>
-        </Link>
-      </div>
-
       <div
         className={styles.navItem}
         onClick={() => handleAuthRequiredNavigation("/travel-plan/list")}
