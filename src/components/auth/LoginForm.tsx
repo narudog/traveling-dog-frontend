@@ -33,7 +33,7 @@ function LoginForm() {
     const value = e.target.value;
     setEmail(value);
     if (!validateEmail(value)) {
-      setEmailError("invalid email");
+      setEmailError("유효한 이메일을 입력해주세요");
     } else {
       setEmailError("");
     }
@@ -43,7 +43,7 @@ function LoginForm() {
     const value = e.target.value;
     setPassword(value);
     if (!validatePassword(value)) {
-      setPasswordError("invalid password");
+      setPasswordError("비밀번호는 8자 이상이어야 합니다");
     } else {
       setPasswordError("");
     }
@@ -55,11 +55,11 @@ function LoginForm() {
     let valid = true;
 
     if (!validateEmail(email)) {
-      setEmailError("invalid email");
+      setEmailError("유효한 이메일을 입력해주세요");
       valid = false;
     }
     if (!validatePassword(password)) {
-      setPasswordError("invalid password");
+      setPasswordError("비밀번호는 8자 이상이어야 합니다");
       valid = false;
     }
 
@@ -94,31 +94,39 @@ function LoginForm() {
     <>
       <form className={styles.form} onSubmit={handleLogin}>
         <div className={styles.inputGroup}>
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">이메일</label>
 
           <input
             id="email"
-            type="text"
+            type="email"
             value={email}
             onChange={handleEmailChange}
+            placeholder="example@example.com"
+            autoComplete="email"
           />
-          {emailError && <p className={styles.error}>{emailError}</p>}
+          {emailError && (
+            <p className={styles.error}>유효한 이메일을 입력해주세요</p>
+          )}
         </div>
         <div className={styles.inputGroup}>
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">비밀번호</label>
           <input
             id="password"
             type="password"
             value={password}
             onChange={handlePasswordChange}
+            placeholder="8자 이상 입력해주세요"
+            autoComplete="current-password"
           />
-          {passwordError && <p className={styles.error}>{passwordError}</p>}
+          {passwordError && (
+            <p className={styles.error}>비밀번호는 8자 이상이어야 합니다</p>
+          )}
         </div>
         <button type="submit" className={styles.button}>
-          Sign In
+          로그인
         </button>
         <Link href="/signup" className={styles.button}>
-          Sign Up
+          회원가입
         </Link>
         {formError && <p className={styles.error}>{formError}</p>}
         {auth.error && (
