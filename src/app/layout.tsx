@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 const pretendard = localFont({
-  src: "../public/fonts/PretendardVariable.woff2",
+  src: "../../public/fonts/PretendardVariable.woff2",
   variable: "--font-pretendard",
   display: "swap",
 });
