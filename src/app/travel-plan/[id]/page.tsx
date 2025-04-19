@@ -9,6 +9,15 @@ import styles from "./page.module.scss";
 import { Itinerary, Location, TravelPlan } from "@/types/plan";
 import { useAuthStore } from "@/store/auth";
 import Carousel from "@/components/carousel/Carousel";
+import { PlaceWithRating } from "@/types/plan";
+
+// 평점 정보를 포함한 액티비티 타입
+interface ActivityWithRating extends Location {
+    rating?: number;
+    totalRatings?: number;
+    photos?: any;
+    reviews?: any;
+}
 
 const TravelPlanDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -16,6 +25,7 @@ const TravelPlanDetailPage = () => {
     const [selectedItinerary, setSelectedItinerary] = useState<Itinerary>();
     const { user } = useAuthStore();
     const [slidesToShow, setSlidesToShow] = useState(3);
+    const [activitiesWithRatings, setActivitiesWithRatings] = useState<Record<number, ActivityWithRating>>({});
 
     useEffect(() => {
         if (user) {
@@ -44,6 +54,34 @@ const TravelPlanDetailPage = () => {
 
     const onClickItinerary = (itinerary: Itinerary) => {
         setSelectedItinerary(itinerary);
+    };
+
+    // 장소 클릭 처리 함수
+    const handlePlaceClick = (activity: ActivityWithRating) => {
+        // // 구글 맵에서 장소 검색
+        // window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.locationName)}`, "_blank");
+    };
+
+    // LocationProcessor에서 장소 상세 정보 수신 처리
+    const handlePlaceDetailsChange = (places: PlaceWithRating[]) => {
+        const newRatings: Record<number, ActivityWithRating> = {};
+
+        places.forEach((place) => {
+            if (place.id) {
+                newRatings[place.id] = {
+                    ...(activitiesWithRatings[place.id] || {}),
+                    id: place.id,
+                    rating: place.rating,
+                    totalRatings: place.totalRatings,
+                    title: activitiesWithRatings[place.id]?.title || "",
+                    photos: place.photos,
+                    reviews: place.reviews,
+                    description: activitiesWithRatings[place.id]?.description || "",
+                };
+            }
+        });
+
+        setActivitiesWithRatings((prev) => ({ ...prev, ...newRatings }));
     };
 
     useEffect(() => {
@@ -79,6 +117,7 @@ const TravelPlanDetailPage = () => {
                 })),
                 color: color,
                 dayNumber: index + 1,
+                activityIds: itinerary.activities.map((a) => a.id),
             };
         });
     }, [plan]);
@@ -86,6 +125,13 @@ const TravelPlanDetailPage = () => {
     if (!plan) {
         return <TravelPlanDetailSkeleton />;
     }
+
+    // 별점 렌더링 함수
+    const renderStars = (rating?: number) => {
+        if (!rating) return "평점 없음";
+
+        return <span className={styles.stars}>{` ${rating.toFixed(1)}`} / 5</span>;
+    };
 
     return (
         <div className={styles.planDetail}>
@@ -128,8 +174,18 @@ const TravelPlanDetailPage = () => {
                             </div>
                             <ul className={styles.locationDesc}>
                                 {itinerary.activities.map((activity, index) => (
-                                    <li key={activity.id}>
-                                        {index + 1}. {activity.title}
+                                    <li
+                                        key={activity.id}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handlePlaceClick(activity);
+                                        }}
+                                        className={styles.activityItem}
+                                    >
+                                        <div className={styles.activityTitle}>
+                                            {index + 1}. {activity.title}
+                                        </div>
+                                        <div className={styles.activityRating}>{activitiesWithRatings[activity.id]?.rating ? renderStars(activitiesWithRatings[activity.id].rating) : "로딩중..."}</div>
                                     </li>
                                 ))}
                             </ul>
@@ -138,7 +194,7 @@ const TravelPlanDetailPage = () => {
                 </Carousel>
             </section>
             <section className={styles.map}>
-                <PolylineMap allItineraryLocations={allItineraryLocations} selectedDayNumber={selectedItinerary ? plan.itineraries.findIndex((i) => i.id === selectedItinerary.id) + 1 : 1} />
+                <PolylineMap allItineraryLocations={allItineraryLocations} selectedDayNumber={selectedItinerary ? plan.itineraries.findIndex((i) => i.id === selectedItinerary.id) + 1 : 1} onPlaceDetailsChange={handlePlaceDetailsChange} />
             </section>
         </div>
     );

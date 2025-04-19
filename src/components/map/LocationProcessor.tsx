@@ -4,13 +4,31 @@ import { AdvancedMarker } from "@vis.gl/react-google-maps";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { useEffect, useState } from "react";
 import RoadDirections from "./RoadDirections";
+import { PlaceWithRating } from "@/types/plan";
 
 // 위치 정보 처리 내부 컴포넌트
-function LocationProcessor({ locations, onPositionsChange, color = "#E91E63", dayNumber = 1, isHighlighted = true }: { locations: string[] | LocationInfo[]; onPositionsChange: (positions: Array<{ lat: number; lng: number; name: string }>) => void; color?: string; dayNumber?: number; isHighlighted?: boolean }) {
+function LocationProcessor({
+    locations,
+    onPositionsChange,
+    onPlaceDetailsChange, // 평점 정보를 포함한 장소 상세 정보를 전달하는 콜백
+    color = "#E91E63",
+    dayNumber = 1,
+    isHighlighted = true,
+    activityIds = [], // 액티비티 ID를 전달받는 옵션 추가
+}: {
+    locations: string[] | LocationInfo[];
+    onPositionsChange: (positions: Array<{ lat: number; lng: number; name: string }>) => void;
+    onPlaceDetailsChange?: (places: PlaceWithRating[]) => void;
+    color?: string;
+    dayNumber?: number;
+    isHighlighted?: boolean;
+    activityIds?: number[];
+}) {
     const map = useMap();
     const placesLibrary = useMapsLibrary("places");
 
     const [positions, setPositions] = useState<Array<{ lat: number; lng: number; name: string }>>([]);
+    const [placesWithRatings, setPlacesWithRatings] = useState<PlaceWithRating[]>([]);
 
     // 문자열 배열인지 객체 배열인지 확인
     const isStringArray = locations.length > 0 && typeof locations[0] === "string";
@@ -23,8 +41,10 @@ function LocationProcessor({ locations, onPositionsChange, color = "#E91E63", da
                 // 문자열 위치 이름 배열 처리
                 const stringLocations = locations as string[];
                 const results: Array<{ lat: number; lng: number; name: string }> = [];
+                const placeResults: PlaceWithRating[] = [];
 
-                for (const name of stringLocations) {
+                for (let i = 0; i < stringLocations.length; i++) {
+                    const name = stringLocations[i];
                     try {
                         // 이름과 지역 분리 (형식: "이름, 지역")
                         const parts = name.split(",");
@@ -36,20 +56,34 @@ function LocationProcessor({ locations, onPositionsChange, color = "#E91E63", da
                         // 새로운 Place API를 사용
                         const { places } = await placesLibrary.Place.searchByText({
                             textQuery: queryString,
-                            fields: ["displayName", "location"],
+                            fields: ["displayName", "location", "photos", "rating", "userRatingCount", "id", "reviews"],
                         });
 
                         if (places && places.length > 0) {
                             const place = places[0];
                             if (place.location) {
-                                results.push({
+                                const locationInfo = {
                                     lat: place.location.lat(),
                                     lng: place.location.lng(),
                                     name: place.displayName || name,
+                                };
+
+                                results.push(locationInfo);
+
+                                // 평점 정보를 포함한 장소 데이터 저장
+                                placeResults.push({
+                                    id: activityIds[i], // 연결된 액티비티 ID가 있다면 저장
+                                    name: place.displayName || name,
+                                    rating: place.rating !== null ? place.rating : undefined,
+                                    totalRatings: place.userRatingCount || undefined,
+                                    placeId: place.id,
+                                    photos: place.photos || undefined,
+                                    reviews: place.reviews || undefined,
                                 });
 
                                 if (results.length === stringLocations.length) {
                                     setPositions(results);
+                                    setPlacesWithRatings(placeResults);
                                 }
                             }
                         }
@@ -61,56 +95,70 @@ function LocationProcessor({ locations, onPositionsChange, color = "#E91E63", da
                 // LocationInfo 객체 배열 처리
                 const locInfoArray = locations as LocationInfo[];
                 const results: Array<{ lat: number; lng: number; name: string }> = [];
+                const placeResults: PlaceWithRating[] = [];
 
-                for (const loc of locInfoArray) {
-                    if (loc.coords) {
-                        // 이미 좌표가 있는 경우
-                        results.push({
-                            lat: loc.coords.lat,
-                            lng: loc.coords.lng,
-                            name: loc.name,
+                for (let i = 0; i < locInfoArray.length; i++) {
+                    const loc = locInfoArray[i];
+                    try {
+                        // 좌표가 없고 이름만 있는 경우
+                        const queryString = loc.region ? `${loc.name} ${loc.region}` : loc.name;
+
+                        // 새로운 Place API를 사용
+                        const { places } = await placesLibrary.Place.searchByText({
+                            textQuery: queryString,
+                            fields: ["displayName", "location", "photos", "rating", "userRatingCount", "id", "reviews"],
                         });
-                    } else {
-                        try {
-                            // 좌표가 없고 이름만 있는 경우
-                            const queryString = loc.region ? `${loc.name} ${loc.region}` : loc.name;
 
-                            // 새로운 Place API를 사용
-                            const { places } = await placesLibrary.Place.searchByText({
-                                textQuery: queryString,
-                                fields: ["displayName", "location"],
-                            });
+                        if (places && places.length > 0) {
+                            const place = places[0];
+                            if (place.location) {
+                                const locationInfo = {
+                                    lat: place.location.lat(),
+                                    lng: place.location.lng(),
+                                    name: place.displayName || loc.name,
+                                };
 
-                            if (places && places.length > 0) {
-                                const place = places[0];
-                                if (place.location) {
-                                    results.push({
-                                        lat: place.location.lat(),
-                                        lng: place.location.lng(),
-                                        name: place.displayName || loc.name,
-                                    });
-                                }
+                                results.push(locationInfo);
+
+                                // 평점 정보를 포함한 장소 데이터 저장
+                                placeResults.push({
+                                    id: activityIds[i], // 연결된 액티비티 ID가 있다면 저장
+                                    name: place.displayName || loc.name,
+                                    rating: place.rating !== null ? place.rating : undefined,
+                                    totalRatings: place.userRatingCount || undefined,
+                                    placeId: place.id,
+                                    photos: place.photos || undefined,
+                                    reviews: place.reviews || undefined,
+                                });
                             }
-                        } catch (error) {
-                            console.error("장소 검색 오류:", error);
                         }
+                    } catch (error) {
+                        console.error("장소 검색 오류:", error);
                     }
                 }
 
                 if (results.length > 0) {
                     setPositions(results);
+                    setPlacesWithRatings(placeResults);
                 }
             }
         };
 
         processLocations();
-    }, [placesLibrary, map, locations, isStringArray]);
+    }, [placesLibrary, map, locations, isStringArray, activityIds]);
 
     useEffect(() => {
         if (positions.length > 0) {
             onPositionsChange(positions);
         }
     }, [positions]);
+
+    // 평점 정보를 포함한 장소 데이터 상태가 변경되면 콜백으로 전달
+    useEffect(() => {
+        if (placesWithRatings.length > 0 && onPlaceDetailsChange) {
+            onPlaceDetailsChange(placesWithRatings);
+        }
+    }, [placesWithRatings]);
 
     return (
         <>
