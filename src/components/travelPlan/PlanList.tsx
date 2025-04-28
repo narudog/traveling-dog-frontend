@@ -9,14 +9,23 @@ interface PlanListProps {
 
 const PlanList = ({ planList }: PlanListProps) => {
   return (
-    <div className={styles["travel-plan-list__container"]}>
-      <div className={styles["travel-plan-list__grid"]}>
-        {planList.map((plan) => (
-          <Link href={`/travel-plan/${plan.id}`} key={plan.id}>
-            <PlanCard plan={plan} />
+    <div className={styles.container}>
+      {planList.length === 0 ? (
+        <div className={styles.empty}>
+          <div>여행 계획이 없습니다.</div>
+          <Link href="/">
+            <button className={styles.button}>여행 계획 만들기</button>
           </Link>
-        ))}
-      </div>
+        </div>
+      ) : (
+        <div className={styles.grid}>
+          {planList.map((plan) => (
+            <Link href={`/travel-plan/${plan.id}`} key={plan.id}>
+              <PlanCard plan={plan} />
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,3 +1,5 @@
+@import "@/styles/variables.scss";
+
 .header {
   position: sticky;
   top: 0;
@@ -42,42 +44,37 @@
       border-radius: 25px;
       font-weight: 700;
       transition: all 0.3s ease;
-    }
-
-    .loginButton {
-      color: #4caf50;
-      border: 1px solid #4caf50;
 
       &:hover {
-        background: rgba(76, 175, 80, 0.1);
+        transform: translateY(-3px);
       }
     }
 
-    .signupButton {
-      background: #4caf50;
-      color: white;
+    .loginButton {
+      color: $secondary-color;
+      border: 2px solid $secondary-color;
 
       &:hover {
-        background: #45a049;
-        transform: translateY(-2px);
+        color: $secondary-color-hover;
+        border: 2px solid $secondary-color-hover;
       }
     }
 
     .logoutButton {
-      background: #4caf50;
+      background: $secondary-color;
       color: white;
 
       &:hover {
-        background: #45a049;
+        background: $secondary-color-hover;
       }
     }
 
     .travelPlanButton {
-      background: #79a7e4;
+      background: $secondary-color;
       color: white;
 
       &:hover {
-        background: #457fa0;
+        background: $secondary-color-hover;
       }
     }
   }

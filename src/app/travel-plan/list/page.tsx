@@ -18,8 +18,6 @@ const TravelPlanList = () => {
 
   return (
     <div className={styles["travel-plan-list"]}>
-      <h1 className={styles["travel-plan-list__title"]}>여행 계획 목록</h1>
-
       <PlanList planList={planList} />
     </div>
   );
