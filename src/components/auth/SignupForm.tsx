@@ -11,7 +11,7 @@ export default function SignupForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [nickname, setNickname] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const auth = useAuthStore();
   const validateEmail = (email: string) => {
@@ -113,7 +113,7 @@ export default function SignupForm() {
         />
       </div>
 
-      {error && <p className={styles.error}>{error}</p>}
+      {error && <p className={styles.error}>회원가입 실패 : {error}</p>}
 
       <button type="submit" className={styles.button} disabled={isLoading}>
         {isLoading ? "처리 중..." : "회원가입"}
