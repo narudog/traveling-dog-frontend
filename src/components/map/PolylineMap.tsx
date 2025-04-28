@@ -5,6 +5,7 @@ import { AdvancedMarker, APIProvider, Map, useMap } from "@vis.gl/react-google-m
 import { useEffect, useState, useMemo } from "react";
 import LocationProcessor from "./LocationProcessor";
 import { calculateCenter, fitMapToPositions } from "@/lib/mapUtils";
+import { PlaceWithRating } from "@/types/plan";
 
 // 🧠 중심 이동 전용 서브 컴포넌트
 function MapCenterController({ positions }: { positions: Array<{ lat: number; lng: number; name: string }> }) {
@@ -23,9 +24,10 @@ interface ItineraryLocation {
     locations: LocationInfo[];
     color: string;
     dayNumber: number;
+    activityIds?: number[];
 }
 
-export default function PolylineMap({ locationNames, allItineraryLocations, selectedDayNumber }: { locationNames?: string[] | LocationInfo[]; allItineraryLocations?: ItineraryLocation[]; selectedDayNumber?: number }) {
+export default function PolylineMap({ locationNames, allItineraryLocations, selectedDayNumber, onPlaceDetailsChange }: { locationNames?: string[] | LocationInfo[]; allItineraryLocations?: ItineraryLocation[]; selectedDayNumber?: number; onPlaceDetailsChange?: (places: PlaceWithRating[]) => void }) {
     const [positions, setPositions] = useState<Array<{ lat: number; lng: number; name: string }>>([]);
     const [allPositions, setAllPositions] = useState<Array<{ lat: number; lng: number; name: string }>>([]);
 
@@ -87,9 +89,11 @@ export default function PolylineMap({ locationNames, allItineraryLocations, sele
                                 setAllPositions((prev) => [...prev, ...positions]);
                             }
                         }}
+                        onPlaceDetailsChange={onPlaceDetailsChange}
                         color={itinerary.color}
                         dayNumber={itinerary.dayNumber}
                         isHighlighted={selectedDayNumber === itinerary.dayNumber}
+                        activityIds={itinerary.activityIds}
                     />
                 ))}
 
