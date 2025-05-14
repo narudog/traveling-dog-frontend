@@ -58,7 +58,7 @@ export default function Home() {
 
         {/* Popular Plans Section */}
         <section className={styles.popularPlans}>
-          <h2>인기 여행 일정</h2>
+          <h2>인기 여행지</h2>
           <PlanList planList={[]} />
         </section>
       </main>
