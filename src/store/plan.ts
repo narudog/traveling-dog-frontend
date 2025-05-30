@@ -56,7 +56,7 @@ export const usePlanStore = create<PlanState & PlanActions>((set) => ({
   getPlanList: async () => {
     set({ loading: true, error: null });
     try {
-      const { data } = await axiosInstance.get("/travel/plans");
+      const { data } = await axiosInstance.get("/travel/plan/list");
       set({ planList: data, loading: false, error: null });
     } catch (error: any) {
       set({ loading: false, error: error?.message || "플랜 목록 조회 실패" });
