@@ -1,7 +1,0 @@
-{
-  "name": "TravelingDog",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "custom"
-}
