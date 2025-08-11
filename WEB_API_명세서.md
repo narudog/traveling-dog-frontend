@@ -34,6 +34,12 @@
 
 - response 200: `jwt`, `refresh_token` 쿠키 삭제
 
+### POST /api/auth/social-login
+
+- desc: 소셜 로그인 (공개)
+- query: `provider=google|naver`, `token=<provider_access_or_id_token>`
+- response 200: `UserProfileDTO` (쿠키로 `jwt`, `refresh_token` 설정)
+
 ---
 
 ## 사용자 UserController
