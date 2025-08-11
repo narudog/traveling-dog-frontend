@@ -2,7 +2,7 @@ import Header from "@/components/commons/Header";
 import SearchSection from "@/components/landing/SearchSection";
 import PolylineMap from "@/components/map/PolylineMap";
 import styles from "./page.module.scss";
-import PlanList from "@/components/travelPlan/PlanList";
+import HomeFeed from "@/components/reviews/HomeFeed";
 import { FiMap, FiCalendar, FiStar } from "react-icons/fi";
 
 export default function Home() {
@@ -56,10 +56,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Popular Plans Section */}
+        {/* Review Feed Section */}
         <section className={styles.popularPlans}>
-          <h2>인기 여행지</h2>
-          <PlanList planList={[]} />
+          <h2>여행 후기</h2>
+          <HomeFeed />
         </section>
       </main>
     </>
