@@ -33,6 +33,7 @@ export default function RootLayout({
       <body className={`${pretendard.variable}`}>
         <SessionProvider>
           <div className={styles.main}>
+            <Header />
             <div className={styles.content}>{children}</div>
           </div>
         </SessionProvider>
