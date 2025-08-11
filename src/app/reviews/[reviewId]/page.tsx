@@ -22,7 +22,7 @@ export default function ReviewDetailPage() {
       setComments(c.content ?? []);
     };
     run();
-  }, [id, getOne, reviewComments]);
+  }, [id]);
 
   if (!review) return <div style={{ padding: 16 }}>로딩 중…</div>;
 

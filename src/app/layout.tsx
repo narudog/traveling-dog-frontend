@@ -6,7 +6,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.scss";
 import styles from "./layout.module.scss";
 import localFont from "next/font/local";
-import BottomNavigation from "@/components/commons/BottomNavigation";
 import Header from "@/components/commons/Header";
 import SessionProvider from "@/components/providers/SessionProvider";
 
@@ -35,7 +34,6 @@ export default function RootLayout({
         <SessionProvider>
           <div className={styles.main}>
             <div className={styles.content}>{children}</div>
-            <BottomNavigation />
           </div>
         </SessionProvider>
       </body>
