@@ -7,6 +7,7 @@ interface AuthState {
   user: Profile | null;
   loading: boolean;
   error: string | null;
+  hasFetchedProfile?: boolean;
 }
 
 // 액션 인터페이스
@@ -35,11 +36,12 @@ interface AuthActions {
 }
 
 // 스토어 생성
-export const useAuthStore = create<AuthState & AuthActions>((set) => ({
+export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
   // 초기 상태
   user: null,
   loading: false,
   error: null,
+  hasFetchedProfile: false,
 
   signup: async ({
     nickname,
@@ -59,7 +61,12 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
         password,
       });
       // 성공 시 결과 저장
-      set({ user: response.data, loading: false, error: null });
+      set({
+        user: response.data,
+        loading: false,
+        error: null,
+        hasFetchedProfile: true,
+      });
       return response.data;
     } catch (error: any) {
       console.log(error);
@@ -92,7 +99,12 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
         }
       );
       // 성공 시 결과 저장
-      set({ user: response.data, loading: false, error: null });
+      set({
+        user: response.data,
+        loading: false,
+        error: null,
+        hasFetchedProfile: true,
+      });
       return response.data;
     } catch (error: any) {
       // 실패 시 에러 업데이트
@@ -112,7 +124,12 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
       const response = await axiosInstance.post(
         `/auth/social-login?provider=${provider}&token=${token}`
       );
-      set({ user: response.data, loading: false, error: null });
+      set({
+        user: response.data,
+        loading: false,
+        error: null,
+        hasFetchedProfile: true,
+      });
       return response.data;
     } catch (error: any) {
       set((prev) => ({
@@ -128,7 +145,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
-      set({ user: null });
+      set({ user: null, hasFetchedProfile: false });
     } catch (error) {
       console.error("로그아웃 중 오류 발생:", error);
     }
@@ -143,13 +160,24 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
   },
 
   getUserProfile: async () => {
+    // 가드: 이미 요청했거나 진행 중이면 종료
+    const { hasFetchedProfile, loading } = get();
+    if (hasFetchedProfile || loading) return;
+
     set((prev) => ({ ...prev, loading: true }));
+
     try {
-      const response = await axiosInstance.get("/user/profile");
-      set({ user: response.data, loading: false });
+      const config: any = { skipRefreshRetry: true };
+      const response = await axiosInstance.get("/user/profile", config);
+      set({ user: response.data, loading: false, hasFetchedProfile: true });
     } catch (error) {
-      set((prev) => ({ ...prev, loading: false, user: null }));
-      console.error("유저 프로필 조회 중 오류 발생:", error);
+      // 비로그인일 수 있으므로 조용히 실패 처리, 플래그만 설정하여 반복 호출 방지
+      set((prev) => ({
+        ...prev,
+        loading: false,
+        user: null,
+        hasFetchedProfile: true,
+      }));
     }
   },
 }));

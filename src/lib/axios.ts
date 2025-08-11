@@ -26,7 +26,9 @@ api.interceptors.response.use(
     if (
       error.response &&
       error.response.status === 401 &&
-      !originalRequest._retry
+      !originalRequest._retry &&
+      // 특정 요청에 한해 리프레시 재시도를 비활성화할 수 있음
+      !(originalRequest as any).skipRefreshRetry
     ) {
       // 재시도 플래그 설정
       originalRequest._retry = true;
