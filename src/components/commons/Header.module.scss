@@ -78,6 +78,22 @@
       }
     }
   }
+
+  .navLinks {
+    display: flex;
+    gap: 1rem;
+    a {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #0f172a;
+      text-decoration: none;
+      transition: background 0.2s ease;
+      &:hover {
+        background: #f1f5f9;
+      }
+    }
+  }
 }
 
 @media (max-width: 768px) {
