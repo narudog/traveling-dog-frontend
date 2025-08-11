@@ -6,6 +6,7 @@ import styles from "./LoginForm.module.scss";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import { signIn, getSession } from "next-auth/react";
 
 function LoginForm() {
   const auth = useAuthStore();
@@ -72,6 +73,21 @@ function LoginForm() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      setFormError("");
+      auth.setLoading(true);
+
+      // Google 로그인 - 콜백 페이지로 리다이렉트
+      await signIn("google", {
+        callbackUrl: "/auth/social-callback",
+      });
+    } catch (error) {
+      setFormError("Google 로그인 중 오류가 발생했습니다.");
+      auth.setLoading(false);
+    }
+  };
+
   return (
     <>
       <form className={styles.form} onSubmit={handleLogin}>
@@ -106,6 +122,14 @@ function LoginForm() {
         </div>
         <button type="submit" className={styles.button}>
           로그인
+        </button>
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className={`${styles.button} ${styles.googleButton}`}
+          disabled={auth.loading}
+        >
+          Google로 로그인
         </button>
         <Link href="/signup" className={styles.button}>
           회원가입

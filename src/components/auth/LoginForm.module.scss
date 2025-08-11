@@ -55,6 +55,20 @@
     &:hover {
       background-color: $primary-color-hover;
     }
+
+    &.googleButton {
+      background-color: #4285f4;
+      margin-bottom: 0.5rem;
+
+      &:hover {
+        background-color: #357ae8;
+      }
+
+      &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+    }
   }
 }
 

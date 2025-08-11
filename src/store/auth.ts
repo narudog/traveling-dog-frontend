@@ -18,6 +18,7 @@ interface AuthActions {
     email: string;
     password: string;
   }) => Promise<void>;
+  socialLogin: (provider: string, token: string) => Promise<void>;
   logout: () => Promise<void>;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -78,11 +79,8 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
     // API 호출 시작: 로딩 상태 업데이트
     set((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      // 브라우저 호환: Buffer 대신 btoa 사용
-      const base64Auth =
-        typeof window !== "undefined"
-          ? btoa(`${email}:${password}`)
-          : Buffer.from(`${email}:${password}`).toString("base64");
+      // 브라우저 호환: btoa 사용
+      const base64Auth = btoa(`${email}:${password}`);
       // 헤더 정보는 세 번째 인자로 전달
       const response = await axiosInstance.post(
         "/auth/login",
@@ -103,6 +101,25 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
         user: null,
         loading: false,
         error: error?.message || "로그인 실패",
+      }));
+      throw error;
+    }
+  },
+
+  socialLogin: async (provider: string, token: string) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axiosInstance.post(
+        `/auth/social-login?provider=${provider}&token=${token}`
+      );
+      set({ user: response.data, loading: false, error: null });
+      return response.data;
+    } catch (error: any) {
+      set((prev) => ({
+        ...prev,
+        user: null,
+        loading: false,
+        error: error?.message || "소셜 로그인 실패",
       }));
       throw error;
     }

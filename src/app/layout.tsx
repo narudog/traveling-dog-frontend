@@ -8,6 +8,7 @@ import styles from "./layout.module.scss";
 import localFont from "next/font/local";
 import BottomNavigation from "@/components/commons/BottomNavigation";
 import Header from "@/components/commons/Header";
+import SessionProvider from "@/components/providers/SessionProvider";
 
 const pretendard = localFont({
   src: "../../public/fonts/PretendardVariable.woff2",
@@ -31,10 +32,12 @@ export default function RootLayout({
   return (
     <html lang="ko-KR">
       <body className={`${pretendard.variable}`}>
-        <div className={styles.main}>
-          <div className={styles.content}>{children}</div>
-          <BottomNavigation />
-        </div>
+        <SessionProvider>
+          <div className={styles.main}>
+            <div className={styles.content}>{children}</div>
+            <BottomNavigation />
+          </div>
+        </SessionProvider>
       </body>
     </html>
   );
