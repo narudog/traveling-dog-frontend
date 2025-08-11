@@ -4,6 +4,8 @@ import {
   TravelPlan,
   PlanUpdateRequest,
   TravelPlanCreateRequest,
+  TravelPlanSearchRequest,
+  TravelPlanSearchResponse,
 } from "@/types/plan";
 
 // 인터페이스 정의
@@ -21,6 +23,13 @@ interface PlanActions {
   getPlanDetail: (planId: string) => Promise<TravelPlan>;
   updatePlan: (planId: string, plan: PlanUpdateRequest) => Promise<void>;
   deletePlan: (planId: string) => Promise<void>;
+  searchPlans: (
+    criteria: TravelPlanSearchRequest
+  ) => Promise<TravelPlanSearchResponse>;
+  likePlan: (planId: number) => Promise<boolean>;
+  unlikePlan: (planId: number) => Promise<void>;
+  getLikeStatus: (planId: number) => Promise<boolean>;
+  getLikedPlans: () => Promise<TravelPlan[]>;
   setPlanList: (planList: TravelPlan[]) => void;
   setPlan: (plan: TravelPlan) => void;
   setLoading: (loading: boolean) => void;
@@ -94,6 +103,58 @@ export const usePlanStore = create<PlanState & PlanActions>((set) => ({
       set({ loading: false, error: null });
     } catch (error: any) {
       set({ loading: false, error: error?.message || "플랜 삭제 실패" });
+      throw error;
+    }
+  },
+
+  searchPlans: async (criteria: TravelPlanSearchRequest) => {
+    set({ loading: true, error: null });
+    try {
+      const { data } = await axiosInstance.post(
+        "/travel/plan/search",
+        criteria ?? {}
+      );
+      set({ loading: false });
+      return data as TravelPlanSearchResponse;
+    } catch (error: any) {
+      set({ loading: false, error: error?.message || "플랜 검색 실패" });
+      throw error;
+    }
+  },
+
+  likePlan: async (planId: number) => {
+    try {
+      const { data } = await axiosInstance.post(`/travel/plan/${planId}/like`);
+      return Boolean(data);
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  unlikePlan: async (planId: number) => {
+    try {
+      await axiosInstance.delete(`/travel/plan/${planId}/like`);
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getLikeStatus: async (planId: number) => {
+    try {
+      const { data } = await axiosInstance.get(
+        `/travel/plan/${planId}/like/status`
+      );
+      return Boolean(data);
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getLikedPlans: async () => {
+    try {
+      const { data } = await axiosInstance.get(`/travel/plan/like`);
+      return data as TravelPlan[];
+    } catch (error) {
       throw error;
     }
   },

@@ -76,3 +76,20 @@ export interface PlaceWithRating {
   reviews?: any;
   photos?: any;
 }
+
+export interface TravelPlanSearchRequest {
+  keyword?: string;
+  country?: string;
+  city?: string;
+  sortBy?: "popular" | "recent" | "oldest";
+  page?: number;
+  size?: number;
+}
+
+export interface TravelPlanSearchResponse {
+  content: TravelPlan[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}

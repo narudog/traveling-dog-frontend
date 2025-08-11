@@ -18,7 +18,7 @@ interface AuthActions {
     email: string;
     password: string;
   }) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   getUserProfile: () => Promise<void>;
@@ -78,7 +78,11 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
     // API 호출 시작: 로딩 상태 업데이트
     set((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      const base64Auth = Buffer.from(`${email}:${password}`).toString("base64");
+      // 브라우저 호환: Buffer 대신 btoa 사용
+      const base64Auth =
+        typeof window !== "undefined"
+          ? btoa(`${email}:${password}`)
+          : Buffer.from(`${email}:${password}`).toString("base64");
       // 헤더 정보는 세 번째 인자로 전달
       const response = await axiosInstance.post(
         "/auth/login",
