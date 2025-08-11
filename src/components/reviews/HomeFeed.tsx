@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useReviewStore } from "@/store/review";
+import Carousel from "@/components/carousel/Carousel";
 import styles from "./HomeFeed.module.scss";
 
 export default function HomeFeed() {
@@ -33,28 +34,42 @@ export default function HomeFeed() {
     return <div className={styles.state}>아직 후기가 없어요</div>;
 
   return (
-    <ul className={styles.grid}>
-      {items.map((r) => (
-        <li key={r.id} className={styles.card}>
-          <Link href={`/reviews/${r.id}`} className={styles.link}>
-            <div className={styles.thumbnail}>
-              {/* 첫 사진이 있으면 썸네일로 */}
-              {r.imageUrls.length ? (
-                <img src={r.imageUrls[0]} alt={r.title} />
-              ) : (
-                <div className={styles.placeholder}>No Image</div>
-              )}
-            </div>
-            <div className={styles.body}>
-              <h3 className={styles.title}>{r.title}</h3>
-              <div className={styles.meta}>
-                <span>좋아요 {r.likeCount}</span>
-                <span>조회 {r.viewCount}</span>
+    <div className={styles.feedContainer}>
+      <div className={styles.header}>
+        <h2 className={styles.sectionTitle}>여행 후기</h2>
+        <Link href="/reviews/feed" className={styles.viewAllButton}>
+          전체보기 →
+        </Link>
+      </div>
+
+      <Carousel
+        slidesToShow={3}
+        showArrows={true}
+        showDots={false}
+        autoplay={false}
+      >
+        {items.map((r) => (
+          <div key={r.id} className={styles.carouselItem}>
+            <Link href={`/reviews/${r.id}`} className={styles.card}>
+              <div className={styles.thumbnail}>
+                {/* 첫 사진이 있으면 썸네일로 */}
+                {r.imageUrls.length ? (
+                  <img src={r.imageUrls[0]} alt={r.title} />
+                ) : (
+                  <div className={styles.placeholder}>No Image</div>
+                )}
               </div>
-            </div>
-          </Link>
-        </li>
-      ))}
-    </ul>
+              <div className={styles.body}>
+                <h3 className={styles.title}>{r.title}</h3>
+                <div className={styles.meta}>
+                  <span>좋아요 {r.likeCount}</span>
+                  <span>조회 {r.viewCount}</span>
+                </div>
+              </div>
+            </Link>
+          </div>
+        ))}
+      </Carousel>
+    </div>
   );
 }

@@ -8,8 +8,6 @@ import { FiMap, FiCalendar, FiStar } from "react-icons/fi";
 export default function Home() {
   return (
     <>
-      <Header />
-
       <main className={styles.main}>
         {/* Hero Section */}
         <section className={styles.hero}>
@@ -58,7 +56,6 @@ export default function Home() {
 
         {/* Review Feed Section */}
         <section className={styles.popularPlans}>
-          <h2>여행 후기</h2>
           <HomeFeed />
         </section>
       </main>

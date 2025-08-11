@@ -1,0 +1,493 @@
+@use "@/styles/variables.scss" as *;
+@use "@/styles/mixins.scss" as *;
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  @include respond-to(md) {
+    padding: 1.5rem;
+  }
+
+  @include respond-to(sm) {
+    padding: 1rem;
+  }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+
+  @include respond-to(sm) {
+    margin-bottom: 2rem;
+  }
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: $text-color;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #87ceeb 0%, #6495ed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  @include respond-to(md) {
+    font-size: 2rem;
+  }
+
+  @include respond-to(sm) {
+    font-size: 1.8rem;
+  }
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0;
+
+  @include respond-to(sm) {
+    font-size: 1rem;
+  }
+}
+
+.form {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(135, 206, 250, 0.1);
+  border: 1px solid rgba(135, 206, 250, 0.15);
+
+  @include respond-to(md) {
+    padding: 2rem;
+    border-radius: 16px;
+  }
+
+  @include respond-to(sm) {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+}
+
+.section {
+  margin-bottom: 2rem;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+
+  @include respond-to(sm) {
+    margin-bottom: 1.5rem;
+  }
+}
+
+.label {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $text-color;
+  margin-bottom: 0.75rem;
+
+  @include respond-to(sm) {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e0e7ff;
+  border-radius: 12px;
+  font-size: 1rem;
+  color: $text-color;
+  background: #fafbff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:focus {
+    outline: none;
+    border-color: #87ceeb;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(135, 206, 250, 0.2);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  @include respond-to(sm) {
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+  }
+}
+
+.textarea {
+  @extend .input;
+  resize: vertical;
+  min-height: 200px;
+  font-family: inherit;
+  line-height: 1.6;
+
+  @include respond-to(sm) {
+    min-height: 160px;
+  }
+}
+
+.tagInput {
+  display: flex;
+  gap: 0.75rem;
+
+  @include respond-to(sm) {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+.addTagButton {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #87ceeb 0%, #6495ed 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+
+  &:hover {
+    background: linear-gradient(135deg, #7dc5ea 0%, #5a8ce8 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(135, 206, 250, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @include respond-to(sm) {
+    padding: 0.875rem 1.25rem;
+  }
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(135, 206, 250, 0.15) 0%,
+    rgba(100, 149, 237, 0.15) 100%
+  );
+  color: #1e40af;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid rgba(135, 206, 250, 0.25);
+}
+
+.removeTag {
+  background: none;
+  border: none;
+  color: #1e40af;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(30, 64, 175, 0.1);
+  }
+}
+
+.fileInputWrapper {
+  position: relative;
+}
+
+.fileInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.fileInputLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #f8fafb 0%, #ecf4f8 100%);
+  border: 2px dashed #87ceeb;
+  border-radius: 12px;
+  color: #1e40af;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+    border-color: #6495ed;
+    transform: translateY(-1px);
+  }
+
+  @include respond-to(sm) {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.95rem;
+  }
+}
+
+.imagePreview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+
+  @include respond-to(sm) {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+.previewItem {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(135, 206, 250, 0.15);
+  border: 1px solid rgba(135, 206, 250, 0.2);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @include respond-to(sm) {
+    border-radius: 8px;
+  }
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8fafb 0%, #ecf4f8 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(135, 206, 250, 0.15);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+  }
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: #87ceeb;
+  cursor: pointer;
+}
+
+.checkboxText {
+  font-size: 1rem;
+  font-weight: 500;
+  color: $text-color;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(135, 206, 250, 0.15);
+
+  @include respond-to(sm) {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+}
+
+.cancelButton {
+  padding: 1rem 2rem;
+  background: transparent;
+  color: #6b7280;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #4b5563;
+  }
+
+  @include respond-to(sm) {
+    padding: 0.875rem 1.5rem;
+  }
+}
+
+.submitButton {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #87ceeb 0%, #6495ed 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #7dc5ea 0%, #5a8ce8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(135, 206, 250, 0.4);
+
+    &::before {
+      left: 100%;
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+
+      &::before {
+        display: none;
+      }
+    }
+  }
+
+  @include respond-to(sm) {
+    padding: 0.875rem 1.5rem;
+  }
+}
+
+/* 다크 모드 대응 */
+@media (prefers-color-scheme: dark) {
+  .form {
+    background: #2d3748;
+    border-color: rgba(135, 206, 250, 0.2);
+  }
+
+  .input,
+  .textarea {
+    background: #4a5568;
+    border-color: rgba(135, 206, 250, 0.3);
+    color: white;
+
+    &:focus {
+      background: #5a6c7d;
+      border-color: #87ceeb;
+    }
+
+    &::placeholder {
+      color: #a0aec0;
+    }
+  }
+
+  .label,
+  .checkboxText {
+    color: white;
+  }
+
+  .tag {
+    background: linear-gradient(
+      135deg,
+      rgba(135, 206, 250, 0.2) 0%,
+      rgba(100, 149, 237, 0.2) 100%
+    );
+    color: #87ceeb;
+    border-color: rgba(135, 206, 250, 0.3);
+  }
+
+  .removeTag {
+    color: #87ceeb;
+
+    &:hover {
+      background: rgba(135, 206, 250, 0.1);
+    }
+  }
+
+  .fileInputLabel {
+    background: linear-gradient(135deg, #4a5568 0%, #5a6c7d 100%);
+    color: #87ceeb;
+    border-color: #87ceeb;
+
+    &:hover {
+      background: linear-gradient(135deg, #5a6c7d 0%, #6b7d8d 100%);
+    }
+  }
+
+  .checkboxLabel {
+    background: linear-gradient(135deg, #4a5568 0%, #5a6c7d 100%);
+    border-color: rgba(135, 206, 250, 0.2);
+
+    &:hover {
+      background: linear-gradient(135deg, #5a6c7d 0%, #6b7d8d 100%);
+    }
+  }
+
+  .previewItem {
+    border-color: rgba(135, 206, 250, 0.3);
+  }
+
+  .cancelButton {
+    color: #a0aec0;
+    border-color: #4a5568;
+
+    &:hover {
+      background: #4a5568;
+      border-color: #5a6c7d;
+      color: #e2e8f0;
+    }
+  }
+}
