@@ -10,6 +10,12 @@ const AuthenticatedButtons = () => {
   return (
     <>
       <Link
+        href="/today-activity/saved"
+        className={`${styles.headerButton} ${styles.travelPlanButton}`}
+      >
+        저장한 활동
+      </Link>
+      <Link
         href="/travel-plan/list"
         className={`${styles.headerButton} ${styles.travelPlanButton}`}
       >

@@ -17,6 +17,10 @@ export interface SaveActivityRequestDTO {
   savedLocation?: string;
 }
 
-export interface SavedActivityResponseDTO extends TodayActivityResponseDTO {
-  savedAt: string;
+export interface SavedActivityResponseDTO {
+  id: number;
+  locationName: string;
+  category: string;
+  createdAt: string;
+  savedLocation?: string;
 }
