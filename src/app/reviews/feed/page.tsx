@@ -21,7 +21,7 @@ export default function ReviewFeedPage() {
       setTotalPages(res.totalPages);
     };
     run();
-  }, [sortBy, page, size, feed]);
+  }, [sortBy, page, size]);
 
   return (
     <div style={{ padding: 16 }}>
