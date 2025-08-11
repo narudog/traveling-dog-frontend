@@ -23,10 +23,6 @@ const Header = () => {
           <Image src="/logo.webp" alt="Logo" width={120} height={40} />
         </Link>
       </div>
-      <nav className={styles.navLinks}>
-        <Link href="/reviews/feed">후기 피드</Link>
-        <Link href="/today-activity">오늘의 활동</Link>
-      </nav>
       <div className={styles.authButtons}>
         {loading ? (
           <div className={styles.skeleton}>
