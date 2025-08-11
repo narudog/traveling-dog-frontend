@@ -1,5 +1,5 @@
 import Header from "@/components/commons/Header";
-import SearchSection from "@/components/landing/SearchSection";
+import HeroTabs from "@/components/landing/HeroTabs";
 import PolylineMap from "@/components/map/PolylineMap";
 import styles from "./page.module.scss";
 import HomeFeed from "@/components/reviews/HomeFeed";
@@ -20,8 +20,8 @@ export default function Home() {
               최적의 일정을 무료로 제안해드립니다
             </p>
 
-            {/* Search Section */}
-            <SearchSection />
+            {/* Hero Tabs */}
+            <HeroTabs />
           </div>
         </section>
 

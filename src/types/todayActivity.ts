@@ -1,18 +1,20 @@
 export interface TodayActivityRequestDTO {
-  city: string;
+  location: string;
   category?: string;
 }
 
 export interface TodayActivityResponseDTO {
-  id: string;
-  title: string;
-  description?: string;
-  category: string;
   location?: string;
+  activities: {
+    locationName: string;
+    category: string;
+  }[];
 }
 
 export interface SaveActivityRequestDTO {
-  activityId: string;
+  locationName: string;
+  category: string;
+  savedLocation?: string;
 }
 
 export interface SavedActivityResponseDTO extends TodayActivityResponseDTO {
