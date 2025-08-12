@@ -37,13 +37,6 @@ WORKDIR /app
 # 개발 환경 변수 설정
 ENV NODE_ENV=development
 
-# 실행 환경에서는 빌드 인자를 사용하지 않음 (런타임에 주입)
-ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
-ENV NEXT_PUBLIC_GOOGLE_MAPS_ID=""
-ENV NEXT_PUBLIC_RAPIDAPI_KEY=""
-ENV GOOGLE_CLIENT_ID=""
-ENV GOOGLE_CLIENT_SECRET=""
-ENV NEXTAUTH_SECRET=""
 
 # 빌드된 결과물 및 정적 파일 복사
 COPY --from=builder /app/.next/standalone ./

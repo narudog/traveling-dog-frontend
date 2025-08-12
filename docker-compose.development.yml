@@ -1,9 +1,15 @@
 version: "3.9"
 services:
-    app:
-        image: dmdmdm1322/travelingdog-dev-frontend:latest # 생성할 이미지 이름
-        container_name: travelingdog-dev-frontend
-        environment:
-            - NODE_ENV=development
-        ports:
-            - "3000:3000"
+  app:
+    image: dmdmdm1322/travelingdog-dev-frontend:latest # 생성할 이미지 이름
+    container_name: travelingdog-dev-frontend
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+      - NEXT_PUBLIC_GOOGLE_MAPS_ID=${NEXT_PUBLIC_GOOGLE_MAPS_ID}
+      - NEXT_PUBLIC_RAPIDAPI_KEY=${NEXT_PUBLIC_RAPIDAPI_KEY}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+    ports:
+      - "3000:3000"
