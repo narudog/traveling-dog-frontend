@@ -28,6 +28,7 @@ jobs:
                     --build-arg GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
                     --build-arg GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
                     --build-arg NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
+                    --build-arg NEXTAUTH_URL="${{ secrets.NEXTAUTH_URL }}" \
                     -t ${{ secrets.DOCKER_USERNAME }}/travelingdog-dev-frontend:latest .
 
       - name: Push Docker image to Docker Hub
@@ -48,5 +49,6 @@ jobs:
           GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
           GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
           NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
+          NEXTAUTH_URL="${{ secrets.NEXTAUTH_URL }}" \
           docker-compose up -d
           EOF
