@@ -29,8 +29,11 @@ export default function TodayActivityPanel() {
 
   const handleLocationClick = (locationName: string, cityName: string) => {
     const searchQuery = encodeURIComponent(`${locationName} ${cityName}`);
-    const googleMapsUrl = `https://www.google.com/maps/search/${searchQuery}`;
-    window.open(googleMapsUrl, "_blank");
+    // 검색할 위치 정보 구성 (장소명 + 검색 위치)
+
+    // 기본: 구글 일반 검색으로 열기
+    const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
+    window.open(googleSearchUrl, "_blank");
   };
 
   const handleSaveActivity = async (activity: any) => {
@@ -100,7 +103,7 @@ export default function TodayActivityPanel() {
                     )
                   }
                 >
-                  🗺️ 지도보기
+                  🗺️ 검색하기
                 </button>
                 <button
                   className={styles.saveButton}

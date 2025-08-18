@@ -74,7 +74,7 @@ export default function SavedActivitiesPage() {
 
   const handleLocationClick = (locationName: string, cityName: string) => {
     const searchQuery = encodeURIComponent(`${locationName} ${cityName}`);
-    const googleMapsUrl = `https://www.google.com/maps/search/${searchQuery}`;
+    const googleMapsUrl = `https://www.google.com/search?q=${searchQuery}`;
     window.open(googleMapsUrl, "_blank");
   };
 
@@ -212,7 +212,7 @@ export default function SavedActivitiesPage() {
                     )
                   }
                 >
-                  🗺️ 지도보기
+                  🗺️ 검색하기
                 </button>
                 <button
                   className={styles.removeButton}
