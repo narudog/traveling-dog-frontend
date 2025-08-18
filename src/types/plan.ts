@@ -43,6 +43,8 @@ export interface Location {
   title: string;
   description: string;
   locationName: string;
+  cost?: string;
+  orderIndex: number;
 }
 
 export enum PlanStatus {

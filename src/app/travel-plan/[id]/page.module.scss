@@ -103,6 +103,7 @@
     overflow: hidden;
   }
 
+  // 이전 locationItem 스타일 (하위 호환성을 위해 유지)
   .locationItem {
     padding: 1rem;
     border-radius: 8px;
@@ -172,6 +173,167 @@
   }
 }
 
+// 새로운 여행 일정 카드 스타일
+.itineraryCard {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #e2e8f0;
+  }
+}
+
+.itineraryCardActive {
+  border-color: #3b82f6;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.itineraryHeader {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.dayBadge {
+  display: inline-block;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.itineraryLocation {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0.5rem 0;
+}
+
+.activityCount {
+  color: #64748b;
+  font-size: 0.875rem;
+  background: #f1f5f9;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.activitiesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex-grow: 1;
+}
+
+.activityCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+
+  &:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+    transform: translateX(4px);
+
+    .clickIndicator {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+}
+
+.activityNumber {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.activityContent {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.activityTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.activityLocation {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.activityDescription {
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.activityCost {
+  font-size: 0.8rem;
+  color: #059669;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.clickIndicator {
+  color: #3b82f6;
+  font-size: 1.25rem;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+// 이전 스타일 유지 (하위 호환성)
 .activityItem {
   display: flex;
   justify-content: space-between;
@@ -186,10 +348,6 @@
   }
 }
 
-.activityTitle {
-  flex: 1;
-}
-
 .activityRating {
   font-size: 0.8rem;
   color: #ff8f00;
@@ -202,23 +360,26 @@
 
 // 스켈레톤 UI 스타일
 .skeleton {
+  // 기본 스켈레톤 믹스인
+  @mixin skeleton-base {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+  }
+
+  // 헤더 스켈레톤
   .title {
     height: 2.5rem;
     width: 70%;
     margin-bottom: 0.5rem;
-    background: linear-gradient(90deg, #edf2f7 0%, #e2e8f0 40%, #edf2f7 80%);
-    background-size: 200% 100%;
-    animation: pulse 1.5s ease-in-out infinite;
-    border-radius: 4px;
+    @include skeleton-base;
   }
 
   .text {
     height: 1rem;
     width: 100%;
-    background: linear-gradient(90deg, #edf2f7 0%, #e2e8f0 40%, #edf2f7 80%);
-    background-size: 200% 100%;
-    animation: pulse 1.5s ease-in-out infinite;
-    border-radius: 4px;
+    @include skeleton-base;
     margin-bottom: 0.5rem;
 
     &:last-child {
@@ -226,6 +387,115 @@
     }
   }
 
+  // 섹션 제목 스켈레톤
+  .skeletonTitle {
+    height: 1.5rem;
+    width: 30%;
+    margin-bottom: 1rem;
+    @include skeleton-base;
+  }
+
+  // Itinerary 카드 스켈레톤
+  .skeletonItineraryCard {
+    background: white;
+    border: 2px solid #f0f0f0;
+
+    .itineraryHeader {
+      border-bottom: 1px solid #f0f0f0;
+    }
+  }
+
+  .skeletonDayBadge {
+    width: 80px;
+    height: 32px;
+    @include skeleton-base;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+  }
+
+  .skeletonItineraryLocation {
+    height: 2rem;
+    width: 60%;
+    @include skeleton-base;
+    margin: 0.5rem auto;
+  }
+
+  .skeletonActivityCount {
+    width: 70px;
+    height: 24px;
+    @include skeleton-base;
+    border-radius: 12px;
+  }
+
+  // Activity 카드 스켈레톤
+  .skeletonActivityCard {
+    background: #f8fafc;
+    border: 1px solid #f0f0f0;
+    cursor: default;
+
+    &:hover {
+      background: #f8fafc;
+      border-color: #f0f0f0;
+      transform: none;
+    }
+  }
+
+  .skeletonActivityNumber {
+    width: 28px;
+    height: 28px;
+    @include skeleton-base;
+    border-radius: 50%;
+  }
+
+  .skeletonActivityTitle {
+    height: 1.2rem;
+    width: 80%;
+    @include skeleton-base;
+    margin-bottom: 0.25rem;
+  }
+
+  .skeletonActivityLocation {
+    height: 1rem;
+    width: 90%;
+    @include skeleton-base;
+    margin-bottom: 0.25rem;
+  }
+
+  .skeletonActivityDescription {
+    height: 0.9rem;
+    width: 100%;
+    @include skeleton-base;
+    margin-bottom: 0.1rem;
+
+    &:after {
+      content: "";
+      display: block;
+      height: 0.9rem;
+      width: 70%;
+      @include skeleton-base;
+      margin-top: 0.1rem;
+    }
+  }
+
+  .skeletonActivityCost {
+    height: 0.9rem;
+    width: 60%;
+    @include skeleton-base;
+  }
+
+  .skeletonClickIndicator {
+    width: 20px;
+    height: 20px;
+    @include skeleton-base;
+    border-radius: 4px;
+  }
+
+  // 맵 스켈레톤
+  .map {
+    @include skeleton-base;
+  }
+
+  // 이전 스타일 (하위 호환성)
   .item {
     .text {
       &:nth-child(1) {
@@ -240,11 +510,14 @@
       }
     }
   }
+}
 
-  .map {
-    background: linear-gradient(90deg, #edf2f7 0%, #e2e8f0 40%, #edf2f7 80%);
-    background-size: 200% 100%;
-    animation: pulse 1.5s ease-in-out infinite;
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 

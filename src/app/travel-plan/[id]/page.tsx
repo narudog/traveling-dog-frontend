@@ -68,9 +68,15 @@ const TravelPlanDetailPage = () => {
   };
 
   // 장소 클릭 처리 함수
-  const handlePlaceClick = (activity: ActivityWithRating) => {
-    // // 구글 맵에서 장소 검색
-    // window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.locationName)}`, "_blank");
+  const handlePlaceClick = (activity: Location) => {
+    if (!plan) return;
+
+    // 구글 맵에서 장소 검색 (locationName + city 조합)
+    const searchQuery = `${activity.locationName}, ${plan.city}`;
+    window.open(
+      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`,
+      "_blank"
+    );
   };
 
   // LocationProcessor에서 장소 상세 정보 수신 처리
@@ -216,6 +222,7 @@ const TravelPlanDetailPage = () => {
       </header>
 
       <section className={styles.locations}>
+        <h2 className={styles.sectionTitle}>여행 일정</h2>
         <Carousel
           slidesToShow={slidesToShow}
           autoplay={false}
@@ -225,35 +232,53 @@ const TravelPlanDetailPage = () => {
           {plan.itineraries.map((itinerary) => (
             <div
               key={itinerary.id}
-              className={`${styles.locationItem} ${selectedItinerary?.id === itinerary.id ? styles.locationItemActive : ""}`}
+              className={`${styles.itineraryCard} ${selectedItinerary?.id === itinerary.id ? styles.itineraryCardActive : ""}`}
               onClick={() => onClickItinerary(itinerary)}
             >
-              <div className={styles.locationHeader}>
-                <h3 className={styles.locationName}>
-                  {itinerary.date}일차 / {itinerary.location}
+              <div className={styles.itineraryHeader}>
+                <div className={styles.dayBadge}>DAY {itinerary.date}</div>
+                <h3 className={styles.itineraryLocation}>
+                  {itinerary.location}
                 </h3>
+                <span className={styles.activityCount}>
+                  {itinerary.activities.length}개 장소
+                </span>
               </div>
-              <ul className={styles.locationDesc}>
+
+              <div className={styles.activitiesList}>
                 {itinerary.activities.map((activity, index) => (
-                  <li
+                  <div
                     key={activity.id}
                     onClick={(e) => {
                       e.stopPropagation();
                       handlePlaceClick(activity);
                     }}
-                    className={styles.activityItem}
+                    className={styles.activityCard}
+                    title={`${activity.locationName}에서 구글 맵 검색`}
                   >
-                    <div className={styles.activityTitle}>
-                      {index + 1}. {activity.title}
+                    <div className={styles.activityNumber}>{index + 1}</div>
+                    <div className={styles.activityContent}>
+                      <div className={styles.activityTitle}>
+                        {activity.title}
+                      </div>
+                      <div className={styles.activityLocation}>
+                        📍 {activity.locationName}
+                      </div>
+                      {activity.description && (
+                        <div className={styles.activityDescription}>
+                          {activity.description}
+                        </div>
+                      )}
+                      {activity.cost && (
+                        <div className={styles.activityCost}>
+                          💰 {activity.cost}
+                        </div>
+                      )}
                     </div>
-                    {/* <div className={styles.activityRating}>
-                      {activitiesWithRatings[activity.id]?.rating
-                        ? renderStars(activitiesWithRatings[activity.id].rating)
-                        : "로딩중..."}
-                    </div> */}
-                  </li>
+                    <div className={styles.clickIndicator}>🔗</div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           ))}
         </Carousel>
@@ -305,18 +330,54 @@ const TravelPlanDetailSkeleton = () => {
       </header>
 
       <section className={`${styles.locations} ${styles.skeleton}`}>
-        <h2 className={styles.sectionTitle}>여행 장소</h2>
+        <div className={`${styles.sectionTitle} ${styles.skeletonTitle}`}></div>
         <div className={styles.carouselSkeleton}>
           {[...Array(3)].map((_, index) => (
             <div
               key={index}
-              className={`${styles.locationItem} ${styles.item}`}
+              className={`${styles.itineraryCard} ${styles.skeletonItineraryCard}`}
             >
-              <div className={styles.locationHeader}>
-                <div className={`${styles.locationName} ${styles.text}`}></div>
+              <div className={styles.itineraryHeader}>
+                <div
+                  className={`${styles.dayBadge} ${styles.skeletonDayBadge}`}
+                ></div>
+                <div
+                  className={`${styles.itineraryLocation} ${styles.skeletonItineraryLocation}`}
+                ></div>
+                <div
+                  className={`${styles.activityCount} ${styles.skeletonActivityCount}`}
+                ></div>
               </div>
-              <div className={`${styles.locationDesc} ${styles.text}`}></div>
-              <div className={`${styles.locationOrder} ${styles.text}`}></div>
+
+              <div className={styles.activitiesList}>
+                {[...Array(3)].map((_, actIndex) => (
+                  <div
+                    key={actIndex}
+                    className={`${styles.activityCard} ${styles.skeletonActivityCard}`}
+                  >
+                    <div
+                      className={`${styles.activityNumber} ${styles.skeletonActivityNumber}`}
+                    ></div>
+                    <div className={styles.activityContent}>
+                      <div
+                        className={`${styles.activityTitle} ${styles.skeletonActivityTitle}`}
+                      ></div>
+                      <div
+                        className={`${styles.activityLocation} ${styles.skeletonActivityLocation}`}
+                      ></div>
+                      <div
+                        className={`${styles.activityDescription} ${styles.skeletonActivityDescription}`}
+                      ></div>
+                      <div
+                        className={`${styles.activityCost} ${styles.skeletonActivityCost}`}
+                      ></div>
+                    </div>
+                    <div
+                      className={`${styles.clickIndicator} ${styles.skeletonClickIndicator}`}
+                    ></div>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
