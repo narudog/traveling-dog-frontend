@@ -1,0 +1,96 @@
+@use "@/styles/variables.scss" as *;
+@use "@/styles/mixins.scss" as *;
+
+.appDownload {
+  padding: 4rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin-top: 3rem;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .textContent {
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      backdrop-filter: blur(10px);
+
+      svg {
+        font-size: 1rem;
+      }
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    > p {
+      font-size: 1.125rem;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+  }
+
+  .qrSection {
+    .qrContainer {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+
+      .qrCode {
+        border-radius: 1rem;
+        margin-bottom: 1rem;
+        display: block;
+        width: 200px;
+        height: 200px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .qrPlaceholder {
+        width: 200px;
+        height: 200px;
+        background: #f3f4f6;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+
+      .qrText {
+        color: #374151;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1.4;
+        margin: 0;
+      }
+    }
+  }
+}

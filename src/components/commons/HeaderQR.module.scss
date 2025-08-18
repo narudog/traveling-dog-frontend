@@ -1,0 +1,123 @@
+@use "@/styles/variables.scss" as *;
+@use "@/styles/mixins.scss" as *;
+
+.headerQR {
+  position: relative;
+
+  .qrButton {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(103, 126, 234, 0.1);
+    border: 1px solid rgba(103, 126, 234, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    color: #677eea;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(103, 126, 234, 0.15);
+      border-color: rgba(103, 126, 234, 0.3);
+      transform: translateY(-1px);
+    }
+
+    svg {
+      font-size: 1rem;
+    }
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    backdrop-filter: blur(4px);
+  }
+
+  .qrModal {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    min-width: 250px;
+  }
+
+  .modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1rem 0.5rem;
+    border-bottom: 1px solid #f3f4f6;
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0;
+    }
+
+    .closeButton {
+      background: none;
+      border: none;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: 0.25rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #f3f4f6;
+        color: #374151;
+      }
+
+      svg {
+        font-size: 1.25rem;
+      }
+    }
+  }
+
+  .qrContent {
+    padding: 1rem;
+    text-align: center;
+
+    .qrCode {
+      border-radius: 0.5rem;
+      margin-bottom: 0.75rem;
+      display: block;
+      width: 120px;
+      height: 120px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .qrPlaceholder {
+      width: 120px;
+      height: 120px;
+      background: #f3f4f6;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.75rem;
+      color: #6b7280;
+      font-size: 0.75rem;
+    }
+
+    .qrText {
+      color: #6b7280;
+      font-size: 0.75rem;
+      font-weight: 500;
+      line-height: 1.4;
+      margin: 0 0 1rem 0;
+    }
+  }
+}

@@ -7,6 +7,7 @@ import AuthenticatedButtons from "./AuthenticatedButtons";
 import { useAuthStore } from "@/store/auth";
 import { useEffect } from "react";
 import UnauthenticatedButtons from "./UnauthenticatedButtons";
+import HeaderQR from "./HeaderQR";
 const Header = () => {
   const { user, getUserProfile, loading } = useAuthStore();
 
@@ -24,6 +25,7 @@ const Header = () => {
         </Link>
       </div>
       <div className={styles.authButtons}>
+        <HeaderQR />
         {loading ? (
           <div className={styles.skeleton}>
             <div className={styles.skeletonButton}></div>

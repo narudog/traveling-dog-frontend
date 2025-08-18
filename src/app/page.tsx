@@ -1,9 +1,8 @@
-import Header from "@/components/commons/Header";
+import AppDownload from "@/components/landing/AppDownload";
 import HeroTabs from "@/components/landing/HeroTabs";
-import PolylineMap from "@/components/map/PolylineMap";
-import styles from "./page.module.scss";
 import HomeFeed from "@/components/reviews/HomeFeed";
-import { FiMap, FiCalendar, FiStar } from "react-icons/fi";
+import { FiCalendar, FiMap, FiStar } from "react-icons/fi";
+import styles from "./page.module.scss";
 
 export default function Home() {
   return (
@@ -58,6 +57,9 @@ export default function Home() {
         <section className={styles.popularPlans}>
           <HomeFeed />
         </section>
+
+        {/* App Download Section */}
+        <AppDownload />
       </main>
     </>
   );
