@@ -10,6 +10,7 @@ interface CarouselProps {
   autoplaySpeed?: number;
   showDots?: boolean;
   showArrows?: boolean;
+  disableDrag?: boolean; // 드래그 비활성화 옵션
 }
 
 export default function Carousel({
@@ -19,6 +20,7 @@ export default function Carousel({
   autoplaySpeed = 3000,
   showDots = false,
   showArrows = true,
+  disableDrag = false,
 }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState(0);
@@ -67,13 +69,13 @@ export default function Carousel({
 
   // 터치 이벤트 핸들러 (모바일용)
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (!hasNavigation) return;
+    if (!hasNavigation || disableDrag) return;
     setTouchStartX(e.touches[0].clientX);
     setIsTouching(true);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isTouching || !hasNavigation) return;
+    if (!isTouching || !hasNavigation || disableDrag) return;
     const touchX = e.touches[0].clientX;
     const diff = touchStartX - touchX;
 
@@ -88,12 +90,13 @@ export default function Carousel({
   };
 
   const handleTouchEnd = () => {
+    if (disableDrag) return;
     setIsTouching(false);
   };
 
   // 마우스 드래그 이벤트 핸들러
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (!hasNavigation) return;
+    if (!hasNavigation || disableDrag) return;
     e.preventDefault();
     setIsDragging(true);
     setMouseStartX(e.clientX);
@@ -101,14 +104,14 @@ export default function Carousel({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !hasNavigation) return;
+    if (!isDragging || !hasNavigation || disableDrag) return;
     e.preventDefault();
     const diff = e.clientX - mouseStartX;
     setDragOffset(diff);
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
-    if (!isDragging || !hasNavigation) return;
+    if (!isDragging || !hasNavigation || disableDrag) return;
     e.preventDefault();
     setIsDragging(false);
 
@@ -127,7 +130,7 @@ export default function Carousel({
   };
 
   const handleMouseLeave = () => {
-    if (isDragging) {
+    if (isDragging && !disableDrag) {
       setIsDragging(false);
       setDragOffset(0);
     }
@@ -151,7 +154,9 @@ export default function Carousel({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
         onDragStart={handleDragStart}
-        style={{ cursor: isDragging ? "grabbing" : "grab" }}
+        style={{
+          cursor: disableDrag ? "default" : isDragging ? "grabbing" : "grab",
+        }}
       >
         <div
           className={styles.carouselTrack}

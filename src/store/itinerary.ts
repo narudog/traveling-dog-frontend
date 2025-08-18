@@ -26,6 +26,7 @@ export interface ItineraryActivityUpdateRequest {
 interface ItineraryState {
   loading: boolean;
   error: string | null;
+  optimisticActivities: Record<number, ItineraryActivityDTO[]>; // itineraryId -> activities
 }
 
 interface ItineraryActions {
@@ -47,12 +48,26 @@ interface ItineraryActions {
     id: number,
     position: number
   ) => Promise<ItineraryActivityDTO>;
+  // 낙관적 업데이트를 위한 액션들
+  setOptimisticActivities: (
+    itineraryId: number,
+    activities: ItineraryActivityDTO[]
+  ) => void;
+  getOptimisticActivities: (
+    itineraryId: number
+  ) => ItineraryActivityDTO[] | null;
+  moveToPositionOptimistic: (
+    itineraryId: number,
+    activityId: number,
+    newPosition: number
+  ) => Promise<void>;
 }
 
 export const useItineraryStore = create<ItineraryState & ItineraryActions>(
-  (set) => ({
+  (set, get) => ({
     loading: false,
     error: null,
+    optimisticActivities: {},
 
     getOne: async (id) => {
       const { data } = await axios.get(`/itinerary/activities/${id}`);
@@ -109,6 +124,69 @@ export const useItineraryStore = create<ItineraryState & ItineraryActions>(
         `/itinerary/activities/${id}/move-to-position/${position}`
       );
       return data as ItineraryActivityDTO;
+    },
+
+    // 낙관적 업데이트 메서드들
+    setOptimisticActivities: (itineraryId, activities) => {
+      set((state) => ({
+        optimisticActivities: {
+          ...state.optimisticActivities,
+          [itineraryId]: activities,
+        },
+      }));
+    },
+
+    getOptimisticActivities: (itineraryId) => {
+      const state = get();
+      return state.optimisticActivities[itineraryId] || null;
+    },
+
+    moveToPositionOptimistic: async (itineraryId, activityId, newPosition) => {
+      const state = get();
+      const currentActivities = state.optimisticActivities[itineraryId];
+
+      if (!currentActivities) return;
+
+      // 현재 위치 찾기
+      const currentIndex = currentActivities.findIndex(
+        (a) => a.id === activityId
+      );
+      if (currentIndex === -1) return;
+
+      // 낙관적 업데이트: 배열에서 요소를 새 위치로 이동
+      const newActivities = [...currentActivities];
+      const [movedActivity] = newActivities.splice(currentIndex, 1);
+      newActivities.splice(newPosition, 0, movedActivity);
+
+      // position 값을 업데이트 (0부터 시작)
+      const updatedActivities = newActivities.map((activity, index) => ({
+        ...activity,
+        position: index,
+      }));
+
+      // 낙관적 업데이트 적용
+      set((state) => ({
+        optimisticActivities: {
+          ...state.optimisticActivities,
+          [itineraryId]: updatedActivities,
+        },
+      }));
+
+      try {
+        // 서버에 실제 업데이트 요청
+        await axios.put(
+          `/itinerary/activities/${activityId}/move-to-position/${newPosition}`
+        );
+      } catch (error) {
+        // 실패 시 원래 상태로 복원
+        set((state) => ({
+          optimisticActivities: {
+            ...state.optimisticActivities,
+            [itineraryId]: currentActivities,
+          },
+        }));
+        throw error;
+      }
     },
   })
 );

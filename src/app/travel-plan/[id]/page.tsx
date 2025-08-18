@@ -10,6 +10,23 @@ import { Itinerary, Location, TravelPlan } from "@/types/plan";
 import { useAuthStore } from "@/store/auth";
 import Carousel from "@/components/carousel/Carousel";
 import { PlaceWithRating } from "@/types/plan";
+import { useItineraryStore, ItineraryActivityDTO } from "@/store/itinerary";
+import DraggableActivity from "@/components/travelPlan/DraggableActivity";
+import { useCallback } from "react";
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { arrayMove } from "@dnd-kit/sortable";
 
 // 평점 정보를 포함한 액티비티 타입
 interface ActivityWithRating extends Location {
@@ -18,6 +35,30 @@ interface ActivityWithRating extends Location {
   photos?: any;
   reviews?: any;
 }
+
+// 타입 변환 유틸리티 함수들
+const locationToItineraryActivity = (
+  location: Location,
+  itineraryId: number
+): ItineraryActivityDTO => ({
+  id: location.id,
+  itineraryId,
+  title: location.title,
+  description: location.description,
+  locationName: location.locationName,
+  position: location.orderIndex,
+});
+
+const itineraryActivityToLocation = (
+  activity: ItineraryActivityDTO
+): Location => ({
+  id: activity.id,
+  title: activity.title,
+  description: activity.description || "",
+  locationName: activity.locationName || "",
+  cost: undefined, // ItineraryActivityDTO에는 cost가 없음
+  orderIndex: activity.position,
+});
 
 const TravelPlanDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -31,6 +72,23 @@ const TravelPlanDetailPage = () => {
   >({});
   const [liked, setLiked] = useState<boolean>(false);
   const [likeLoading, setLikeLoading] = useState<boolean>(false);
+  const [isAnyDragging, setIsAnyDragging] = useState<boolean>(false); // 전역 드래그 상태
+
+  // Itinerary store 훅
+  const {
+    setOptimisticActivities,
+    getOptimisticActivities,
+    moveToPositionOptimistic,
+  } = useItineraryStore();
+
+  // DnD 센서 설정 (Carousel과의 충돌 방지)
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px 이상 드래그해야 활성화
+      },
+    })
+  );
 
   useEffect(() => {
     const fetchPlan = async () => {
@@ -79,6 +137,64 @@ const TravelPlanDetailPage = () => {
     );
   };
 
+  // 드래그 시작 핸들러
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setIsAnyDragging(true);
+  }, []);
+
+  // 드래그 앤 드롭으로 액티비티 순서 변경
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent, itineraryId: number) => {
+      setIsAnyDragging(false); // 드래그 종료
+
+      const { active, over } = event;
+
+      if (!over || active.id === over.id) {
+        return;
+      }
+
+      const optimisticActivities = getOptimisticActivities(itineraryId);
+      if (!optimisticActivities) return;
+
+      const oldIndex = optimisticActivities.findIndex(
+        (item) => item.id === active.id
+      );
+      const newIndex = optimisticActivities.findIndex(
+        (item) => item.id === over.id
+      );
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        // 낙관적 업데이트: 배열 순서 변경
+        const newActivities = arrayMove(
+          optimisticActivities,
+          oldIndex,
+          newIndex
+        );
+
+        // position 업데이트
+        const updatedActivities = newActivities.map((activity, index) => ({
+          ...activity,
+          position: index,
+        }));
+
+        setOptimisticActivities(itineraryId, updatedActivities);
+
+        try {
+          // 서버에 실제 변경 요청
+          await moveToPositionOptimistic(
+            itineraryId,
+            Number(active.id),
+            newIndex
+          );
+        } catch (error) {
+          console.error("Failed to move activity:", error);
+          // 에러 발생 시 원래 상태로 복원 (moveToPositionOptimistic에서 처리됨)
+        }
+      }
+    },
+    [getOptimisticActivities, setOptimisticActivities, moveToPositionOptimistic]
+  );
+
   // LocationProcessor에서 장소 상세 정보 수신 처리
   const handlePlaceDetailsChange = (places: PlaceWithRating[]) => {
     const newRatings: Record<number, ActivityWithRating> = {};
@@ -104,8 +220,18 @@ const TravelPlanDetailPage = () => {
   useEffect(() => {
     if (plan) {
       setSelectedItinerary(plan.itineraries[0]);
+
+      // 낙관적 업데이트를 위해 각 itinerary의 activities를 스토어에 설정
+      plan.itineraries.forEach((itinerary) => {
+        const sortedActivities = [...itinerary.activities]
+          .sort((a, b) => a.orderIndex - b.orderIndex)
+          .map((activity) =>
+            locationToItineraryActivity(activity, itinerary.id)
+          );
+        setOptimisticActivities(itinerary.id, sortedActivities);
+      });
     }
-  }, [plan]);
+  }, [plan, setOptimisticActivities]);
 
   useEffect(() => {
     const fetchLike = async () => {
@@ -228,6 +354,7 @@ const TravelPlanDetailPage = () => {
           autoplay={false}
           showDots={true}
           showArrows={true}
+          disableDrag={isAnyDragging}
         >
           {plan.itineraries.map((itinerary) => (
             <div
@@ -246,38 +373,36 @@ const TravelPlanDetailPage = () => {
               </div>
 
               <div className={styles.activitiesList}>
-                {itinerary.activities.map((activity, index) => (
-                  <div
-                    key={activity.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePlaceClick(activity);
-                    }}
-                    className={styles.activityCard}
-                    title={`${activity.locationName}에서 구글 맵 검색`}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragEnd={(event) => handleDragEnd(event, itinerary.id)}
+                >
+                  <SortableContext
+                    items={(
+                      getOptimisticActivities(itinerary.id) ||
+                      itinerary.activities.map((activity) =>
+                        locationToItineraryActivity(activity, itinerary.id)
+                      )
+                    ).map((activity) => activity.id)}
+                    strategy={verticalListSortingStrategy}
                   >
-                    <div className={styles.activityNumber}>{index + 1}</div>
-                    <div className={styles.activityContent}>
-                      <div className={styles.activityTitle}>
-                        {activity.title}
-                      </div>
-                      <div className={styles.activityLocation}>
-                        📍 {activity.locationName}
-                      </div>
-                      {activity.description && (
-                        <div className={styles.activityDescription}>
-                          {activity.description}
-                        </div>
-                      )}
-                      {activity.cost && (
-                        <div className={styles.activityCost}>
-                          💰 {activity.cost}
-                        </div>
-                      )}
-                    </div>
-                    <div className={styles.clickIndicator}>🔗</div>
-                  </div>
-                ))}
+                    {(
+                      getOptimisticActivities(itinerary.id) ||
+                      itinerary.activities.map((activity) =>
+                        locationToItineraryActivity(activity, itinerary.id)
+                      )
+                    ).map((activity, index) => (
+                      <DraggableActivity
+                        key={activity.id}
+                        activity={itineraryActivityToLocation(activity)}
+                        index={index}
+                        onPlaceClick={handlePlaceClick}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
               </div>
             </div>
           ))}
