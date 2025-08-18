@@ -246,11 +246,11 @@ const TravelPlanDetailPage = () => {
                     <div className={styles.activityTitle}>
                       {index + 1}. {activity.title}
                     </div>
-                    <div className={styles.activityRating}>
+                    {/* <div className={styles.activityRating}>
                       {activitiesWithRatings[activity.id]?.rating
                         ? renderStars(activitiesWithRatings[activity.id].rating)
                         : "로딩중..."}
-                    </div>
+                    </div> */}
                   </li>
                 ))}
               </ul>
@@ -258,7 +258,7 @@ const TravelPlanDetailPage = () => {
           ))}
         </Carousel>
       </section>
-      <section className={styles.map}>
+      {/* <section className={styles.map}>
         <PolylineMap
           allItineraryLocations={allItineraryLocations}
           selectedDayNumber={
@@ -270,7 +270,7 @@ const TravelPlanDetailPage = () => {
           }
           onPlaceDetailsChange={handlePlaceDetailsChange}
         />
-      </section>
+      </section> */}
     </div>
   );
 };
