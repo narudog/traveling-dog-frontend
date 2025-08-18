@@ -26,7 +26,7 @@ export default function HomeFeed() {
       }
     };
     run();
-  }, [feed]);
+  }, []);
 
   if (loading) return <div className={styles.state}>후기 불러오는 중...</div>;
   if (error) return <div className={styles.state}>오류: {error}</div>;
