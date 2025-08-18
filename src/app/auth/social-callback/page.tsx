@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useAuthStore } from "@/store/auth";
 
 export default function SocialCallbackPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get("returnUrl") || "/";
   const auth = useAuthStore();
 
   useEffect(() => {
@@ -27,8 +29,8 @@ export default function SocialCallbackPage() {
             console.log("Google ID 토큰 발견, 백엔드 API 호출 시작");
             // 백엔드 API로 소셜 로그인 요청
             await auth.socialLogin("google", googleIdToken);
-            console.log("소셜 로그인 성공, 홈으로 이동");
-            router.push("/");
+            console.log("소셜 로그인 성공, 원래 페이지로 이동:", returnUrl);
+            router.push(returnUrl);
           } else {
             console.error("Google ID 토큰을 찾을 수 없습니다:", {
               googleIdToken,

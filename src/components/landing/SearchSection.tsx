@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import styles from "./SearchSection.module.scss";
 import { useForm } from "react-hook-form";
 import { usePlanStore } from "@/store/plan";
+import { useAuthStore } from "@/store/auth";
 import { useRouter } from "next/navigation";
 import AccommodationSelector from "./AccommodationSelector";
 import { Hotel } from "@/types/booking";
@@ -15,11 +16,8 @@ type SearchFormInputs = {
   city: string;
   startDate: string;
   endDate: string;
-  budget: string;
   travelStyle: string;
-  accommodation: string;
   interests: string;
-  transportation: string;
 };
 
 // 선택된 호텔 인터페이스 정의
@@ -41,30 +39,13 @@ const interestsOptions = [
   { value: "예술", label: "예술/박물관" },
 ];
 
-const accommodationOptions = [
-  { value: "호텔", label: "호텔" },
-  { value: "모텔", label: "모텔" },
-  { value: "펜션", label: "펜션" },
-  { value: "게스트하우스", label: "게스트하우스" },
-  { value: "에어비앤비", label: "에어비앤비" },
-];
-
-const transportationOptions = [
-  { value: "비행기", label: "비행기" },
-  { value: "기차", label: "기차" },
-  { value: "지하철", label: "지하철" },
-  { value: "버스", label: "버스" },
-  { value: "자동차", label: "자동차" },
-  { value: "자전거", label: "자전거" },
-  { value: "도보", label: "도보" },
-];
-
 export default function SearchSection() {
   const { createPlan } = usePlanStore();
+  const { user, loading: authLoading } = useAuthStore();
   const { searchHotelsDestination, searchHotels } = useBookingStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
+  const totalSteps = 2;
   const router = useRouter();
 
   // 숙소 선택 관련 상태
@@ -83,12 +64,6 @@ export default function SearchSection() {
     []
   );
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  const [selectedAccommodations, setSelectedAccommodations] = useState<
-    string[]
-  >([]);
-  const [selectedTransportations, setSelectedTransportations] = useState<
-    string[]
-  >([]);
 
   const {
     register,
@@ -105,11 +80,8 @@ export default function SearchSection() {
       city: "",
       startDate: "",
       endDate: "",
-      budget: "",
       travelStyle: "",
-      accommodation: "",
       interests: "",
-      transportation: "",
     },
   });
 
@@ -155,38 +127,6 @@ export default function SearchSection() {
         });
         trigger(field);
         break;
-      case "accommodation":
-        setSelectedAccommodations((prev) => {
-          let newValues;
-          if (prev.includes(value)) {
-            newValues = prev.filter((item) => item !== value);
-          } else {
-            newValues = [...prev, value];
-          }
-          setValue(field, newValues.join(", "));
-          if (newValues.length > 0) {
-            clearErrors(field);
-          }
-          return newValues;
-        });
-        trigger(field);
-        break;
-      case "transportation":
-        setSelectedTransportations((prev) => {
-          let newValues;
-          if (prev.includes(value)) {
-            newValues = prev.filter((item) => item !== value);
-          } else {
-            newValues = [...prev, value];
-          }
-          setValue(field, newValues.join(", "));
-          if (newValues.length > 0) {
-            clearErrors(field);
-          }
-          return newValues;
-        });
-        trigger(field);
-        break;
     }
   };
 
@@ -208,10 +148,8 @@ export default function SearchSection() {
   const validateCurrentStep = async () => {
     switch (currentStep) {
       case 1:
-        return await trigger(["city", "budget"]);
+        return await trigger(["city", "startDate", "endDate"]);
       case 2:
-        return await trigger(["startDate", "endDate"]);
-      case 3:
         // 태그 선택 검증
         let isValid = true;
         if (selectedTravelStyles.length === 0) {
@@ -229,26 +167,6 @@ export default function SearchSection() {
           isValid = false;
         }
         return isValid && (await trigger(["travelStyle", "interests"]));
-      case 4:
-        // 태그 선택 검증
-        let isStepValid = true;
-        if (selectedAccommodations.length === 0) {
-          setError("accommodation", {
-            type: "required",
-            message: "최소 하나의 숙박 유형을 선택해주세요",
-          });
-          isStepValid = false;
-        }
-        if (selectedTransportations.length === 0) {
-          setError("transportation", {
-            type: "required",
-            message: "최소 하나의 교통수단을 선택해주세요",
-          });
-          isStepValid = false;
-        }
-        return (
-          isStepValid && (await trigger(["accommodation", "transportation"]))
-        );
       default:
         return true;
     }
@@ -330,6 +248,14 @@ export default function SearchSection() {
     };
   }, [city, startDate, endDate, searchHotelsDestination, searchHotels]);
 
+  // 로그인 후 돌아왔을 때 저장된 데이터 복원
+  useEffect(() => {
+    if (!authLoading && user) {
+      // 사용자가 인증되었고 로딩이 완료된 경우
+      loadFormData();
+    }
+  }, [user, authLoading]);
+
   // 숙소 선택기 토글 시 리셋
   useEffect(() => {
     if (!showAccommodationSelector) {
@@ -344,11 +270,53 @@ export default function SearchSection() {
     }
   }, [showAccommodationSelector, hotels]);
 
-  const onSubmit = async (data: SearchFormInputs) => {
-    const isStepValid = await validateCurrentStep();
-    if (!isStepValid) {
-      return;
+  // 폼 데이터 저장 및 복원 함수
+  const saveFormData = (data: SearchFormInputs) => {
+    const formData = {
+      ...data,
+      selectedHotels,
+      selectedTravelStyles,
+      selectedInterests,
+      currentStep,
+    };
+    sessionStorage.setItem("pendingPlanData", JSON.stringify(formData));
+  };
+
+  const loadFormData = () => {
+    const savedData = sessionStorage.getItem("pendingPlanData");
+    if (savedData) {
+      try {
+        const data = JSON.parse(savedData);
+        // 폼 데이터 복원
+        setValue("city", data.city);
+        setValue("startDate", data.startDate);
+        setValue("endDate", data.endDate);
+        setValue("travelStyle", data.travelStyle);
+        setValue("interests", data.interests);
+        setSelectedHotels(data.selectedHotels || []);
+        setSelectedTravelStyles(data.selectedTravelStyles || []);
+        setSelectedInterests(data.selectedInterests || []);
+        setCurrentStep(data.currentStep || 2); // 마지막 단계로 이동
+
+        // 저장된 데이터 삭제
+        sessionStorage.removeItem("pendingPlanData");
+
+        // 자동으로 일정 만들기 실행
+        setTimeout(() => {
+          handleSubmit(executePlanCreation)();
+        }, 100);
+
+        return true;
+      } catch (error) {
+        console.error("저장된 폼 데이터 복원 실패:", error);
+        sessionStorage.removeItem("pendingPlanData");
+      }
     }
+    return false;
+  };
+
+  // 실제 일정 생성 함수
+  const executePlanCreation = async (data: SearchFormInputs) => {
     const planList = JSON.parse(localStorage.getItem("planList") || "[]");
     console.log("일정 만들기:", data);
 
@@ -363,11 +331,8 @@ export default function SearchSection() {
         city: data.city,
         startDate: data.startDate,
         endDate: data.endDate,
-        budget: data.budget,
         travelStyle: data.travelStyle,
-        accommodation: data.accommodation,
         interests: data.interests,
-        transportation: data.transportation,
         userSpecifiedAccommodations: selectedHotels,
       });
       // 여기에 일정 만들기 로직 구현
@@ -379,6 +344,27 @@ export default function SearchSection() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const onSubmit = async (data: SearchFormInputs) => {
+    const isStepValid = await validateCurrentStep();
+    if (!isStepValid) {
+      return;
+    }
+
+    // 인증 상태 확인
+    if (!authLoading && !user) {
+      // 폼 데이터 저장
+      saveFormData(data);
+
+      // 로그인 페이지로 리다이렉트 (현재 경로를 callbackUrl로 전달)
+      const currentPath = window.location.pathname;
+      router.push(`/login?callbackUrl=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+
+    // 인증된 사용자인 경우 바로 일정 생성
+    await executePlanCreation(data);
   };
 
   return (
@@ -423,25 +409,6 @@ export default function SearchSection() {
               떠나고 싶은 도시를 입력하세요
             </div>
           </div>
-
-          <div className={styles.inputGroup}>
-            <input
-              id="budget"
-              type="text"
-              className={`${styles.textInput} ${errors.budget ? styles.inputError : ""}`}
-              placeholder="예산(예: 100만원)"
-              {...register("budget", { required: true })}
-            />
-            <div className={styles.inputHint}>
-              예산에 맞는 일정을 추천해 드립니다
-            </div>
-          </div>
-        </div>
-
-        {/* 단계 2: 날짜 */}
-        <div
-          className={`${styles.formStep} ${currentStep === 2 ? styles.active : ""}`}
-        >
           <div className={styles.inputGroup}>
             <label htmlFor="startDate">여행 시작일</label>
             <input
@@ -487,9 +454,9 @@ export default function SearchSection() {
           </div>
         </div>
 
-        {/* 단계 3: 예산 및 여행 스타일 */}
+        {/* 단계 2: 여행 스타일 */}
         <div
-          className={`${styles.formStep} ${currentStep === 3 ? styles.active : ""}`}
+          className={`${styles.formStep} ${currentStep === 2 ? styles.active : ""}`}
         >
           <div className={styles.inputGroup}>
             <RenderTagGroup
@@ -528,48 +495,12 @@ export default function SearchSection() {
           </div>
         </div>
 
-        {/* 단계 4: 선호사항 */}
-        <div
-          className={`${styles.formStep} ${currentStep === 4 ? styles.active : ""}`}
-        >
-          <div className={styles.inputGroup}>
-            <RenderTagGroup
-              options={accommodationOptions}
-              field="accommodation"
-              selectedValues={selectedAccommodations}
-              errorState={!!errors.accommodation}
-              handleTagSelect={handleTagSelect}
-            />
-            {errors.accommodation && (
-              <div className={styles.errorMessage}>
-                {errors.accommodation.message}
-              </div>
-            )}
-            <div className={styles.inputHint}>
-              원하는 숙박 유형을 모두 선택해주세요
-            </div>
-          </div>
-
-          <div className={styles.inputGroup}>
-            <RenderTagGroup
-              options={transportationOptions}
-              field="transportation"
-              selectedValues={selectedTransportations}
-              errorState={!!errors.transportation}
-              handleTagSelect={handleTagSelect}
-            />
-            {errors.transportation && (
-              <div className={styles.errorMessage}>
-                {errors.transportation.message}
-              </div>
-            )}
-            <div className={styles.inputHint}>
-              이용하고 싶은 교통수단을 모두 선택해주세요
-            </div>
-          </div>
-
-          {/* 숙소 선택 섹션 */}
-          <div className={styles.accommodationSelectorContainer}>
+        {/* 단계 3: 선호사항 */}
+        {/* <div
+          className={`${styles.formStep} ${currentStep === 3 ? styles.active : ""}`}
+        > */}
+        {/* 숙소 선택 섹션 */}
+        {/* <div className={styles.accommodationSelectorContainer}>
             <button
               type="button"
               className={styles.toggleButton}
@@ -603,7 +534,7 @@ export default function SearchSection() {
               />
             )}
           </div>
-        </div>
+        </div> */}
 
         {/* 단계별 버튼 */}
         <div className={styles.buttonContainer}>

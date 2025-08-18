@@ -3,7 +3,7 @@
 import Airplane from "@/components/animations/Airplane";
 import { useAuthStore } from "@/store/auth";
 import styles from "./LoginForm.module.scss";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import { signIn, getSession } from "next-auth/react";
@@ -11,6 +11,8 @@ import { signIn, getSession } from "next-auth/react";
 function LoginForm() {
   const auth = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
 
@@ -66,7 +68,7 @@ function LoginForm() {
       await auth.login({ email, password });
 
       setFormError("");
-      router.push("/");
+      router.push(callbackUrl);
       router.refresh(); // 세션 상태 갱신을 위한 새로고침
     } catch (error) {
       setFormError("로그인 중 오류가 발생했습니다.");
@@ -78,9 +80,10 @@ function LoginForm() {
       setFormError("");
       auth.setLoading(true);
 
-      // Google 로그인 - 콜백 페이지로 리다이렉트
+      // Google 로그인 - 콜백 페이지로 리다이렉트 (원래 페이지 정보 포함)
+      const socialCallbackUrl = `/auth/social-callback?returnUrl=${encodeURIComponent(callbackUrl)}`;
       await signIn("google", {
-        callbackUrl: "/auth/social-callback",
+        callbackUrl: socialCallbackUrl,
       });
     } catch (error) {
       setFormError("Google 로그인 중 오류가 발생했습니다.");

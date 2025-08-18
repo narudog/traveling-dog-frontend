@@ -1,22 +1,18 @@
 export interface TravelPlan {
-  accommodation: [{ id: number; name: string }];
-  budget: string;
+  id: number;
   city: string;
   country: string;
+  startDate: string;
   endDate: string;
-  id: number;
+  travelStyles: [{ id: number; name: string }];
   interests: [{ id: number; name: string }];
   itineraries: Itinerary[];
-  likeCount: number;
   nickname: string | null;
-  season: string;
-  startDate: string;
   status: string;
   title: string;
-  transportation: [{ id: number; name: string }];
-  travelStyles: [{ id: number; name: string }];
   userId: number | null;
   viewCount: number;
+  likeCount: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,11 +21,8 @@ export interface TravelPlanCreateRequest {
   city: string;
   startDate: string;
   endDate: string;
-  budget: string;
   travelStyle: string;
-  accommodation: string;
   interests: string;
-  transportation: string;
   userSpecifiedAccommodations: SelectedHotelByDate[];
 }
 
