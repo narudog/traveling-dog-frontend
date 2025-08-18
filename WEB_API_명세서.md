@@ -1,4 +1,4 @@
-# Traveling Dog 웹 API 명세서 (Web Front)
+# Traveling 웹 API 명세서 (Web Front)
 
 본 문서는 웹 프론트엔드가 구현할 API 명세입니다. `AppAuthController`를 제외한 모든 API를 포함합니다. 인증은 기본적으로 쿠키 기반(JWT)이며, 공개 엔드포인트는 별도 표시합니다.
 
