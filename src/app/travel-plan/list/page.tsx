@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import PlanList from "@/components/travelPlan/PlanList";
 import { useAuthStore } from "@/store/auth";
 const TravelPlanList = () => {
-  const { planList, getPlanList, setPlanList } = usePlanStore();
+  const { getPlanList, setPlanList } = usePlanStore();
   const { user } = useAuthStore();
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const TravelPlanList = () => {
 
   return (
     <div className={styles["travel-plan-list"]}>
-      <PlanList planList={planList} />
+      <PlanList />
     </div>
   );
 };

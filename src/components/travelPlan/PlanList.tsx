@@ -1,13 +1,35 @@
 import Link from "next/link";
 import PlanCard from "./PlanCard";
 import styles from "./PlanList.module.scss";
-import { TravelPlan } from "@/types/plan";
+import { usePlanStore } from "@/store/plan";
 
-interface PlanListProps {
-  planList: TravelPlan[];
-}
+const PlanList = () => {
+  const { isLoading, planList } = usePlanStore();
 
-const PlanList = ({ planList }: PlanListProps) => {
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.grid}>
+          {/* 로딩 중일 때 스켈레톤 카드들 표시 */}
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className={styles.skeletonCard}>
+              <div className={styles.skeletonImage}></div>
+              <div className={styles.skeletonContent}>
+                <div className={styles.skeletonTitle}></div>
+                <div className={styles.skeletonSubtitle}></div>
+                <div className={styles.skeletonDescription}></div>
+                <div className={styles.skeletonMeta}>
+                  <div className={styles.skeletonDate}></div>
+                  <div className={styles.skeletonLikes}></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       {planList.length === 0 ? (
