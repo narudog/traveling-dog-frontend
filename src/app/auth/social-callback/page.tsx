@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useAuthStore } from "@/store/auth";
@@ -54,37 +54,39 @@ export default function SocialCallbackPage() {
   }, [session, status, router, auth]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        flexDirection: "column",
-        gap: "1rem",
-      }}
-    >
-      <div>소셜 로그인 처리 중...</div>
+    <Suspense fallback={null}>
       <div
         style={{
-          width: "20px",
-          height: "20px",
-          border: "2px solid #f3f3f3",
-          borderTop: "2px solid #3498db",
-          borderRadius: "50%",
-          animation: "spin 1s linear infinite",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          flexDirection: "column",
+          gap: "1rem",
         }}
-      />
-      <style jsx>{`
-        @keyframes spin {
-          0% {
-            transform: rotate(0deg);
+      >
+        <div>소셜 로그인 처리 중...</div>
+        <div
+          style={{
+            width: "20px",
+            height: "20px",
+            border: "2px solid #f3f3f3",
+            borderTop: "2px solid #3498db",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+          }}
+        />
+        <style jsx>{`
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
           }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
-    </div>
+        `}</style>
+      </div>
+    </Suspense>
   );
 }
