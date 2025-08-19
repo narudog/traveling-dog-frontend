@@ -35,19 +35,6 @@ const eslintConfig = [
       "@typescript-eslint/no-explicit-any": "warn", // 'any' 타입 사용 제한
       "@typescript-eslint/consistent-type-definitions": ["error", "interface"], // interface 사용 권장
       "@typescript-eslint/no-inferrable-types": "warn", // 추론 가능한 타입 명시 방지
-      "@typescript-eslint/member-delimiter-style": [
-        "error",
-        {
-          multiline: {
-            delimiter: "none", // 멤버 구분 기호 제거
-            requireLast: true,
-          },
-          singleline: {
-            delimiter: "comma", // 한 줄일 경우 콤마 사용
-            requireLast: false,
-          },
-        },
-      ],
     },
   },
 ];
