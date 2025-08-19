@@ -1,10 +1,12 @@
 import LoginForm from "@/components/auth/LoginForm";
+import { Suspense } from "react";
 import styles from "./page.module.scss";
-import Link from "next/link";
 const LoginPage = () => {
   return (
     <div className={styles.container}>
-      <LoginForm />
+      <Suspense fallback={null}>
+        <LoginForm />
+      </Suspense>
     </div>
   );
 };
