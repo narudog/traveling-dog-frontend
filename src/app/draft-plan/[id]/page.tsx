@@ -3,7 +3,7 @@
 import PolylineMap from "@/components/map/PolylineMap";
 import { usePlanStore } from "@/store/plan";
 import { format } from "date-fns";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./page.module.scss";
 import { Itinerary, Location, TravelPlan } from "@/types/plan";
@@ -27,6 +27,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { arrayMove } from "@dnd-kit/sortable";
+import { useDraftPlanStore } from "@/store/draftPlan";
 
 // 평점 정보를 포함한 액티비티 타입
 interface ActivityWithRating extends Location {
@@ -62,10 +63,16 @@ const itineraryActivityToLocation = (
 
 const TravelPlanDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { plan, getPlanDetail, setPlan, likePlan, unlikePlan, getLikeStatus } =
-    usePlanStore();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { saveDraftPlan, isLoading } = usePlanStore();
+  const {
+    draftPlan,
+    getDraftPlan,
+    isLoading: isDraftPlanLoading,
+  } = useDraftPlanStore();
   const [selectedItinerary, setSelectedItinerary] = useState<Itinerary>();
-  const { user } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const [slidesToShow, setSlidesToShow] = useState(3);
   const [activitiesWithRatings, setActivitiesWithRatings] = useState<
     Record<number, ActivityWithRating>
@@ -73,6 +80,15 @@ const TravelPlanDetailPage = () => {
   const [liked, setLiked] = useState<boolean>(false);
   const [likeLoading, setLikeLoading] = useState<boolean>(false);
   const [isAnyDragging, setIsAnyDragging] = useState<boolean>(false); // 전역 드래그 상태
+
+  useEffect(() => {
+    const fetchDraftPlan = async () => {
+      await getDraftPlan(id);
+    };
+
+    if (draftPlan) return;
+    fetchDraftPlan();
+  }, [id, getDraftPlan]);
 
   // Itinerary store 훅
   const {
@@ -89,21 +105,6 @@ const TravelPlanDetailPage = () => {
       },
     })
   );
-
-  useEffect(() => {
-    const fetchPlan = async () => {
-      try {
-        await getPlanDetail(id);
-      } catch (e) {
-        const local = JSON.parse(localStorage.getItem("planList") || "[]").find(
-          (p: TravelPlan) => p.id === Number(id)
-        );
-        if (local) setPlan(local);
-      }
-    };
-    if (plan) return;
-    fetchPlan();
-  }, [id, getPlanDetail, setPlan]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -126,12 +127,40 @@ const TravelPlanDetailPage = () => {
     setSelectedItinerary(itinerary);
   };
 
+  const onSave = useCallback(async () => {
+    if (!isAuthenticated) {
+      const confirmLogin = window.confirm(
+        "로그인이 필요한 기능입니다.\n로그인 페이지로 이동하시겠습니까?"
+      );
+
+      if (confirmLogin) {
+        // 현재 페이지 정보를 저장하고 자동 저장 플래그 추가
+        const callbackUrl = `/draft-plan/${id}?autoSave=true`;
+        router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+      }
+      return;
+    }
+
+    try {
+      const tripPlan = await saveDraftPlan({
+        title: draftPlan?.title || "",
+        startDate: draftPlan?.startDate || "",
+        endDate: draftPlan?.endDate || "",
+        draftTripPlanId: Number(draftPlan?.id),
+      });
+      router.push(`/travel-plan/${tripPlan.id}`);
+    } catch (error) {
+      console.error("저장 중 오류가 발생했습니다:", error);
+      alert("저장 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
+  }, [isAuthenticated, id, router, saveDraftPlan, draftPlan]);
+
   // 장소 클릭 처리 함수
   const handlePlaceClick = (activity: Location) => {
-    if (!plan) return;
+    if (!draftPlan) return;
 
     // 구글 맵에서 장소 검색 (locationName + city 조합)
-    const searchQuery = `${activity.locationName}, ${plan.city}`;
+    const searchQuery = `${activity.locationName}, ${draftPlan.city}`;
     window.open(
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`,
       "_blank"
@@ -219,11 +248,11 @@ const TravelPlanDetailPage = () => {
   };
 
   useEffect(() => {
-    if (plan) {
-      setSelectedItinerary(plan.itineraries[0]);
+    if (draftPlan) {
+      setSelectedItinerary(draftPlan.itineraries[0]);
 
       // 낙관적 업데이트를 위해 각 itinerary의 activities를 스토어에 설정
-      plan.itineraries.forEach((itinerary) => {
+      draftPlan.itineraries.forEach((itinerary) => {
         const sortedActivities = [...itinerary.activities]
           .sort((a, b) => a.orderIndex - b.orderIndex)
           .map((activity) =>
@@ -232,119 +261,61 @@ const TravelPlanDetailPage = () => {
         setOptimisticActivities(itinerary.id, sortedActivities);
       });
     }
-  }, [plan, setOptimisticActivities]);
+  }, [draftPlan, setOptimisticActivities]);
 
+  // 로그인 후 돌아왔을 때 자동 저장 처리
   useEffect(() => {
-    const fetchLike = async () => {
-      if (!user) {
-        setLiked(false);
-        return;
-      }
-      try {
-        const status = await getLikeStatus(Number(id));
-        setLiked(Boolean(status));
-      } catch (e) {
-        setLiked(false);
-      }
-    };
-    fetchLike();
-  }, [user, id]);
+    const autoSave = searchParams.get("autoSave");
 
-  // 모든 itinerary의 위치 정보를 하나의 배열로 변환
-  const allItineraryLocations = useMemo(() => {
-    if (!plan) return [];
+    if (autoSave === "true" && isAuthenticated && draftPlan) {
+      // URL에서 autoSave 파라미터 제거
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, "", newUrl);
 
-    return plan.itineraries.map((itinerary, index) => {
-      // 각 itinerary에 대한 색상 생성 (다른 색상을 사용하기 위해)
-      const colors = [
-        "#FF3D00", // 심홍색
-        "#FF9100", // 주황
-        "#00B0FF", // 하늘색
-        "#D500F9", // 밝은 보라
-        "#304FFE", // 어두운 파랑
-        "#FF1744", // 밝은 빨강
-        "#7C4DFF", // 진한 보라
-        "#FF6D00", // 진한 주황,
-        "#F50057", // 분홍
-        "#AA00FF", // 보라
-      ];
-      const color = colors[index % colors.length];
+      // 자동 저장 실행
+      onSave();
+    }
+  }, [isAuthenticated, draftPlan, searchParams, onSave]);
 
-      return {
-        locations: itinerary.activities.map((activity) => ({
-          name: activity.locationName,
-          region: plan.city + ", " + plan.country,
-        })),
-        color: color,
-        dayNumber: index + 1,
-        activityIds: itinerary.activities.map((a) => a.id),
-      };
-    });
-  }, [plan]);
-
-  if (!plan) {
+  if (!draftPlan || isDraftPlanLoading) {
     return <TravelPlanDetailSkeleton />;
   }
-
-  // 별점 렌더링 함수
-  const renderStars = (rating?: number) => {
-    if (!rating) return "평점 없음";
-
-    return <span className={styles.stars}>{` ${rating.toFixed(1)}`} / 5</span>;
-  };
 
   return (
     <div className={styles.planDetail}>
       <header className={styles.header}>
         <div className={styles.titleArea}>
-          <h1 className={styles.title}>{plan.title}</h1>
+          <h1 className={styles.title}>{draftPlan.title}</h1>
           <span className={styles.location}>
-            {plan.country} - {plan.city}
+            {draftPlan.country} - {draftPlan.city}
           </span>
           <span className={styles.date}>
-            {format(new Date(plan.startDate), "yyyy.MM.dd")} ~{" "}
-            {format(new Date(plan.endDate), "yyyy.MM.dd")}
+            {format(new Date(draftPlan.startDate), "yyyy.MM.dd")} ~{" "}
+            {format(new Date(draftPlan.endDate), "yyyy.MM.dd")}
           </span>
-          <div className={styles.stats}>
-            <div className={styles.statsItem}>
-              <span className={styles.statsLabel}>조회수</span>
-              <span className={styles.statsValue}>{plan.viewCount}</span>
-            </div>
-            <div className={styles.divider}>|</div>
-            <div className={styles.statsItem}>
-              <span className={styles.statsLabel}>좋아요</span>
-              <span className={styles.statsValue}>
-                {plan.likeCount + (liked ? 1 : 0)}
-              </span>
-            </div>
-            <div className={styles.divider}>|</div>
-            <button
-              className={styles.likeButton}
-              disabled={likeLoading || !user}
-              onClick={async () => {
-                if (!user) return;
-                setLikeLoading(true);
-                try {
-                  if (!liked) {
-                    const added = await likePlan(Number(id));
-                    if (added) setLiked(true);
-                  } else {
-                    await unlikePlan(Number(id));
-                    setLiked(false);
-                  }
-                } finally {
-                  setLikeLoading(false);
-                }
-              }}
-            >
-              {liked ? "좋아요 취소" : "좋아요"}
-            </button>
-          </div>
         </div>
       </header>
 
       <section className={styles.locations}>
-        <h2 className={styles.sectionTitle}>여행 일정</h2>
+        <div className={styles.draftPlanHeader}>
+          <h2 className={styles.sectionTitle}>여행 일정</h2>
+          <button
+            type="button"
+            className={`${styles.draftPlanButton} ${isLoading ? styles.loading : ""}`}
+            onClick={onSave}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <span className={styles.spinner}></span>
+                저장중...
+              </>
+            ) : (
+              "저장하기"
+            )}
+          </button>
+        </div>
+
         <Carousel
           slidesToShow={slidesToShow}
           autoplay={false}
@@ -352,7 +323,7 @@ const TravelPlanDetailPage = () => {
           showArrows={true}
           disableDrag={isAnyDragging}
         >
-          {plan.itineraries.map((itinerary) => (
+          {draftPlan.itineraries.map((itinerary) => (
             <div
               key={itinerary.id}
               className={`${styles.itineraryCard} ${selectedItinerary?.id === itinerary.id ? styles.itineraryCardActive : ""}`}
@@ -404,19 +375,6 @@ const TravelPlanDetailPage = () => {
           ))}
         </Carousel>
       </section>
-      {/* <section className={styles.map}>
-        <PolylineMap
-          allItineraryLocations={allItineraryLocations}
-          selectedDayNumber={
-            selectedItinerary
-              ? plan.itineraries.findIndex(
-                  (i) => i.id === selectedItinerary.id
-                ) + 1
-              : 1
-          }
-          onPlaceDetailsChange={handlePlaceDetailsChange}
-        />
-      </section> */}
     </div>
   );
 };

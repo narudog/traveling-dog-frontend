@@ -7,7 +7,7 @@ interface AuthState {
   user: Profile | null;
   loading: boolean;
   error: string | null;
-  hasFetchedProfile?: boolean;
+  isAuthenticated?: boolean;
 }
 
 // 액션 인터페이스
@@ -41,7 +41,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
   user: null,
   loading: false,
   error: null,
-  hasFetchedProfile: false,
+  isAuthenticated: false,
 
   signup: async ({
     nickname,
@@ -65,7 +65,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
         user: response.data,
         loading: false,
         error: null,
-        hasFetchedProfile: true,
+        isAuthenticated: true,
       });
       return response.data;
     } catch (error: any) {
@@ -103,7 +103,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
         user: response.data,
         loading: false,
         error: null,
-        hasFetchedProfile: true,
+        isAuthenticated: true,
       });
       return response.data;
     } catch (error: any) {
@@ -128,7 +128,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
         user: response.data,
         loading: false,
         error: null,
-        hasFetchedProfile: true,
+        isAuthenticated: true,
       });
       return response.data;
     } catch (error: any) {
@@ -145,7 +145,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
-      set({ user: null, hasFetchedProfile: false });
+      set({ user: null, isAuthenticated: false });
     } catch (error) {
       console.error("로그아웃 중 오류 발생:", error);
     }
@@ -161,22 +161,22 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
 
   getUserProfile: async () => {
     // 가드: 이미 요청했거나 진행 중이면 종료
-    const { hasFetchedProfile, loading } = get();
-    if (hasFetchedProfile || loading) return;
+    const { isAuthenticated, loading } = get();
+    if (isAuthenticated || loading) return;
 
     set((prev) => ({ ...prev, loading: true }));
 
     try {
       const config: any = { skipRefreshRetry: true };
       const response = await axiosInstance.get("/user/profile", config);
-      set({ user: response.data, loading: false, hasFetchedProfile: true });
+      set({ user: response.data, loading: false, isAuthenticated: true });
     } catch (error) {
       // 비로그인일 수 있으므로 조용히 실패 처리, 플래그만 설정하여 반복 호출 방지
       set((prev) => ({
         ...prev,
         loading: false,
         user: null,
-        hasFetchedProfile: true,
+        isAuthenticated: false,
       }));
     }
   },

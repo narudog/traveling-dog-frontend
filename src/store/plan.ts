@@ -6,6 +6,8 @@ import {
   TravelPlanCreateRequest,
   TravelPlanSearchRequest,
   TravelPlanSearchResponse,
+  DraftTravelPlan,
+  DraftTravelPlanSaveRequest,
 } from "@/types/plan";
 
 // 인터페이스 정의
@@ -19,6 +21,7 @@ interface PlanState {
 // 액션 인터페이스
 interface PlanActions {
   createPlan: (plan: TravelPlanCreateRequest) => Promise<TravelPlan>;
+  saveDraftPlan: (plan: DraftTravelPlanSaveRequest) => Promise<TravelPlan>;
   getPlanList: () => Promise<void>;
   getPlanDetail: (planId: string) => Promise<TravelPlan>;
   updatePlan: (planId: string, plan: PlanUpdateRequest) => Promise<void>;
@@ -56,6 +59,18 @@ export const usePlanStore = create<PlanState & PlanActions>((set) => ({
         isLoading: false,
         error: error?.message || "플랜 생성 실패",
       }));
+      throw error;
+    }
+  },
+
+  saveDraftPlan: async (plan: DraftTravelPlanSaveRequest) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await axiosInstance.post("/travel/plan/save", plan);
+      set({ plan: data, isLoading: false, error: null });
+      return data;
+    } catch (error: any) {
+      set({ isLoading: false, error: error?.message || "플랜 저장 실패" });
       throw error;
     }
   },

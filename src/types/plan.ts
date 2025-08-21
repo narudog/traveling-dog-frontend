@@ -17,6 +17,18 @@ export interface TravelPlan {
     updatedAt: string;
 }
 
+export interface DraftTravelPlan {
+    id: number;
+    city: string;
+    country: string;
+    title: string;
+    startDate: string;
+    endDate: string;
+    travelStyles: [{ id: number; name: string }];
+    interests: [{ id: number; name: string }];
+    itineraries: Itinerary[];
+}
+
 export interface TravelPlanCreateRequest {
     city: string;
     startDate: string;
@@ -24,6 +36,13 @@ export interface TravelPlanCreateRequest {
     travelStyle: string;
     interests: string;
     userSpecifiedAccommodations: SelectedHotelByDate[];
+}
+
+export interface DraftTravelPlanSaveRequest {
+    title: string;
+    startDate: string;
+    endDate: string;
+    draftTripPlanId: number;
 }
 
 export interface SelectedHotelByDate {
