@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.narudog.traveling_dog_app",
+      "sha256_cert_fingerprints": [
+        "57:C7:67:FB:BF:57:9A:BC:4D:40:96:12:FC:4F:F4:0C:32:24:38:CA:F8:87:5F:19:95:CB:BA:9D:3E:96:8C:05"
+      ]
+    }
+  }
+]
