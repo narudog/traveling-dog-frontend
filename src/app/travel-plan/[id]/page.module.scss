@@ -289,6 +289,14 @@
   }
 }
 
+.activityNumberContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 .activityNumber {
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
@@ -316,21 +324,59 @@
   min-width: 0;
 }
 
+.activityTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
 .activityTitle {
   font-size: 1rem;
   font-weight: 600;
   color: #1e293b;
-  margin-bottom: 0.25rem;
   line-height: 1.4;
+  flex-grow: 1;
+  margin-right: 0.75rem;
 }
 
-.activityLocation {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 0.25rem;
+.titleButtons {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.mapButton {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1e40af;
+    outline-offset: 2px;
+  }
 }
 
 .activityDescription {
@@ -339,8 +385,6 @@
   line-height: 1.4;
   margin-bottom: 0.25rem;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -363,29 +407,162 @@
   align-self: center;
 }
 
-.dragHandle {
-  color: #9ca3af;
-  font-size: 1.2rem;
+// 우측 상단 아이콘 영역
+.activityIcons {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+}
+
+.activityCard:hover .activityIcons {
+  opacity: 1;
+}
+
+.activityCard:hover .dragHandle {
   opacity: 0.7;
+}
+
+.iconButton {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.25rem;
+  cursor: pointer;
   transition: all 0.2s ease;
-  flex-shrink: 0;
-  align-self: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  color: #64748b;
+
+  svg {
+    transition: all 0.2s ease;
+  }
+
+  &:hover {
+    background: white;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    color: #374151;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  // 지도 버튼 특별 스타일 (첫 번째 버튼)
+  &:first-child {
+    &:hover {
+      color: #3b82f6;
+      border-color: #3b82f6;
+    }
+  }
+
+  // 편집 버튼 특별 스타일 (두 번째 버튼)
+  &:nth-child(2) {
+    &:hover {
+      color: #f59e0b;
+      border-color: #f59e0b;
+    }
+  }
+
+  // 삭제 버튼 특별 스타일 (세 번째 버튼)
+  &:nth-child(3) {
+    &:hover {
+      color: #ef4444;
+      border-color: #ef4444;
+    }
+  }
+}
+
+// 액티비티 액션 영역 (삭제됨 - 이제 dragHandle이 absolute positioning 사용)
+
+.editButton {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// 기존 editIndicator는 제거됨
+.editIndicator {
+  display: none;
+}
+
+// .
+
+.dragHandle {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  opacity: 0; // 기본적으로 숨김
+  transition: all 0.2s ease;
   cursor: grab;
   user-select: none;
   padding: 0.5rem;
-  margin: -0.5rem;
   border-radius: 6px;
   touch-action: none; // 터치 이벤트 제어
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  backdrop-filter: blur(4px);
+  z-index: 1;
+
+  svg {
+    transition: all 0.2s ease;
+  }
 
   &:hover {
     opacity: 1;
     color: #6b7280;
-    background-color: #f1f5f9;
+    background: white;
+    border-color: #cbd5e1;
+    transform: translateY(-51%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   }
 
   &:active {
-    background-color: #e2e8f0;
-    transform: scale(1.1);
+    background: #e2e8f0;
+    transform: translateY(-50%) scale(1.05);
+
+    svg {
+      transform: scale(1.1);
+    }
   }
 }
 
@@ -402,6 +579,15 @@
     background-color: #3b82f6;
     color: white;
     opacity: 1;
+
+    svg {
+      transform: scale(1.1);
+    }
+  }
+
+  .activityIcons {
+    opacity: 0;
+    pointer-events: none;
   }
 }
 
@@ -617,6 +803,26 @@
   min-height: 120px;
 }
 
+// 액티비티 편집 카드 스타일
+.editActivityCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 12px;
+  border: 2px solid #f59e0b;
+  margin-bottom: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 120px;
+
+  .activityNumber {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+  }
+}
+
 .addActivityForm {
   flex-grow: 1;
   display: flex;
@@ -799,6 +1005,102 @@
     background: linear-gradient(135deg, #1d4ed8, #1e40af);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+// 모달 스타일
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: modalSlideIn 0.2s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalHeader {
+  padding: 1.5rem 1.5rem 0;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 1rem;
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    padding-bottom: 1rem;
+  }
+}
+
+.modalBody {
+  padding: 0 1.5rem 1rem;
+
+  p {
+    margin: 0 0 0.75rem;
+    color: #64748b;
+    line-height: 1.5;
+  }
+}
+
+.modalWarning {
+  color: #ef4444 !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.deleteButton {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
   }
 
   &:active:not(:disabled) {

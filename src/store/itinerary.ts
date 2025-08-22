@@ -20,9 +20,10 @@ export interface ItineraryActivityCreateRequest {
 }
 
 export interface ItineraryActivityUpdateRequest {
-  title?: string;
+  title: string;
   description?: string;
-  locationName?: string;
+  locationName: string;
+  cost?: string;
 }
 
 interface ItineraryState {

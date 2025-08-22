@@ -89,12 +89,37 @@ const TravelPlanDetailPage = () => {
     [itineraryId: number]: boolean;
   }>({});
 
+  // 액티비티 편집 관련 상태
+  const [editingActivityId, setEditingActivityId] = useState<number | null>(
+    null
+  );
+  const [editingActivity, setEditingActivity] = useState<{
+    title: string;
+    description: string;
+    locationName: string;
+    cost: string;
+  }>({
+    title: "",
+    description: "",
+    locationName: "",
+    cost: "",
+  });
+  const [isUpdatingActivity, setIsUpdatingActivity] = useState<boolean>(false);
+
+  // 액티비티 삭제 관련 상태
+  const [deletingActivityId, setDeletingActivityId] = useState<number | null>(
+    null
+  );
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
   // Itinerary store 훅
   const {
     setOptimisticActivities,
     getOptimisticActivities,
     moveToPositionOptimistic,
     create,
+    update,
+    remove,
   } = useItineraryStore();
 
   // 각 itinerary별 activity 상태를 가져오는 헬퍼 함수
@@ -183,6 +208,163 @@ const TravelPlanDetailPage = () => {
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`,
       "_blank"
     );
+  };
+
+  // 액티비티 편집 모드 시작
+  const handleStartEditActivity = (activity: Location) => {
+    if (!user || !plan || plan.userId !== user.id) return;
+
+    setEditingActivityId(activity.id);
+    setEditingActivity({
+      title: activity.title,
+      description: activity.description,
+      locationName: activity.locationName,
+      cost: activity.cost || "",
+    });
+  };
+
+  // 액티비티 삭제 확인 모달 열기
+  const handleStartDeleteActivity = (activity: Location) => {
+    if (!user || !plan || plan.userId !== user.id) return;
+    setDeletingActivityId(activity.id);
+  };
+
+  // 액티비티 삭제 취소
+  const handleCancelDeleteActivity = () => {
+    setDeletingActivityId(null);
+  };
+
+  // 액티비티 삭제 처리
+  const handleDeleteActivity = async () => {
+    if (!deletingActivityId || !plan) return;
+
+    setIsDeleting(true);
+    try {
+      await remove(deletingActivityId);
+
+      // Plan state에서 액티비티 제거
+      const updatedPlan = { ...plan };
+      const targetItinerary = updatedPlan.itineraries.find((itinerary) =>
+        itinerary.activities.some(
+          (activity) => activity.id === deletingActivityId
+        )
+      );
+
+      if (targetItinerary) {
+        targetItinerary.activities = targetItinerary.activities.filter(
+          (activity) => activity.id !== deletingActivityId
+        );
+
+        setPlan(updatedPlan);
+
+        // 낙관적 업데이트에서도 제거
+        const currentOptimisticActivities =
+          getOptimisticActivities(targetItinerary.id) || [];
+        const updatedOptimisticActivities = currentOptimisticActivities.filter(
+          (activity) => activity.id !== deletingActivityId
+        );
+        setOptimisticActivities(
+          targetItinerary.id,
+          updatedOptimisticActivities
+        );
+      }
+
+      handleCancelDeleteActivity();
+    } catch (error) {
+      console.error("액티비티 삭제 실패:", error);
+      alert("액티비티 삭제에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // 액티비티 편집 취소
+  const handleCancelEditActivity = () => {
+    setEditingActivityId(null);
+    setEditingActivity({
+      title: "",
+      description: "",
+      locationName: "",
+      cost: "",
+    });
+  };
+
+  // 액티비티 업데이트 처리
+  const handleUpdateActivity = async () => {
+    if (
+      !editingActivityId ||
+      !editingActivity.title.trim() ||
+      !editingActivity.locationName.trim()
+    )
+      return;
+
+    setIsUpdatingActivity(true);
+    try {
+      const updateRequest = {
+        title: editingActivity.title.trim(),
+        description: editingActivity.description.trim() || undefined,
+        locationName: editingActivity.locationName.trim(),
+        cost: editingActivity.cost.trim() || undefined,
+      };
+
+      const updatedActivity = await update(editingActivityId, updateRequest);
+
+      // Plan state 업데이트
+      if (plan) {
+        const updatedPlan = { ...plan };
+        const targetItinerary = updatedPlan.itineraries.find((itinerary) =>
+          itinerary.activities.some(
+            (activity) => activity.id === editingActivityId
+          )
+        );
+
+        if (targetItinerary) {
+          const activityIndex = targetItinerary.activities.findIndex(
+            (activity) => activity.id === editingActivityId
+          );
+
+          if (activityIndex !== -1) {
+            targetItinerary.activities[activityIndex] = {
+              id: updatedActivity.id,
+              title: updatedActivity.title,
+              description: updatedActivity.description || "",
+              locationName: updatedActivity.locationName || "",
+              cost: updatedActivity.cost || "",
+              orderIndex: updatedActivity.orderIndex,
+            };
+
+            setPlan(updatedPlan);
+
+            // 낙관적 업데이트도 업데이트
+            const currentOptimisticActivities =
+              getOptimisticActivities(targetItinerary.id) || [];
+            const optimisticActivityIndex =
+              currentOptimisticActivities.findIndex(
+                (activity) => activity.id === editingActivityId
+              );
+
+            if (optimisticActivityIndex !== -1) {
+              const updatedOptimisticActivities = [
+                ...currentOptimisticActivities,
+              ];
+              updatedOptimisticActivities[optimisticActivityIndex] =
+                updatedActivity;
+              setOptimisticActivities(
+                targetItinerary.id,
+                updatedOptimisticActivities
+              );
+            }
+          }
+        }
+      }
+
+      handleCancelEditActivity();
+    } catch (error) {
+      console.error("액티비티 업데이트 실패:", error);
+      alert("액티비티 업데이트에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsUpdatingActivity(false);
+    }
   };
 
   // 액티비티 추가 취소
@@ -509,14 +691,113 @@ const TravelPlanDetailPage = () => {
                       itinerary.activities.map((activity) =>
                         locationToItineraryActivity(activity, itinerary.id)
                       )
-                    ).map((activity, index) => (
-                      <DraggableActivity
-                        key={activity.id}
-                        activity={itineraryActivityToLocation(activity)}
-                        index={index}
-                        onPlaceClick={handlePlaceClick}
-                      />
-                    ))}
+                    ).map((activity, index) => {
+                      const locationActivity =
+                        itineraryActivityToLocation(activity);
+
+                      // 편집 모드인 경우 편집 카드 렌더링
+                      if (editingActivityId === activity.id) {
+                        return (
+                          <div
+                            key={activity.id}
+                            className={styles.editActivityCard}
+                          >
+                            <div className={styles.activityNumber}>
+                              {index + 1}
+                            </div>
+                            <div className={styles.addActivityForm}>
+                              <div className={styles.inputRow}>
+                                <input
+                                  type="text"
+                                  placeholder="제목 *"
+                                  value={editingActivity.title}
+                                  onChange={(e) =>
+                                    setEditingActivity((prev) => ({
+                                      ...prev,
+                                      title: e.target.value,
+                                    }))
+                                  }
+                                  className={styles.titleInput}
+                                />
+                                <input
+                                  type="text"
+                                  placeholder="장소명 * (구글맵 검색 가능한 정확한 이름)"
+                                  value={editingActivity.locationName}
+                                  onChange={(e) =>
+                                    setEditingActivity((prev) => ({
+                                      ...prev,
+                                      locationName: e.target.value,
+                                    }))
+                                  }
+                                  className={styles.locationInput}
+                                />
+                              </div>
+                              <div className={styles.inputRow}>
+                                <textarea
+                                  placeholder="설명"
+                                  value={editingActivity.description}
+                                  onChange={(e) =>
+                                    setEditingActivity((prev) => ({
+                                      ...prev,
+                                      description: e.target.value,
+                                    }))
+                                  }
+                                  className={styles.descriptionInput}
+                                  rows={2}
+                                />
+                                <input
+                                  type="text"
+                                  placeholder="예상 비용 (예: 15,000원)"
+                                  value={editingActivity.cost}
+                                  onChange={(e) =>
+                                    setEditingActivity((prev) => ({
+                                      ...prev,
+                                      cost: e.target.value,
+                                    }))
+                                  }
+                                  className={styles.costInput}
+                                />
+                              </div>
+                              <div className={styles.formActions}>
+                                <button
+                                  className={styles.cancelButton}
+                                  onClick={handleCancelEditActivity}
+                                  type="button"
+                                  disabled={isUpdatingActivity}
+                                >
+                                  취소
+                                </button>
+                                <button
+                                  className={styles.submitButton}
+                                  onClick={handleUpdateActivity}
+                                  type="button"
+                                  disabled={
+                                    isUpdatingActivity ||
+                                    !editingActivity.title.trim() ||
+                                    !editingActivity.locationName.trim()
+                                  }
+                                >
+                                  {isUpdatingActivity ? "저장 중..." : "저장"}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // 일반 모드
+                      return (
+                        <DraggableActivity
+                          key={activity.id}
+                          activity={locationActivity}
+                          index={index}
+                          onPlaceClick={handlePlaceClick}
+                          onEditClick={handleStartEditActivity}
+                          onDeleteClick={handleStartDeleteActivity}
+                          isEditable={!!(user && plan.userId === user.id)}
+                        />
+                      );
+                    })}
                     {user && plan.userId === user.id && (
                       <div className={styles.addActivityCard}>
                         <div className={styles.activityNumber}>+</div>
@@ -617,6 +898,40 @@ const TravelPlanDetailPage = () => {
           ))}
         </Carousel>
       </section>
+
+      {/* 삭제 확인 모달 */}
+      {deletingActivityId && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <h3>액티비티 삭제</h3>
+            </div>
+            <div className={styles.modalBody}>
+              <p>이 액티비티를 정말 삭제하시겠습니까?</p>
+              <p className={styles.modalWarning}>
+                삭제된 액티비티는 복구할 수 없습니다.
+              </p>
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                className={styles.cancelButton}
+                onClick={handleCancelDeleteActivity}
+                disabled={isDeleting}
+              >
+                취소
+              </button>
+              <button
+                className={styles.deleteButton}
+                onClick={handleDeleteActivity}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "삭제 중..." : "삭제"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* <section className={styles.map}>
         <PolylineMap
           allItineraryLocations={allItineraryLocations}
@@ -689,9 +1004,6 @@ const TravelPlanDetailSkeleton = () => {
                     key={actIndex}
                     className={`${styles.activityCard} ${styles.skeletonActivityCard}`}
                   >
-                    <div
-                      className={`${styles.activityNumber} ${styles.skeletonActivityNumber}`}
-                    ></div>
                     <div className={styles.activityContent}>
                       <div
                         className={`${styles.activityTitle} ${styles.skeletonActivityTitle}`}
