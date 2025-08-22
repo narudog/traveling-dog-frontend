@@ -47,7 +47,7 @@ const locationToItineraryActivity = (
   title: location.title,
   description: location.description,
   locationName: location.locationName,
-  position: location.orderIndex,
+  orderIndex: location.orderIndex,
 });
 
 const itineraryActivityToLocation = (
@@ -58,7 +58,7 @@ const itineraryActivityToLocation = (
   description: activity.description || "",
   locationName: activity.locationName || "",
   cost: undefined, // ItineraryActivityDTO에는 cost가 없음
-  orderIndex: activity.position,
+  orderIndex: activity.orderIndex,
 });
 
 const TravelPlanDetailPage = () => {
