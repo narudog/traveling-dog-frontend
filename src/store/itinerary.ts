@@ -7,14 +7,16 @@ export interface ItineraryActivityDTO {
   title: string;
   description?: string;
   locationName?: string;
-  position: number;
+  cost?: string;
+  orderIndex: number;
 }
 
 export interface ItineraryActivityCreateRequest {
   itineraryId: number;
   title: string;
   description?: string;
-  locationName?: string;
+  locationName: string;
+  cost?: string;
 }
 
 export interface ItineraryActivityUpdateRequest {

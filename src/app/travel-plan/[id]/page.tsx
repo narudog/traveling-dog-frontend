@@ -27,6 +27,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { arrayMove } from "@dnd-kit/sortable";
+import { ItineraryActivityCreateRequest } from "@/store/itinerary";
 
 // 평점 정보를 포함한 액티비티 타입
 interface ActivityWithRating extends Location {
@@ -46,7 +47,8 @@ const locationToItineraryActivity = (
   title: location.title,
   description: location.description,
   locationName: location.locationName,
-  position: location.orderIndex,
+  cost: location.cost,
+  orderIndex: location.orderIndex,
 });
 
 const itineraryActivityToLocation = (
@@ -56,8 +58,8 @@ const itineraryActivityToLocation = (
   title: activity.title,
   description: activity.description || "",
   locationName: activity.locationName || "",
-  cost: undefined, // ItineraryActivityDTO에는 cost가 없음
-  orderIndex: activity.position,
+  cost: activity.cost,
+  orderIndex: activity.orderIndex,
 });
 
 const TravelPlanDetailPage = () => {
@@ -74,12 +76,57 @@ const TravelPlanDetailPage = () => {
   const [likeLoading, setLikeLoading] = useState<boolean>(false);
   const [isAnyDragging, setIsAnyDragging] = useState<boolean>(false); // 전역 드래그 상태
 
+  // 액티비티 추가 관련 상태 (각 itinerary별로 독립적)
+  const [newActivities, setNewActivities] = useState<{
+    [itineraryId: number]: {
+      title: string;
+      description: string;
+      locationName: string;
+      cost: string;
+    };
+  }>({});
+  const [submittingItineraries, setSubmittingItineraries] = useState<{
+    [itineraryId: number]: boolean;
+  }>({});
+
   // Itinerary store 훅
   const {
     setOptimisticActivities,
     getOptimisticActivities,
     moveToPositionOptimistic,
+    create,
   } = useItineraryStore();
+
+  // 각 itinerary별 activity 상태를 가져오는 헬퍼 함수
+  const getActivityForItinerary = (itineraryId: number) => {
+    return (
+      newActivities[itineraryId] || {
+        title: "",
+        description: "",
+        locationName: "",
+        cost: "",
+      }
+    );
+  };
+
+  // 각 itinerary별 activity 상태를 업데이트하는 헬퍼 함수
+  const updateActivityForItinerary = (
+    itineraryId: number,
+    updates: Partial<{
+      title: string;
+      description: string;
+      locationName: string;
+      cost: string;
+    }>
+  ) => {
+    setNewActivities((prev) => ({
+      ...prev,
+      [itineraryId]: {
+        ...getActivityForItinerary(itineraryId),
+        ...updates,
+      },
+    }));
+  };
 
   // DnD 센서 설정 (Carousel과의 충돌 방지)
   const sensors = useSensors(
@@ -136,6 +183,79 @@ const TravelPlanDetailPage = () => {
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`,
       "_blank"
     );
+  };
+
+  // 액티비티 추가 취소
+  const handleCancelAddActivity = (itineraryId: number) => {
+    setNewActivities((prev) => ({
+      ...prev,
+      [itineraryId]: {
+        title: "",
+        description: "",
+        locationName: "",
+        cost: "",
+      },
+    }));
+  };
+
+  // 액티비티 추가 처리
+  const handleAddActivity = async (itineraryId: number) => {
+    const activity = getActivityForItinerary(itineraryId);
+    if (!activity.title.trim() || !activity.locationName.trim()) return;
+
+    setSubmittingItineraries((prev) => ({ ...prev, [itineraryId]: true }));
+    try {
+      const createRequest: ItineraryActivityCreateRequest = {
+        itineraryId,
+        title: activity.title.trim(),
+        description: activity.description.trim() || undefined,
+        locationName: activity.locationName.trim(),
+        cost: activity.cost.trim() || undefined,
+      };
+
+      const createdActivity = await create(createRequest);
+
+      // Plan state 업데이트
+      if (plan) {
+        const updatedPlan = { ...plan };
+        const targetItinerary = updatedPlan.itineraries.find(
+          (it) => it.id === createdActivity.itineraryId
+        );
+
+        if (targetItinerary) {
+          const newLocation: Location = {
+            id: createdActivity.id,
+            title: createdActivity.title,
+            description: createdActivity.description || "",
+            locationName: createdActivity.locationName || "",
+            cost: createdActivity.cost,
+            orderIndex: createdActivity.orderIndex,
+          };
+
+          targetItinerary.activities.push(newLocation);
+          setPlan(updatedPlan);
+
+          // 낙관적 업데이트도 업데이트
+          const currentOptimisticActivities =
+            getOptimisticActivities(createdActivity.itineraryId) || [];
+          const newOptimisticActivity = locationToItineraryActivity(
+            newLocation,
+            createdActivity.itineraryId
+          );
+          setOptimisticActivities(createdActivity.itineraryId, [
+            ...currentOptimisticActivities,
+            newOptimisticActivity,
+          ]);
+        }
+      }
+
+      handleCancelAddActivity(itineraryId);
+    } catch (error) {
+      console.error("액티비티 추가 실패:", error);
+      alert("액티비티 추가에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setSubmittingItineraries((prev) => ({ ...prev, [itineraryId]: false }));
+    }
   };
 
   // 드래그 시작 핸들러
@@ -397,6 +517,99 @@ const TravelPlanDetailPage = () => {
                         onPlaceClick={handlePlaceClick}
                       />
                     ))}
+                    {user && plan.userId === user.id && (
+                      <div className={styles.addActivityCard}>
+                        <div className={styles.activityNumber}>+</div>
+                        <div className={styles.addActivityForm}>
+                          <div className={styles.inputRow}>
+                            <input
+                              type="text"
+                              placeholder="제목 *"
+                              value={
+                                getActivityForItinerary(itinerary.id).title
+                              }
+                              onChange={(e) =>
+                                updateActivityForItinerary(itinerary.id, {
+                                  title: e.target.value,
+                                })
+                              }
+                              className={styles.titleInput}
+                            />
+                            <input
+                              type="text"
+                              placeholder="장소명 * (구글맵 검색 가능한 정확한 이름)"
+                              value={
+                                getActivityForItinerary(itinerary.id)
+                                  .locationName
+                              }
+                              onChange={(e) =>
+                                updateActivityForItinerary(itinerary.id, {
+                                  locationName: e.target.value,
+                                })
+                              }
+                              className={styles.locationInput}
+                            />
+                          </div>
+                          <div className={styles.inputRow}>
+                            <textarea
+                              placeholder="설명"
+                              value={
+                                getActivityForItinerary(itinerary.id)
+                                  .description
+                              }
+                              onChange={(e) =>
+                                updateActivityForItinerary(itinerary.id, {
+                                  description: e.target.value,
+                                })
+                              }
+                              className={styles.descriptionInput}
+                              rows={2}
+                            />
+                            <input
+                              type="text"
+                              placeholder="예상 비용 (예: 15,000원)"
+                              value={getActivityForItinerary(itinerary.id).cost}
+                              onChange={(e) =>
+                                updateActivityForItinerary(itinerary.id, {
+                                  cost: e.target.value,
+                                })
+                              }
+                              className={styles.costInput}
+                            />
+                          </div>
+                          <div className={styles.formActions}>
+                            <button
+                              className={styles.cancelButton}
+                              onClick={() =>
+                                handleCancelAddActivity(itinerary.id)
+                              }
+                              type="button"
+                              disabled={submittingItineraries[itinerary.id]}
+                            >
+                              취소
+                            </button>
+                            <button
+                              className={styles.submitButton}
+                              onClick={() => handleAddActivity(itinerary.id)}
+                              type="button"
+                              disabled={
+                                submittingItineraries[itinerary.id] ||
+                                !getActivityForItinerary(
+                                  itinerary.id
+                                ).title.trim() ||
+                                !getActivityForItinerary(
+                                  itinerary.id
+                                ).locationName.trim()
+                              }
+                            >
+                              {submittingItineraries[itinerary.id]
+                                ? "추가 중..."
+                                : "추가하기"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </SortableContext>
                 </DndContext>
               </div>

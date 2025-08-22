@@ -302,6 +302,13 @@
   font-weight: 600;
   flex-shrink: 0;
   margin-top: 2px;
+
+  // 추가 카드의 + 아이콘 스타일
+  .addActivityCard & {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    font-size: 1.2rem;
+    font-weight: 300;
+  }
 }
 
 .activityContent {
@@ -592,5 +599,216 @@
   }
   100% {
     background-position: -200% 0;
+  }
+}
+
+// 액티비티 추가 카드 스타일
+.addActivityCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 12px;
+  border: 2px dashed #0ea5e9;
+  margin-top: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 120px;
+}
+
+.addActivityForm {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0; // 플렉스 아이템이 축소될 수 있도록
+}
+
+.inputRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.titleInput,
+.locationInput,
+.costInput {
+  flex: 1;
+  padding: 0.4rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  min-width: 0;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+    font-size: 0.75rem;
+  }
+}
+
+.titleInput {
+  flex: 1.2;
+}
+
+.locationInput {
+  flex: 1.8;
+}
+
+.costInput {
+  flex: 0.8;
+}
+
+.descriptionInput {
+  flex: 1;
+  padding: 0.4rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  resize: vertical;
+  font-family: inherit;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  min-height: 50px;
+  max-height: 70px;
+  width: 100%;
+  min-width: 0;
+
+  &:focus {
+    outline: none;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+    font-size: 0.75rem;
+  }
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+
+  .cancelButton,
+  .submitButton {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    white-space: nowrap;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  .cancelButton {
+    background: white;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+
+    &:hover:not(:disabled) {
+      background: #f9fafb;
+      border-color: #9ca3af;
+      color: #374151;
+    }
+  }
+
+  .submitButton {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.cancelButton {
+  background: white;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    color: #374151;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.submitButton {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
