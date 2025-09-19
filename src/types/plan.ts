@@ -54,11 +54,11 @@ export interface Itinerary {
   id: number;
   day?: number;
   date: string;
-  activities: Location[];
+  activities: Activity[];
   location: string;
 }
 
-export interface Location {
+export interface Activity {
   id: number;
   title: string;
   description: string;

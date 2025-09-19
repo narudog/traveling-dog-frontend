@@ -9,6 +9,7 @@ export interface ItineraryActivityDTO {
   locationName?: string;
   cost?: string;
   orderIndex: number;
+  notes?: string;
 }
 
 export interface ItineraryActivityCreateRequest {

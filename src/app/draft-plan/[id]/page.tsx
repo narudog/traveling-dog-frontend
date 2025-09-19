@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./page.module.scss";
-import { Itinerary, Location, TravelPlan } from "@/types/plan";
+import { Itinerary, Activity, TravelPlan } from "@/types/plan";
 import { useAuthStore } from "@/store/auth";
 import Carousel from "@/components/carousel/Carousel";
 import { PlaceWithRating } from "@/types/plan";
@@ -30,7 +30,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { useDraftPlanStore } from "@/store/draftPlan";
 
 // 평점 정보를 포함한 액티비티 타입
-interface ActivityWithRating extends Location {
+interface ActivityWithRating extends Activity {
   rating?: number;
   totalRatings?: number;
   photos?: any;
@@ -39,26 +39,29 @@ interface ActivityWithRating extends Location {
 
 // 타입 변환 유틸리티 함수들
 const locationToItineraryActivity = (
-  location: Location,
+  location: Activity,
   itineraryId: number
 ): ItineraryActivityDTO => ({
   id: location.id,
   itineraryId,
   title: location.title,
   description: location.description,
+  cost: location.cost || undefined,
   locationName: location.locationName,
   orderIndex: location.orderIndex,
+  notes: location.notes || undefined,
 });
 
 const itineraryActivityToLocation = (
   activity: ItineraryActivityDTO
-): Location => ({
+): Activity => ({
   id: activity.id,
   title: activity.title,
   description: activity.description || "",
   locationName: activity.locationName || "",
-  cost: undefined, // ItineraryActivityDTO에는 cost가 없음
+  cost: activity.cost || undefined, // ItineraryActivityDTO에는 cost가 없음
   orderIndex: activity.orderIndex,
+  notes: activity.notes || undefined,
 });
 
 const TravelPlanDetailPage = () => {
@@ -96,6 +99,21 @@ const TravelPlanDetailPage = () => {
     getOptimisticActivities,
     moveToPositionOptimistic,
   } = useItineraryStore();
+
+  // day가 모두 존재하면 day 기준, 아니면 date 기준 정렬
+  const sortedItineraries = useMemo(() => {
+    if (!draftPlan) return [] as Itinerary[];
+    const arr = [...draftPlan.itineraries];
+    const canSortByDay = arr.every((it) => typeof it.day === "number");
+    if (canSortByDay) {
+      arr.sort((a, b) => (a.day as number) - (b.day as number));
+    } else {
+      arr.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+    }
+    return arr;
+  }, [draftPlan]);
 
   // DnD 센서 설정 (Carousel과의 충돌 방지)
   const sensors = useSensors(
@@ -156,7 +174,7 @@ const TravelPlanDetailPage = () => {
   }, [isAuthenticated, id, router, saveDraftPlan, draftPlan]);
 
   // 장소 클릭 처리 함수
-  const handlePlaceClick = (activity: Location) => {
+  const handlePlaceClick = (activity: Activity) => {
     if (!draftPlan) return;
 
     // 구글 맵에서 장소 검색 (locationName + city 조합)
@@ -249,10 +267,12 @@ const TravelPlanDetailPage = () => {
 
   useEffect(() => {
     if (draftPlan) {
-      setSelectedItinerary(draftPlan.itineraries[0]);
+      if (sortedItineraries.length) {
+        setSelectedItinerary(sortedItineraries[0]);
+      }
 
       // 낙관적 업데이트를 위해 각 itinerary의 activities를 스토어에 설정
-      draftPlan.itineraries.forEach((itinerary) => {
+      sortedItineraries.forEach((itinerary) => {
         const sortedActivities = [...itinerary.activities]
           .sort((a, b) => a.orderIndex - b.orderIndex)
           .map((activity) =>
@@ -261,7 +281,7 @@ const TravelPlanDetailPage = () => {
         setOptimisticActivities(itinerary.id, sortedActivities);
       });
     }
-  }, [draftPlan, setOptimisticActivities]);
+  }, [draftPlan, setOptimisticActivities, sortedItineraries]);
 
   // 로그인 후 돌아왔을 때 자동 저장 처리
   useEffect(() => {
@@ -323,14 +343,20 @@ const TravelPlanDetailPage = () => {
           showArrows={true}
           disableDrag={isAnyDragging}
         >
-          {draftPlan.itineraries.map((itinerary) => (
+          {sortedItineraries.map((itinerary, idx) => (
             <div
               key={itinerary.id}
               className={`${styles.itineraryCard} ${selectedItinerary?.id === itinerary.id ? styles.itineraryCardActive : ""}`}
               onClick={() => onClickItinerary(itinerary)}
             >
               <div className={styles.itineraryHeader}>
-                <div className={styles.dayBadge}>DAY {itinerary.date}</div>
+                <div className={styles.dayBadge}>
+                  DAY{" "}
+                  {typeof itinerary.day === "number" ? itinerary.day : idx + 1}
+                </div>
+                <div className={styles.itineraryDate}>
+                  {format(new Date(itinerary.date), "yyyy.MM.dd")}
+                </div>
                 <h3 className={styles.itineraryLocation}>
                   {itinerary.location}
                 </h3>
@@ -366,6 +392,7 @@ const TravelPlanDetailPage = () => {
                         activity={itineraryActivityToLocation(activity)}
                         index={index}
                         onPlaceClick={handlePlaceClick}
+                        disableDrag
                       />
                     ))}
                   </SortableContext>

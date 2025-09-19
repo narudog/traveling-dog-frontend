@@ -1,18 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Location } from "@/types/plan";
-import styles from "../../app/travel-plan/[id]/page.module.scss";
+import { Activity } from "@/types/plan";
+import styles from "./DraggableActivity.module.scss";
 
 interface DraggableActivityProps {
-  activity: Location;
+  activity: Activity;
   index: number;
-  onPlaceClick: (activity: Location) => void;
-  onEditClick?: (activity: Location) => void;
-  onDeleteClick?: (activity: Location) => void;
+  onPlaceClick: (activity: Activity) => void;
+  onEditClick?: (activity: Activity) => void;
+  onDeleteClick?: (activity: Activity) => void;
   isEditable?: boolean;
+  disableDrag?: boolean;
 }
 
 const DraggableActivity: React.FC<DraggableActivityProps> = ({
@@ -22,6 +23,7 @@ const DraggableActivity: React.FC<DraggableActivityProps> = ({
   onEditClick,
   onDeleteClick,
   isEditable = false,
+  disableDrag = false,
 }) => {
   const {
     attributes,
@@ -30,13 +32,15 @@ const DraggableActivity: React.FC<DraggableActivityProps> = ({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: activity.id });
+  } = useSortable({ id: activity.id, disabled: disableDrag });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
+
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <div
@@ -132,21 +136,78 @@ const DraggableActivity: React.FC<DraggableActivityProps> = ({
           <div className={styles.activityTitle}>{activity.title}</div>
         </div>
         {activity.description && (
-          <div className={styles.activityDescription}>
+          <div
+            className={`${styles.activityDescription} ${expanded ? styles.expanded : ""}`}
+          >
             {activity.description}
           </div>
         )}
-        {activity.cost && (
-          <div className={styles.activityCost}>💰 {activity.cost}</div>
+        {(activity.cost || activity.notes) && (
+          <div className={styles.activityMeta}>
+            {activity.cost &&
+              (expanded ? (
+                <div className={styles.costBlock}>{activity.cost}</div>
+              ) : (
+                <span className={`${styles.metaItem} ${styles.costChip}`}>
+                  {activity.cost}
+                </span>
+              ))}
+            {activity.notes &&
+              (expanded ? (
+                <div className={styles.notesBlock}>{activity.notes}</div>
+              ) : (
+                <span
+                  className={`${styles.metaItem} ${styles.notesChip}`}
+                  title={activity.notes}
+                >
+                  {activity.notes}
+                </span>
+              ))}
+          </div>
+        )}
+
+        {(Boolean(activity.description && activity.description.length > 100) ||
+          Boolean(activity.notes && activity.notes.length > 60)) && (
+          <button
+            type="button"
+            className={styles.toggleButton}
+            data-expanded={expanded}
+            aria-expanded={expanded}
+            aria-label={expanded ? "접기" : "더보기"}
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded((v) => !v);
+            }}
+          >
+            <svg
+              className={styles.chevron}
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9l6 6 6-6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
         )}
       </div>
       <div
         className={styles.dragHandle}
-        {...listeners}
-        style={{ cursor: isDragging ? "grabbing" : "grab" }}
+        {...(disableDrag ? {} : (listeners as any))}
+        style={{
+          display: disableDrag ? "none" : "block",
+          cursor: disableDrag ? "default" : isDragging ? "grabbing" : "grab",
+        }}
         title="드래그하여 순서 변경"
         aria-label="드래그하여 순서를 변경"
-        aria-grabbed={isDragging}
+        aria-grabbed={disableDrag ? undefined : isDragging}
         role="button"
       >
         <svg

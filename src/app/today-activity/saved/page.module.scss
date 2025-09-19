@@ -292,7 +292,7 @@
   }
 }
 
-.activityCard {
+.todayActivityCard {
   background: white;
   border-radius: 20px;
   padding: 2rem;
@@ -323,7 +323,7 @@
   }
 }
 
-.activityHeader {
+.todayActivityHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -333,7 +333,7 @@
   }
 }
 
-.activityInfo {
+.todayActivityInfo {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -345,7 +345,7 @@
   flex-shrink: 0;
 }
 
-.activityName {
+.todayActivityName {
   font-size: 1.1rem;
   font-weight: 600;
   color: $text-color;
@@ -482,13 +482,13 @@
   .categoryTabs,
   .count,
   .empty,
-  .activityCard {
+  .todayActivityCard {
     background: #2d3748;
     border-color: rgba(135, 206, 250, 0.2);
   }
 
   .title,
-  .activityName,
+  .todayActivityName,
   .savedLocationInfo,
   .empty h3 {
     color: white;
@@ -510,7 +510,7 @@
     }
   }
 
-  .activityCard {
+  .todayActivityCard {
     background: #2d3748;
     border-color: rgba(135, 206, 250, 0.2);
 

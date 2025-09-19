@@ -256,6 +256,13 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
+.itineraryDate {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-top: -0.25rem;
+  margin-bottom: 0.5rem;
+}
+
 .dayBadge {
   display: inline-block;
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
@@ -386,6 +393,17 @@
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.activityNotes {
+  font-size: 0.8rem;
+  color: #475569;
+  line-height: 1.4;
+  background: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.25rem;
 }
 
 .activityCost {

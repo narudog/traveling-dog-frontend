@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./page.module.scss";
-import { Itinerary, Location, TravelPlan } from "@/types/plan";
+import { Itinerary, Activity, TravelPlan } from "@/types/plan";
 import { useAuthStore } from "@/store/auth";
 import Carousel from "@/components/carousel/Carousel";
 import { PlaceWithRating } from "@/types/plan";
@@ -30,7 +30,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { ItineraryActivityCreateRequest } from "@/store/itinerary";
 
 // 평점 정보를 포함한 액티비티 타입
-interface ActivityWithRating extends Location {
+interface ActivityWithRating extends Activity {
   rating?: number;
   totalRatings?: number;
   photos?: any;
@@ -39,7 +39,7 @@ interface ActivityWithRating extends Location {
 
 // 타입 변환 유틸리티 함수들
 const locationToItineraryActivity = (
-  location: Location,
+  location: Activity,
   itineraryId: number
 ): ItineraryActivityDTO => ({
   id: location.id,
@@ -53,7 +53,7 @@ const locationToItineraryActivity = (
 
 const itineraryActivityToLocation = (
   activity: ItineraryActivityDTO
-): Location => ({
+): Activity => ({
   id: activity.id,
   title: activity.title,
   description: activity.description || "",
@@ -199,7 +199,7 @@ const TravelPlanDetailPage = () => {
   };
 
   // 장소 클릭 처리 함수
-  const handlePlaceClick = (activity: Location) => {
+  const handlePlaceClick = (activity: Activity) => {
     if (!plan) return;
 
     // 구글 맵에서 장소 검색 (locationName + city 조합)
@@ -211,7 +211,7 @@ const TravelPlanDetailPage = () => {
   };
 
   // 액티비티 편집 모드 시작
-  const handleStartEditActivity = (activity: Location) => {
+  const handleStartEditActivity = (activity: Activity) => {
     if (!user || !plan || plan.userId !== user.id) return;
 
     setEditingActivityId(activity.id);
@@ -224,7 +224,7 @@ const TravelPlanDetailPage = () => {
   };
 
   // 액티비티 삭제 확인 모달 열기
-  const handleStartDeleteActivity = (activity: Location) => {
+  const handleStartDeleteActivity = (activity: Activity) => {
     if (!user || !plan || plan.userId !== user.id) return;
     setDeletingActivityId(activity.id);
   };
@@ -405,7 +405,7 @@ const TravelPlanDetailPage = () => {
         );
 
         if (targetItinerary) {
-          const newLocation: Location = {
+          const newActivity: Activity = {
             id: createdActivity.id,
             title: createdActivity.title,
             description: createdActivity.description || "",
@@ -414,14 +414,14 @@ const TravelPlanDetailPage = () => {
             orderIndex: createdActivity.orderIndex,
           };
 
-          targetItinerary.activities.push(newLocation);
+          targetItinerary.activities.push(newActivity);
           setPlan(updatedPlan);
 
           // 낙관적 업데이트도 업데이트
           const currentOptimisticActivities =
             getOptimisticActivities(createdActivity.itineraryId) || [];
           const newOptimisticActivity = locationToItineraryActivity(
-            newLocation,
+            newActivity,
             createdActivity.itineraryId
           );
           setOptimisticActivities(createdActivity.itineraryId, [
@@ -785,7 +785,7 @@ const TravelPlanDetailPage = () => {
                         );
                       }
 
-                      // 일반 모드
+                      // 일반 모드: 상세 페이지에서는 드래그 활성화
                       return (
                         <DraggableActivity
                           key={activity.id}
@@ -1000,10 +1000,7 @@ const TravelPlanDetailSkeleton = () => {
 
               <div className={styles.activitiesList}>
                 {[...Array(3)].map((_, actIndex) => (
-                  <div
-                    key={actIndex}
-                    className={`${styles.activityCard} ${styles.skeletonActivityCard}`}
-                  >
+                  <div key={actIndex} className={styles.skeletonActivityCard}>
                     <div className={styles.activityContent}>
                       <div
                         className={`${styles.activityTitle} ${styles.skeletonActivityTitle}`}

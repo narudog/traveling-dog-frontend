@@ -177,13 +177,13 @@ export default function SavedActivitiesPage() {
       ) : (
         <div className={styles.activitiesList}>
           {activities.map((savedActivity) => (
-            <div key={savedActivity.id} className={styles.activityCard}>
-              <div className={styles.activityHeader}>
-                <div className={styles.activityInfo}>
+            <div key={savedActivity.id} className={styles.todayActivityCard}>
+              <div className={styles.todayActivityHeader}>
+                <div className={styles.todayActivityInfo}>
                   <span className={styles.categoryIcon}>
                     {getCategoryIcon(savedActivity.category)}
                   </span>
-                  <h3 className={styles.activityName}>
+                  <h3 className={styles.todayActivityName}>
                     {savedActivity.locationName}
                   </h3>
                 </div>
