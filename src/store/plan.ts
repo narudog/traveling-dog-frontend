@@ -20,7 +20,6 @@ interface PlanState {
 
 // 액션 인터페이스
 interface PlanActions {
-  createPlan: (plan: TravelPlanCreateRequest) => Promise<TravelPlan>;
   saveDraftPlan: (plan: DraftTravelPlanSaveRequest) => Promise<TravelPlan>;
   getPlanList: () => Promise<void>;
   getPlanDetail: (planId: string) => Promise<TravelPlan>;
@@ -44,25 +43,6 @@ export const usePlanStore = create<PlanState & PlanActions>((set) => ({
   planList: [],
   isLoading: false,
   error: null,
-  createPlan: async (plan: TravelPlanCreateRequest) => {
-    set({ isLoading: true, error: null });
-    try {
-      // 헤더 정보는 세 번째 인자로 전달
-      const { data } = await axiosInstance.post("/travel/plan", plan);
-      // 성공 시 결과 저장
-      set({ plan: data, isLoading: false, error: null });
-      return data;
-    } catch (error: any) {
-      // 실패 시 에러 업데이트
-      set((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: error?.message || "플랜 생성 실패",
-      }));
-      throw error;
-    }
-  },
-
   saveDraftPlan: async (plan: DraftTravelPlanSaveRequest) => {
     set({ isLoading: true, error: null });
     try {

@@ -41,9 +41,7 @@ const interestsOptions = [
 ];
 
 export default function SearchSection() {
-  const { createPlan } = usePlanStore();
-  const { createDraftPlan } = useDraftPlanStore();
-  const { user, loading: authLoading, isAuthenticated } = useAuthStore();
+  const { createDraftPlan, taskStatus } = useDraftPlanStore();
   const { searchHotelsDestination, searchHotels } = useBookingStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -250,7 +248,6 @@ export default function SearchSection() {
 
   // 실제 일정 생성 함수
   const executePlanCreation = async (data: SearchFormInputs) => {
-    const planList = JSON.parse(localStorage.getItem("planList") || "[]");
     console.log("일정 만들기:", data);
 
     // 선택된 호텔 정보도 함께 기록
@@ -260,31 +257,15 @@ export default function SearchSection() {
 
     try {
       setIsLoading(true);
-
-      if (isAuthenticated) {
-        const plan = await createPlan({
-          city: data.city,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          travelStyle: data.travelStyle,
-          interests: data.interests,
-          userSpecifiedAccommodations: selectedHotels,
-        });
-        // 여기에 일정 만들기 로직 구현
-        planList.push(plan);
-        localStorage.setItem("planList", JSON.stringify(planList));
-        router.push(`/travel-plan/${plan.id}`);
-      } else {
-        const draftPlan = await createDraftPlan({
-          city: data.city,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          travelStyle: data.travelStyle,
-          interests: data.interests,
-          userSpecifiedAccommodations: selectedHotels,
-        });
-        router.push(`/draft-plan/${draftPlan.id}`);
-      }
+      const status = await createDraftPlan({
+        city: data.city,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        travelStyle: data.travelStyle,
+        interests: data.interests,
+        userSpecifiedAccommodations: selectedHotels,
+      });
+      // 폴링 전환 이후에는 즉시 이동하지 않고, 상단 배지에서 진행 현황을 표시합니다.
     } catch (error) {
       console.error("일정 만들기 오류:", error);
     } finally {
@@ -297,17 +278,6 @@ export default function SearchSection() {
     if (!isStepValid) {
       return;
     }
-
-    // 인증 상태 확인
-    // if (!authLoading && !user) {
-    //   // 폼 데이터 저장
-    //   saveFormData(data);
-
-    //   // 로그인 페이지로 리다이렉트 (현재 경로를 callbackUrl로 전달)
-    //   const currentPath = window.location.pathname;
-    //   router.push(`/login?callbackUrl=${encodeURIComponent(currentPath)}`);
-    //   return;
-    // }
 
     // 인증된 사용자인 경우 바로 일정 생성
     await executePlanCreation(data);
@@ -501,7 +471,9 @@ export default function SearchSection() {
             <button
               type="submit"
               className={styles.searchButton}
-              disabled={!isValid || isLoading}
+              disabled={
+                !isValid || isLoading || taskStatus?.status === "PROCESSING"
+              }
             >
               {isLoading ? (
                 <span className={styles.spinner}></span>
