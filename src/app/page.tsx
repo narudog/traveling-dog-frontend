@@ -1,6 +1,7 @@
 import AppDownload from "@/components/landing/AppDownload";
 import HeroTabs from "@/components/landing/HeroTabs";
 import HomeFeed from "@/components/reviews/HomeFeed";
+import PreviewCarousel from "@/components/travelPlan/PreviewCarousel";
 import { FiCalendar, FiMap, FiStar } from "react-icons/fi";
 import styles from "./page.module.scss";
 
@@ -20,6 +21,16 @@ export default function Home() {
             {/* Hero Tabs */}
             <HeroTabs />
           </div>
+        </section>
+
+        {/* Preview Section */}
+        <section className={styles.previewSection}>
+          <PreviewCarousel />
+        </section>
+
+        {/* Review Feed Section */}
+        <section className={styles.popularPlans}>
+          <HomeFeed />
         </section>
 
         {/* How It Works Section */}
@@ -51,11 +62,6 @@ export default function Home() {
               <p>제안된 일정을 자유롭게 수정하세요</p>
             </div>
           </div>
-        </section>
-
-        {/* Review Feed Section */}
-        <section className={styles.popularPlans}>
-          <HomeFeed />
         </section>
 
         {/* App Download Section */}

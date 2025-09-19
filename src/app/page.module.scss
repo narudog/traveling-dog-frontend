@@ -114,6 +114,18 @@
 }
 
 /* 인기 여행 일정 섹션 */
+.previewSection {
+  padding: $desktop-padding;
+  background-color: #ffffff;
+
+  h2 {
+    text-align: center;
+    font-size: 2.25rem;
+    margin-bottom: 3rem;
+    color: $text-color;
+  }
+}
+
 .popularPlans {
   padding: $desktop-padding;
   background-color: #f9fafb;
@@ -172,6 +184,15 @@
       margin-bottom: 2.5rem;
     }
   }
+
+  .previewSection {
+    padding: $tablet-padding;
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 2.5rem;
+    }
+  }
 }
 
 /* 모바일 반응형 */
@@ -199,6 +220,15 @@
   }
 
   .popularPlans {
+    padding: $mobile-padding;
+
+    h2 {
+      font-size: 1.75rem;
+      margin-bottom: 2rem;
+    }
+  }
+
+  .previewSection {
     padding: $mobile-padding;
 
     h2 {

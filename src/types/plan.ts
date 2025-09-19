@@ -52,7 +52,8 @@ export interface SelectedHotelByDate {
 
 export interface Itinerary {
   id: number;
-  date: number;
+  day?: number;
+  date: string;
   activities: Location[];
   location: string;
 }
@@ -64,6 +65,7 @@ export interface Location {
   locationName: string;
   cost?: string;
   orderIndex: number;
+  notes?: string;
 }
 
 export enum PlanStatus {

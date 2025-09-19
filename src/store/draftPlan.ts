@@ -13,8 +13,10 @@ import {
 // 인터페이스 정의
 interface DraftPlanState {
   draftPlan: DraftTravelPlan | null;
+  draftPreview: DraftTravelPlan[];
   taskStatus: TaskStatus | null;
   isLoading: boolean;
+  isLoadingPreview: boolean;
   error: string | null;
   polling: boolean;
   pollingIntervalId?: number | null;
@@ -28,6 +30,7 @@ interface DraftPlanActions {
   initializeFromLocalStorage: () => void;
   clearTaskStatus: () => void;
   getDraftPlan: (id: string) => Promise<DraftTravelPlan>;
+  getDraftPreview: () => Promise<DraftTravelPlan[]>;
 }
 
 // 스토어 생성
@@ -35,8 +38,10 @@ export const useDraftPlanStore = create<DraftPlanState & DraftPlanActions>(
   (set, get) => ({
     // 초기 상태
     draftPlan: null,
+    draftPreview: [],
     taskStatus: null,
     isLoading: false,
+    isLoadingPreview: false,
     error: null,
     polling: false,
     pollingIntervalId: null,
@@ -111,6 +116,20 @@ export const useDraftPlanStore = create<DraftPlanState & DraftPlanActions>(
     clearTaskStatus: () => {
       localStorage.removeItem("taskStatus");
       set({ taskStatus: null });
+    },
+
+    getDraftPreview: async () => {
+      set({ isLoadingPreview: true, error: null });
+      try {
+        const { data } = await axiosInstance.get(`/trip/draft/preview`);
+        set({ draftPreview: data, error: null });
+        return data;
+      } catch (error: any) {
+        set({ error: error?.message });
+        throw error;
+      } finally {
+        set({ isLoadingPreview: false });
+      }
     },
     getDraftPlan: async (id: string) => {
       set({ isLoading: true, error: null });
