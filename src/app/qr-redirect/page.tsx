@@ -22,11 +22,23 @@ const QrRedirectInner = () => {
   const timerRef = useRef<number | null>(null);
 
   const taskId = useMemo(() => searchParams.get("taskId"), [searchParams]);
+  const savedPlanId = useMemo(
+    () => searchParams.get("savedPlanId"),
+    [searchParams]
+  );
+  const userId = useMemo(() => searchParams.get("userId"), [searchParams]);
 
   const schemeUrl = useMemo(() => {
-    if (!taskId) return "";
-    return `travelingdog://home?taskId=${encodeURIComponent(taskId)}`;
-  }, [taskId]);
+    if (taskId) {
+      return `travelingdog://home?taskId=${encodeURIComponent(taskId)}`;
+    }
+    if (savedPlanId) {
+      return userId
+        ? `travelingdog://trip-detail/${encodeURIComponent(savedPlanId)}`
+        : `travelingdog://draft-trip/${encodeURIComponent(savedPlanId)}`;
+    }
+    return "";
+  }, [taskId, savedPlanId, userId]);
 
   const isAndroid = useMemo(
     () =>
@@ -71,15 +83,17 @@ const QrRedirectInner = () => {
   }, [schemeUrl]);
 
   useEffect(() => {
-    if (!taskId) {
-      setError("유효하지 않은 접근입니다. taskId가 필요합니다.");
+    if (!taskId && !savedPlanId) {
+      setError(
+        "유효하지 않은 접근입니다. taskId 또는 savedPlanId가 필요합니다."
+      );
       return;
     }
     tryOpenApp();
     return () => {
       if (timerRef.current) window.clearTimeout(timerRef.current);
     };
-  }, [taskId, tryOpenApp]);
+  }, [taskId, savedPlanId, tryOpenApp]);
 
   const openStore = useCallback(() => {
     if (isAndroid) {

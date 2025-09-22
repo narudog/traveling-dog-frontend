@@ -35,11 +35,31 @@ const TaskStatusBadge = () => {
 
   // 모든 훅은 조건부 렌더 이전에 선언되어야 함
   const shareUrl = useMemo(() => {
-    if (!taskStatus?.taskId) return "";
+    if (!taskStatus) return "";
     if (typeof window === "undefined") return "";
     const origin = window.location.origin;
-    return `${origin}/qr-redirect?taskId=${encodeURIComponent(taskStatus.taskId)}`;
-  }, [taskStatus?.taskId]);
+
+    if (taskStatus.status === "PROCESSING") {
+      if (!taskStatus.taskId) return "";
+      return `${origin}/qr-redirect?taskId=${encodeURIComponent(taskStatus.taskId)}`;
+    }
+
+    if (taskStatus.status === "COMPLETED") {
+      const savedPlanId = taskStatus.savedPlanId;
+      const userId = taskStatus.userId;
+      if (!savedPlanId) return "";
+      const params = new URLSearchParams({ savedPlanId: String(savedPlanId) });
+      if (userId) params.set("userId", String(userId));
+      return `${origin}/qr-redirect?${params.toString()}`;
+    }
+
+    return "";
+  }, [
+    taskStatus?.status,
+    taskStatus?.taskId,
+    taskStatus?.savedPlanId,
+    taskStatus?.userId,
+  ]);
 
   useEffect(() => {
     if (!isQrOpen) return;
@@ -72,6 +92,12 @@ const TaskStatusBadge = () => {
       : status === "COMPLETED"
         ? `${styles.fab} ${styles.completed}`
         : `${styles.fab} ${styles.failed}`;
+
+  const hasQr = useMemo(() => {
+    if (status === "PROCESSING") return Boolean(taskStatus.taskId);
+    if (status === "COMPLETED") return Boolean(taskStatus.savedPlanId);
+    return false;
+  }, [status, taskStatus?.taskId, taskStatus?.savedPlanId]);
 
   return (
     <div className={styles.floating}>
@@ -146,7 +172,7 @@ const TaskStatusBadge = () => {
             </svg>
           )}
         </div>
-        {taskStatus?.taskId && (
+        {hasQr && (
           <>
             <button
               className={styles.qrBtn}
