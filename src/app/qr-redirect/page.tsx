@@ -18,7 +18,7 @@ const QrRedirectPage = () => {
 
   const schemeUrl = useMemo(() => {
     if (!taskId) return "";
-    return `travelingdog://task?taskId=${encodeURIComponent(taskId)}`;
+    return `travelingdog://home?taskId=${encodeURIComponent(taskId)}`;
   }, [taskId]);
 
   const isAndroid = useMemo(
