@@ -18,6 +18,14 @@
     flex-direction: column;
     gap: $spacing-medium;
 
+    &.disabled {
+      pointer-events: none;
+      user-select: none;
+      opacity: 0.85;
+      filter: grayscale(10%);
+      position: relative;
+    }
+
     .formStep {
       display: none;
       &.active {

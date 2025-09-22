@@ -283,134 +283,138 @@ export default function SearchSection() {
     await executePlanCreation(data);
   };
 
+  const isBusy = isLoading || taskStatus?.status === "PROCESSING";
+
   return (
     <div className={styles.searchSection}>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className={styles.searchBox}
+        className={`${styles.searchBox} ${isBusy ? styles.disabled : ""}`}
         data-testid="search-box"
+        aria-disabled={isBusy}
       >
-        {/* 진행 표시기 */}
-        <div className={styles.stepsIndicator}>
-          {[...Array(totalSteps)].map((_, index) => (
-            <div
-              key={index}
-              className={`${styles.step} ${currentStep > index + 1 ? styles.completed : currentStep === index + 1 ? styles.active : ""}`}
-            >
-              {currentStep <= index + 1 && index + 1}
-            </div>
-          ))}
-        </div>
-
-        {/* 단계 1: 목적지 */}
-        <div
-          className={`${styles.formStep} ${currentStep === 1 ? styles.active : ""}`}
-        >
-          <div className={styles.inputGroup}>
-            <label htmlFor="city">여행 목적지</label>
-            <input
-              id="city"
-              type="text"
-              placeholder="여행 도시(예: 서울, 파리)"
-              className={`${styles.textInput} ${errors.city ? styles.inputError : ""}`}
-              {...register("city", { required: true })}
-            />
-            <div className={styles.inputHint}>
-              떠나고 싶은 도시를 입력하세요
-            </div>
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="startDate">여행 시작일</label>
-            <input
-              id="startDate"
-              type="date"
-              className={`${styles.dateInput} ${errors.startDate ? styles.inputError : ""}`}
-              min={new Date().toISOString().split("T")[0]}
-              {...register("startDate", {
-                required: true,
-                onChange: handleStartDateChange,
-              })}
-              onFocus={(e) => {
-                e.target.showPicker && e.target.showPicker();
-              }}
-            />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label htmlFor="endDate">여행 종료일</label>
-            <input
-              id="endDate"
-              type="date"
-              className={`${styles.dateInput} ${errors.endDate ? styles.inputError : ""}`}
-              min={startDate || new Date().toISOString().split("T")[0]}
-              max={
-                startDate
-                  ? new Date(
-                      new Date(startDate).getTime() + 7 * 24 * 60 * 60 * 1000
-                    )
-                      .toISOString()
-                      .split("T")[0]
-                  : undefined
-              }
-              disabled={!startDate}
-              {...register("endDate", { required: true })}
-              onFocus={(e) => {
-                e.target.showPicker && e.target.showPicker();
-              }}
-            />
-            <div className={styles.inputHint}>
-              최대 7일까지 일정을 만들 수 있어요
-            </div>
-          </div>
-        </div>
-
-        {/* 단계 2: 여행 스타일 */}
-        <div
-          className={`${styles.formStep} ${currentStep === 2 ? styles.active : ""}`}
-        >
-          <div className={styles.inputGroup}>
-            <RenderTagGroup
-              options={travelStyleOptions}
-              field="travelStyle"
-              selectedValues={selectedTravelStyles}
-              errorState={!!errors.travelStyle}
-              handleTagSelect={handleTagSelect}
-            />
-            {errors.travelStyle && (
-              <div className={styles.errorMessage}>
-                {errors.travelStyle.message}
+        <fieldset disabled={isBusy} aria-busy={isBusy}>
+          {/* 진행 표시기 */}
+          <div className={styles.stepsIndicator}>
+            {[...Array(totalSteps)].map((_, index) => (
+              <div
+                key={index}
+                className={`${styles.step} ${currentStep > index + 1 ? styles.completed : currentStep === index + 1 ? styles.active : ""}`}
+              >
+                {currentStep <= index + 1 && index + 1}
               </div>
-            )}
-            <div className={styles.inputHint}>
-              원하는 여행 스타일을 모두 선택해주세요
-            </div>
+            ))}
           </div>
 
-          <div className={styles.inputGroup}>
-            <RenderTagGroup
-              options={interestsOptions}
-              field="interests"
-              selectedValues={selectedInterests}
-              errorState={!!errors.interests}
-              handleTagSelect={handleTagSelect}
-            />
-            {errors.interests && (
-              <div className={styles.errorMessage}>
-                {errors.interests.message}
+          {/* 단계 1: 목적지 */}
+          <div
+            className={`${styles.formStep} ${currentStep === 1 ? styles.active : ""}`}
+          >
+            <div className={styles.inputGroup}>
+              <label htmlFor="city">여행 목적지</label>
+              <input
+                id="city"
+                type="text"
+                placeholder="여행 도시(예: 서울, 파리)"
+                className={`${styles.textInput} ${errors.city ? styles.inputError : ""}`}
+                {...register("city", { required: true })}
+              />
+              <div className={styles.inputHint}>
+                떠나고 싶은 도시를 입력하세요
               </div>
-            )}
-            <div className={styles.inputHint}>
-              관심 있는 활동을 모두 선택해주세요
+            </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="startDate">여행 시작일</label>
+              <input
+                id="startDate"
+                type="date"
+                className={`${styles.dateInput} ${errors.startDate ? styles.inputError : ""}`}
+                min={new Date().toISOString().split("T")[0]}
+                {...register("startDate", {
+                  required: true,
+                  onChange: handleStartDateChange,
+                })}
+                onFocus={(e) => {
+                  e.target.showPicker && e.target.showPicker();
+                }}
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label htmlFor="endDate">여행 종료일</label>
+              <input
+                id="endDate"
+                type="date"
+                className={`${styles.dateInput} ${errors.endDate ? styles.inputError : ""}`}
+                min={startDate || new Date().toISOString().split("T")[0]}
+                max={
+                  startDate
+                    ? new Date(
+                        new Date(startDate).getTime() + 7 * 24 * 60 * 60 * 1000
+                      )
+                        .toISOString()
+                        .split("T")[0]
+                    : undefined
+                }
+                disabled={!startDate}
+                {...register("endDate", { required: true })}
+                onFocus={(e) => {
+                  e.target.showPicker && e.target.showPicker();
+                }}
+              />
+              <div className={styles.inputHint}>
+                최대 7일까지 일정을 만들 수 있어요
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* 단계 3: 선호사항 */}
-        {/* <div
+          {/* 단계 2: 여행 스타일 */}
+          <div
+            className={`${styles.formStep} ${currentStep === 2 ? styles.active : ""}`}
+          >
+            <div className={styles.inputGroup}>
+              <RenderTagGroup
+                options={travelStyleOptions}
+                field="travelStyle"
+                selectedValues={selectedTravelStyles}
+                errorState={!!errors.travelStyle}
+                handleTagSelect={handleTagSelect}
+              />
+              {errors.travelStyle && (
+                <div className={styles.errorMessage}>
+                  {errors.travelStyle.message}
+                </div>
+              )}
+              <div className={styles.inputHint}>
+                원하는 여행 스타일을 모두 선택해주세요
+              </div>
+            </div>
+
+            <div className={styles.inputGroup}>
+              <RenderTagGroup
+                options={interestsOptions}
+                field="interests"
+                selectedValues={selectedInterests}
+                errorState={!!errors.interests}
+                handleTagSelect={handleTagSelect}
+              />
+              {errors.interests && (
+                <div className={styles.errorMessage}>
+                  {errors.interests.message}
+                </div>
+              )}
+              <div className={styles.inputHint}>
+                관심 있는 활동을 모두 선택해주세요
+              </div>
+            </div>
+          </div>
+
+          {/* 단계 3: 선호사항 */}
+          {/* <div
           className={`${styles.formStep} ${currentStep === 3 ? styles.active : ""}`}
         > */}
-        {/* 숙소 선택 섹션 */}
-        {/* <div className={styles.accommodationSelectorContainer}>
+          {/* 숙소 선택 섹션 */}
+          {/* <div className={styles.accommodationSelectorContainer}>
             <button
               type="button"
               className={styles.toggleButton}
@@ -446,43 +450,44 @@ export default function SearchSection() {
           </div>
         </div> */}
 
-        {/* 단계별 버튼 */}
-        <div className={styles.buttonContainer}>
-          {currentStep > 1 && (
-            <button
-              type="button"
-              className={styles.prevButton}
-              onClick={prevStep}
-            >
-              이전
-            </button>
-          )}
+          {/* 단계별 버튼 */}
+          <div className={styles.buttonContainer}>
+            {currentStep > 1 && (
+              <button
+                type="button"
+                className={styles.prevButton}
+                onClick={prevStep}
+              >
+                이전
+              </button>
+            )}
 
-          {currentStep < totalSteps && (
-            <button
-              type="button"
-              className={styles.nextButton}
-              onClick={nextStep}
-            >
-              다음
-            </button>
-          )}
-          {currentStep === totalSteps && (
-            <button
-              type="submit"
-              className={styles.searchButton}
-              disabled={
-                !isValid || isLoading || taskStatus?.status === "PROCESSING"
-              }
-            >
-              {isLoading ? (
-                <span className={styles.spinner}></span>
-              ) : (
-                "일정 만들기"
-              )}
-            </button>
-          )}
-        </div>
+            {currentStep < totalSteps && (
+              <button
+                type="button"
+                className={styles.nextButton}
+                onClick={nextStep}
+              >
+                다음
+              </button>
+            )}
+            {currentStep === totalSteps && (
+              <button
+                type="submit"
+                className={styles.searchButton}
+                disabled={
+                  !isValid || isLoading || taskStatus?.status === "PROCESSING"
+                }
+              >
+                {isLoading ? (
+                  <span className={styles.spinner}></span>
+                ) : (
+                  "일정 만들기"
+                )}
+              </button>
+            )}
+          </div>
+        </fieldset>
       </form>
     </div>
   );
