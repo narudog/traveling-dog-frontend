@@ -70,6 +70,7 @@ export default function SearchSection() {
     handleSubmit,
     watch,
     setValue,
+    reset,
     setError,
     clearErrors,
     formState: { errors, isValid },
@@ -265,7 +266,11 @@ export default function SearchSection() {
         interests: data.interests,
         userSpecifiedAccommodations: selectedHotels,
       });
-      // 폴링 전환 이후에는 즉시 이동하지 않고, 상단 배지에서 진행 현황을 표시합니다.
+      // 성공적으로 반환되면 폼 초기화
+      reset();
+      setSelectedTravelStyles([]);
+      setSelectedInterests([]);
+      // 폴링 전환 이후에는 즉시 이동하지 않고, 배지에서 진행 현황을 표시합니다.
     } catch (error) {
       console.error("일정 만들기 오류:", error);
     } finally {
