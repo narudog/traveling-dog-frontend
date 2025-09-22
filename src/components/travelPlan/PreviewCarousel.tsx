@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 export default function PreviewCarousel() {
   const router = useRouter();
-  const { draftPreview, isLoadingPreview, error, getDraftPreview } =
+  const { draftPreview, isLoadingPreview, previewError, getDraftPreview } =
     useDraftPlanStore();
 
   const [slidesToShow, setSlidesToShow] = useState<number>(3);
@@ -55,7 +55,7 @@ export default function PreviewCarousel() {
     );
   }
 
-  if (error) {
+  if (previewError) {
     return <div className={styles.error}>미리보기를 불러오지 못했어요.</div>;
   }
 

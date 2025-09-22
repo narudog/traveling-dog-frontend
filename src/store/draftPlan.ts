@@ -18,6 +18,7 @@ interface DraftPlanState {
   isLoading: boolean;
   isLoadingPreview: boolean;
   error: string | null;
+  previewError: string | null;
   polling: boolean;
   pollingIntervalId?: number | null;
 }
@@ -43,6 +44,7 @@ export const useDraftPlanStore = create<DraftPlanState & DraftPlanActions>(
     isLoading: false,
     isLoadingPreview: false,
     error: null,
+    previewError: null,
     polling: false,
     pollingIntervalId: null,
 
@@ -119,13 +121,13 @@ export const useDraftPlanStore = create<DraftPlanState & DraftPlanActions>(
     },
 
     getDraftPreview: async () => {
-      set({ isLoadingPreview: true, error: null });
+      set({ isLoadingPreview: true, previewError: null });
       try {
         const { data } = await axiosInstance.get(`/trip/draft/preview`);
-        set({ draftPreview: data, error: null });
+        set({ draftPreview: data, previewError: null });
         return data;
       } catch (error: any) {
-        set({ error: error?.message });
+        set({ previewError: error?.message });
         throw error;
       } finally {
         set({ isLoadingPreview: false });
