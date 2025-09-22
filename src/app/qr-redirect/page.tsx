@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useSearchParams } from "next/navigation";
 
 const ANDROID_STORE_URL =
@@ -8,7 +15,7 @@ const ANDROID_STORE_URL =
 // iOS 스토어 URL이 확정되면 아래 상수를 채워주세요.
 const IOS_STORE_URL = ""; // e.g. https://apps.apple.com/app/idXXXXXXXXX
 
-const QrRedirectPage = () => {
+const QrRedirectInner = () => {
   const searchParams = useSearchParams();
   const [fallbackReady, setFallbackReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -165,4 +172,28 @@ const QrRedirectPage = () => {
   );
 };
 
-export default QrRedirectPage;
+export default function QrRedirectPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+            flexDirection: "column",
+            gap: 12,
+            padding: 16,
+            textAlign: "center",
+          }}
+        >
+          <h1 style={{ marginBottom: 8 }}>앱을 여는 중...</h1>
+          <p style={{ color: "#6b7280" }}>잠시만 기다려주세요.</p>
+        </div>
+      }
+    >
+      <QrRedirectInner />
+    </Suspense>
+  );
+}
