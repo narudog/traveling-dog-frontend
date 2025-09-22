@@ -93,11 +93,9 @@ const TaskStatusBadge = () => {
         ? `${styles.fab} ${styles.completed}`
         : `${styles.fab} ${styles.failed}`;
 
-  const hasQr = useMemo(() => {
-    if (status === "PROCESSING") return Boolean(taskStatus.taskId);
-    if (status === "COMPLETED") return Boolean(taskStatus.savedPlanId);
-    return false;
-  }, [status, taskStatus?.taskId, taskStatus?.savedPlanId]);
+  const hasQr =
+    (status === "PROCESSING" && Boolean(taskStatus.taskId)) ||
+    (status === "COMPLETED" && Boolean(taskStatus.savedPlanId));
 
   return (
     <div className={styles.floating}>
