@@ -4,6 +4,7 @@ import HomeFeed from "@/components/reviews/HomeFeed";
 import PreviewCarousel from "@/components/travelPlan/PreviewCarousel";
 import { FiCalendar, FiMap, FiStar } from "react-icons/fi";
 import styles from "./page.module.scss";
+import { Suspense } from "react";
 
 export default function Home() {
   return (
@@ -19,7 +20,9 @@ export default function Home() {
             </p>
 
             {/* Hero Tabs */}
-            <HeroTabs />
+            <Suspense fallback={null}>
+              <HeroTabs />
+            </Suspense>
           </div>
         </section>
 

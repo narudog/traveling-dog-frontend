@@ -17,6 +17,7 @@ export default function HeroTabs() {
       setActive(tab);
     }
   }, [searchParams]);
+
   return (
     <div className={styles.tabs}>
       <div className={styles.tabHeaders}>
