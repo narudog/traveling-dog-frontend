@@ -9,16 +9,19 @@ import { useEffect } from "react";
 import UnauthenticatedButtons from "./UnauthenticatedButtons";
 import HeaderQR from "./HeaderQR";
 import { useDraftPlanStore } from "@/store/draftPlan";
+import { useTodayActivityStore } from "@/store/todayActivity";
 const Header = () => {
   const { user, getUserProfile, loading } = useAuthStore();
-  const { initializeFromLocalStorage } = useDraftPlanStore();
+  const { initializePlanPollingFromLocalStorage } = useDraftPlanStore();
+  const { initializeActivityPollingFromLocalStorage } = useTodayActivityStore();
 
   useEffect(() => {
     if (!user) {
       getUserProfile();
     }
     // 드래프트 생성 진행 상태 복원
-    initializeFromLocalStorage();
+    initializePlanPollingFromLocalStorage();
+    initializeActivityPollingFromLocalStorage();
   }, []);
 
   return (

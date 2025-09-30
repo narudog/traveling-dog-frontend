@@ -3,13 +3,12 @@
 import { useState } from "react";
 import styles from "./TodayActivityPanel.module.scss";
 import { useTodayActivityStore } from "@/store/todayActivity";
-import type { TodayActivityResponseDTO } from "@/types/todayActivity";
 
 export default function TodayActivityPanel() {
-  const { recommend, loading, save } = useTodayActivityStore();
+  const { recommend, isLoading, save, result, taskStatus } =
+    useTodayActivityStore();
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState<string | undefined>(undefined);
-  const [result, setResult] = useState<TodayActivityResponseDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [savingStates, setSavingStates] = useState<{ [key: string]: boolean }>(
     {}
@@ -18,10 +17,8 @@ export default function TodayActivityPanel() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setResult(null);
     try {
-      const res = await recommend({ location, category });
-      setResult(res);
+      await recommend({ location, category });
     } catch (err: any) {
       setError(err?.message || "추천 실패");
     }
@@ -57,33 +54,42 @@ export default function TodayActivityPanel() {
     }
   };
 
+  const isBusy = isLoading || taskStatus?.status === "PROCESSING";
+
   return (
     <div>
-      <form className={styles.form} onSubmit={onSubmit}>
-        <div className={styles.row}>
-          <input
-            className={styles.input}
-            placeholder="도시(예: 서울, 부산, 제주)"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            required
-          />
-          <select
-            className={styles.select}
-            value={category ?? ""}
-            onChange={(e) => setCategory(e.target.value || undefined)}
-          >
-            <option value="">카테고리(선택)</option>
-            <option value="맛집">맛집</option>
-            <option value="명소">명소</option>
-            <option value="카페">카페</option>
-            <option value="자연">자연</option>
-            <option value="체험">체험</option>
-          </select>
-        </div>
-        <button className={styles.submit} disabled={loading}>
-          {loading ? "추천 중..." : "추천 받기"}
-        </button>
+      <form
+        className={`${isBusy ? styles.disabled : ""}`}
+        onSubmit={onSubmit}
+        data-testid="today-activity-form"
+        aria-disabled={isBusy}
+      >
+        <fieldset className={styles.form} disabled={isBusy} aria-busy={isBusy}>
+          <div className={styles.row}>
+            <input
+              className={styles.input}
+              placeholder="도시(예: 서울, 부산, 제주)"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              required
+            />
+            <select
+              className={styles.select}
+              value={category ?? ""}
+              onChange={(e) => setCategory(e.target.value || undefined)}
+            >
+              <option value="">카테고리(선택)</option>
+              <option value="맛집">맛집</option>
+              <option value="명소">명소</option>
+              <option value="카페">카페</option>
+              <option value="자연">자연</option>
+              <option value="체험">체험</option>
+            </select>
+          </div>
+          <button className={styles.submit}>
+            {isLoading ? "추천 중..." : "추천 받기"}
+          </button>
+        </fieldset>
       </form>
 
       {error && <div className={styles.state}>오류: {error}</div>}

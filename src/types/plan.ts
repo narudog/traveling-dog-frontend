@@ -110,7 +110,7 @@ export interface TravelPlanSearchResponse {
   totalPages: number;
 }
 
-export interface TaskStatus {
+export interface PlanTaskStatus {
   taskId: string;
   status: "PROCESSING" | "COMPLETED" | "FAILED";
   error?: string;

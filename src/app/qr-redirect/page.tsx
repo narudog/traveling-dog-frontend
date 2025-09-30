@@ -22,6 +22,7 @@ const QrRedirectInner = () => {
   const timerRef = useRef<number | null>(null);
 
   const taskId = useMemo(() => searchParams.get("taskId"), [searchParams]);
+  const type = useMemo(() => searchParams.get("type"), [searchParams]);
   const savedPlanId = useMemo(
     () => searchParams.get("savedPlanId"),
     [searchParams]
@@ -29,16 +30,16 @@ const QrRedirectInner = () => {
   const userId = useMemo(() => searchParams.get("userId"), [searchParams]);
 
   const schemeUrl = useMemo(() => {
-    if (taskId) {
-      return `travelingdog://home?taskId=${encodeURIComponent(taskId)}`;
-    }
     if (savedPlanId) {
       return userId
         ? `travelingdog://trip-detail/${encodeURIComponent(savedPlanId)}`
         : `travelingdog://draft-trip/${encodeURIComponent(savedPlanId)}`;
     }
+    if (taskId && type) {
+      return `travelingdog://home?taskId=${encodeURIComponent(taskId)}&type=${encodeURIComponent(type)}`;
+    }
     return "";
-  }, [taskId, savedPlanId, userId]);
+  }, [taskId, type, savedPlanId, userId]);
 
   const isAndroid = useMemo(
     () =>

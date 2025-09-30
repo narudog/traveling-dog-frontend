@@ -1,7 +1,14 @@
-.floating {
+.planFloating {
   position: fixed;
   right: 5%;
   bottom: 13%;
+  z-index: 1000;
+}
+
+.activityFloating {
+  position: fixed;
+  right: 5%;
+  bottom: 20%;
   z-index: 1000;
 }
 
@@ -9,7 +16,7 @@
   position: relative;
 }
 
-.fab {
+.planFab {
   width: 56px;
   height: 56px;
   border-radius: 9999px;
@@ -22,23 +29,40 @@
     transform 0.15s ease,
     box-shadow 0.15s ease;
   cursor: pointer;
+
+  &.processing,
+  &.completed {
+    background: #22c55e; /* green-500 */
+    color: #ffffff;
+    border-color: rgba(34, 197, 94, 0.85);
+  }
+}
+
+.activityFab {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  cursor: pointer;
+
+  &.processing,
+  &.completed {
+    background: #6366f1; /* indigo-500 */
+    color: #ffffff;
+    border-color: rgba(99, 102, 241, 0.85);
+  }
 }
 
 .fab:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
-}
-
-.processing {
-  background: #0ea5e9; /* sky-500 */
-  color: #ffffff;
-  border-color: rgba(14, 165, 233, 0.85);
-}
-
-.completed {
-  background: #22c55e; /* green-500 */
-  color: #ffffff;
-  border-color: rgba(34, 197, 94, 0.85);
 }
 
 .failed {
@@ -105,7 +129,7 @@
 
 .qrTooltip {
   position: absolute;
-  left: -8px;
+  right: 0px;
   top: -36px;
   background: rgba(17, 24, 39, 0.9);
   color: #ffffff;

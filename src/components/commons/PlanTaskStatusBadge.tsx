@@ -17,12 +17,12 @@ const TaskStatusBadge = () => {
     startPolling,
     stopPolling,
     clearTaskStatus,
-    initializeFromLocalStorage,
+    initializePlanPollingFromLocalStorage,
   } = useDraftPlanStore();
 
   useEffect(() => {
-    initializeFromLocalStorage();
-  }, [initializeFromLocalStorage]);
+    initializePlanPollingFromLocalStorage();
+  }, [initializePlanPollingFromLocalStorage]);
 
   useEffect(() => {
     if (taskStatus?.status === "PROCESSING" && !polling && taskStatus?.taskId) {
@@ -41,7 +41,7 @@ const TaskStatusBadge = () => {
 
     if (taskStatus.status === "PROCESSING") {
       if (!taskStatus.taskId) return "";
-      return `${origin}/qr-redirect?taskId=${encodeURIComponent(taskStatus.taskId)}`;
+      return `${origin}/qr-redirect?taskId=${encodeURIComponent(taskStatus.taskId)}&type=plan`;
     }
 
     if (taskStatus.status === "COMPLETED") {
@@ -50,7 +50,7 @@ const TaskStatusBadge = () => {
       if (!savedPlanId) return "";
       const params = new URLSearchParams({ savedPlanId: String(savedPlanId) });
       if (userId) params.set("userId", String(userId));
-      return `${origin}/qr-redirect?${params.toString()}`;
+      return `${origin}/qr-redirect?${params.toString()}&type=plan`;
     }
 
     return "";
@@ -86,31 +86,26 @@ const TaskStatusBadge = () => {
         ? `/travel-plan/${taskStatus.savedPlanId}`
         : `/draft-plan/${taskStatus.savedPlanId}`
       : undefined;
-  const className =
+  const fabClassName =
     status === "PROCESSING"
-      ? `${styles.fab} ${styles.processing}`
+      ? `${styles.planFab} ${styles.processing}`
       : status === "COMPLETED"
-        ? `${styles.fab} ${styles.completed}`
-        : `${styles.fab} ${styles.failed}`;
+        ? `${styles.planFab} ${styles.completed}`
+        : `${styles.planFab} ${styles.failed}`;
 
   const hasQr =
     (status === "PROCESSING" && Boolean(taskStatus.taskId)) ||
     (status === "COMPLETED" && Boolean(taskStatus.savedPlanId));
 
   return (
-    <div className={styles.floating}>
+    <div className={styles.planFloating}>
       <div className={styles.wrapper}>
         <div
-          className={className}
+          className={fabClassName}
           role={targetHref ? "button" : undefined}
           tabIndex={targetHref ? 0 : undefined}
           onClick={() => {
             if (targetHref) router.push(targetHref);
-          }}
-          onKeyDown={(e) => {
-            if ((e.key === "Enter" || e.key === " ") && targetHref) {
-              router.push(targetHref);
-            }
           }}
           aria-label={
             status === "PROCESSING"
@@ -184,7 +179,7 @@ const TaskStatusBadge = () => {
               QR
             </button>
             <span className={styles.qrTooltip} role="tooltip">
-              앱에서 이어하려면 QR을 열어 스캔하세요
+              QR을 스캔하면 앱에서 볼 수 있어요.
             </span>
           </>
         )}
@@ -220,7 +215,12 @@ const TaskStatusBadge = () => {
               style={{ display: "flex", justifyContent: "center", padding: 12 }}
             >
               {qrDataUrl ? (
-                <img src={qrDataUrl} alt="task QR" width={240} height={240} />
+                <img
+                  src={qrDataUrl}
+                  alt="plan task QR"
+                  width={240}
+                  height={240}
+                />
               ) : (
                 <span className={styles.spinner} aria-label="로딩중" />
               )}

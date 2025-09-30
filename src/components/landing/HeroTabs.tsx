@@ -1,12 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchSection from "@/components/landing/SearchSection";
 import TodayActivityPanel from "@/components/landing/TodayActivityPanel";
 import styles from "./HeroTabs.module.scss";
+import { useSearchParams } from "next/navigation";
 
 export default function HeroTabs() {
-  const [active, setActive] = useState<"planner" | "today">("planner");
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") === "today" ? "today" : "planner";
+  const [active, setActive] = useState<"planner" | "today">(initialTab);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "today" || tab === "planner") {
+      setActive(tab);
+    }
+  }, [searchParams]);
   return (
     <div className={styles.tabs}>
       <div className={styles.tabHeaders}>

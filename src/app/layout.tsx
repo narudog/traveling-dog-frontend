@@ -9,7 +9,8 @@ import localFont from "next/font/local";
 import Header from "@/components/commons/Header";
 import SessionProvider from "@/components/providers/SessionProvider";
 import { siteConfig, absoluteUrl } from "@/lib/seo";
-import TaskStatusBadge from "@/components/commons/TaskStatusBadge";
+import PlanTaskStatusBadge from "@/components/commons/PlanTaskStatusBadge";
+import ActivityTaskStatusBadge from "@/components/commons/ActivityTaskStatusBadge";
 
 const pretendard = localFont({
   src: "../../public/fonts/PretendardVariable.woff2",
@@ -99,7 +100,8 @@ export default function RootLayout({
           <div className={styles.main}>
             <Header />
             <div className={styles.content}>{children}</div>
-            <TaskStatusBadge />
+            <PlanTaskStatusBadge />
+            <ActivityTaskStatusBadge />
           </div>
         </SessionProvider>
       </body>

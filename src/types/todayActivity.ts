@@ -24,3 +24,11 @@ export interface SavedActivityResponseDTO {
   createdAt: string;
   savedLocation?: string;
 }
+
+export interface ActivityTaskStatus {
+  taskId: string;
+  status: "PROCESSING" | "COMPLETED" | "FAILED";
+  error?: string;
+  activity?: TodayActivityResponseDTO;
+  createdAt: string;
+}

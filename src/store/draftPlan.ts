@@ -7,14 +7,14 @@ import {
   TravelPlanSearchRequest,
   TravelPlanSearchResponse,
   DraftTravelPlan,
-  TaskStatus,
+  PlanTaskStatus,
 } from "@/types/plan";
 
 // 인터페이스 정의
 interface DraftPlanState {
   draftPlan: DraftTravelPlan | null;
   draftPreview: DraftTravelPlan[];
-  taskStatus: TaskStatus | null;
+  taskStatus: PlanTaskStatus | null;
   isLoading: boolean;
   isLoadingPreview: boolean;
   error: string | null;
@@ -25,10 +25,10 @@ interface DraftPlanState {
 
 // 액션 인터페이스
 interface DraftPlanActions {
-  createDraftPlan: (plan: TravelPlanCreateRequest) => Promise<TaskStatus>;
+  createDraftPlan: (plan: TravelPlanCreateRequest) => Promise<PlanTaskStatus>;
   startPolling: (taskId: string, intervalMs?: number) => void;
   stopPolling: () => void;
-  initializeFromLocalStorage: () => void;
+  initializePlanPollingFromLocalStorage: () => void;
   clearTaskStatus: () => void;
   getDraftPlan: (id: string) => Promise<DraftTravelPlan>;
   getDraftPreview: () => Promise<DraftTravelPlan[]>;
@@ -59,7 +59,7 @@ export const useDraftPlanStore = create<DraftPlanState & DraftPlanActions>(
       set({ isLoading: true, error: null });
       try {
         const { data } = await axiosInstance.post("/trip/draft", plan);
-        localStorage.setItem("taskStatus", JSON.stringify(data));
+        localStorage.setItem("planTaskStatus", JSON.stringify(data));
         set({ taskStatus: data, isLoading: false, error: null });
         // PROCESSING 상태면 폴링 시작
         if (data?.status === "PROCESSING" && data?.taskId) {
@@ -80,7 +80,7 @@ export const useDraftPlanStore = create<DraftPlanState & DraftPlanActions>(
             const { data } = await axiosInstance.get(
               `/trip/draft/polling/status/${taskId}`
             );
-            localStorage.setItem("taskStatus", JSON.stringify(data));
+            localStorage.setItem("planTaskStatus", JSON.stringify(data));
             set({ taskStatus: data });
             if (data?.status !== "PROCESSING") {
               window.clearInterval(intervalId);
@@ -101,11 +101,11 @@ export const useDraftPlanStore = create<DraftPlanState & DraftPlanActions>(
         return { polling: false, pollingIntervalId: null };
       });
     },
-    initializeFromLocalStorage: () => {
+    initializePlanPollingFromLocalStorage: () => {
       try {
-        const raw = localStorage.getItem("taskStatus");
+        const raw = localStorage.getItem("planTaskStatus");
         if (!raw) return;
-        const parsed: TaskStatus = JSON.parse(raw);
+        const parsed: PlanTaskStatus = JSON.parse(raw);
         set({ taskStatus: parsed });
         if (parsed.status === "PROCESSING" && parsed.taskId) {
           // 앱 전역에서 폴링 재개
@@ -116,7 +116,7 @@ export const useDraftPlanStore = create<DraftPlanState & DraftPlanActions>(
       }
     },
     clearTaskStatus: () => {
-      localStorage.removeItem("taskStatus");
+      localStorage.removeItem("planTaskStatus");
       set({ taskStatus: null });
     },
 
