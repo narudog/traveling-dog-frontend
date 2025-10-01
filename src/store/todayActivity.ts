@@ -86,7 +86,7 @@ export const useTodayActivityStore = create<
             set({ polling: false, pollingIntervalId: null });
           }
           if (data.status === "COMPLETED") {
-            set({ result: data.activity });
+            set({ result: data.result });
           }
         } catch (e: any) {
           set({ error: e?.message });
@@ -114,7 +114,7 @@ export const useTodayActivityStore = create<
         get().startPolling(parsed.taskId);
       }
       if (parsed.status === "COMPLETED") {
-        set({ result: parsed.activity });
+        set({ result: parsed.result });
       }
     } catch (e: any) {
       set({ error: e?.message });

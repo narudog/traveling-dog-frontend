@@ -29,6 +29,6 @@ export interface ActivityTaskStatus {
   taskId: string;
   status: "PROCESSING" | "COMPLETED" | "FAILED";
   error?: string;
-  activity?: TodayActivityResponseDTO;
+  result?: TodayActivityResponseDTO;
   createdAt: string;
 }
